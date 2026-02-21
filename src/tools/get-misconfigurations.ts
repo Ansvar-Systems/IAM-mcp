@@ -42,16 +42,17 @@ export async function handler(
   db: { prepare(sql: string): { get(...params: unknown[]): unknown; all(...params: unknown[]): unknown[] } },
   params: GetMisconfigurationsInput,
 ): Promise<ToolResponse<FlatMisconfigurationEntry[]>> {
-  const effectiveLimit = Math.min(Math.max(params.limit ?? 50, 1), 200);
+  // Limit applies to the flattened output (each parent row expands to multiple misconfigs)
+  const effectiveLimit = Math.min(Math.max(params.limit ?? 200, 1), 500);
 
   let rows: RawVendorConfigRow[];
 
   if (params.vendor) {
-    const sql = "SELECT id, vendor, feature, category, common_misconfigurations FROM vendor_configurations WHERE vendor = ? AND common_misconfigurations != '[]'";
-    rows = db.prepare(sql).all(params.vendor) as RawVendorConfigRow[];
+    const sql = "SELECT id, vendor, feature, category, common_misconfigurations FROM vendor_configurations WHERE vendor = ? AND common_misconfigurations != '[]' LIMIT ?";
+    rows = db.prepare(sql).all(params.vendor, effectiveLimit) as RawVendorConfigRow[];
   } else {
-    const sql = "SELECT id, vendor, feature, category, common_misconfigurations FROM vendor_configurations WHERE common_misconfigurations != '[]' LIMIT ?";
-    rows = db.prepare(sql).all(effectiveLimit) as RawVendorConfigRow[];
+    const sql = "SELECT id, vendor, feature, category, common_misconfigurations FROM vendor_configurations WHERE common_misconfigurations != '[]'";
+    rows = db.prepare(sql).all() as RawVendorConfigRow[];
   }
 
   // Extract and flatten misconfigurations
@@ -78,7 +79,7 @@ export async function handler(
   }
 
   return {
-    results,
+    results: results.slice(0, effectiveLimit),
     _metadata: generateResponseMetadata(),
   };
 }
