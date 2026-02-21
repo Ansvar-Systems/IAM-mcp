@@ -1,0 +1,570 @@
+{
+  "vendor_configurations": [
+    {
+      "id": "aws-iam-policies",
+      "vendor": "aws-iam",
+      "feature": "IAM Policies (Identity, Resource, Permission Boundary, SCP)",
+      "category": "authorization",
+      "description": "AWS IAM policies are JSON documents that define permissions using the Effect-Action-Resource-Condition model. Four policy types exist: Identity-based policies (attached to users, groups, or roles), Resource-based policies (attached to resources like S3 buckets, SQS queues), Permission boundaries (maximum permissions an identity can have, regardless of identity policies), and Service Control Policies (organization-wide guardrails in AWS Organizations). Policy evaluation follows a deny-by-default model with explicit deny always winning. Understanding the policy evaluation logic (explicit deny > SCP boundary > permission boundary > session policy > identity policy > resource policy) is critical for correct authorization design.",
+      "best_practices": "1. Use AWS managed policies for common use cases but create customer-managed policies for least privilege. 2. Use permission boundaries to delegate role creation to developers without allowing privilege escalation. 3. Apply SCPs at the organizational level for account-wide guardrails (deny unused regions, restrict root). 4. Use IAM policy conditions (aws:SourceIp, aws:PrincipalTag, aws:RequestedRegion) for fine-grained control. 5. Analyze policies with IAM Access Analyzer before deployment to identify overly permissive statements. 6. Use resource-based policies for cross-account access instead of sharing long-term credentials. 7. Avoid wildcard resources ('*') in identity policies; scope to specific ARNs. 8. Tag all IAM policies with owner, purpose, and review date for lifecycle management.",
+      "common_misconfigurations": [
+        {"issue": "Wildcard actions and resources ('Action': '*', 'Resource': '*') in identity policies", "impact": "Full administrative access granted, violating least privilege and enabling lateral movement across all services", "severity": "critical"},
+        {"issue": "No permission boundaries set for developer-created roles", "impact": "Developers create roles with permissions exceeding their own, enabling privilege escalation", "severity": "critical"},
+        {"issue": "SCPs not applied to restrict unused regions", "impact": "Adversaries create resources in unmonitored regions for cryptomining, data exfiltration, or persistence", "severity": "high"},
+        {"issue": "Inline policies used instead of managed policies", "impact": "Inline policies are harder to audit, version, and reuse, creating governance blind spots", "severity": "medium"},
+        {"issue": "Policy conditions not used for source IP or MFA requirements", "impact": "Credentials usable from any network or without MFA, increasing exposure from credential theft", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(3)", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "RBAC Role Assignments + Conditional Access", "gcp-iam": "IAM Policies (allow/deny) + Organization Policies", "okta": "Authorization Policies + Admin Roles"}
+    },
+    {
+      "id": "aws-iam-roles",
+      "vendor": "aws-iam",
+      "feature": "IAM Roles (Service, Cross-Account, Federation)",
+      "category": "authorization",
+      "description": "IAM Roles provide temporary security credentials via AWS STS (Security Token Service) AssumeRole. Roles have trust policies defining who can assume them and permission policies defining what they can do. Three primary use cases: Service Roles (EC2 instance profiles, Lambda execution roles, ECS task roles) eliminate long-term credentials in application code; Cross-Account Roles enable secure resource sharing between AWS accounts without credential sharing; and Federation Roles (SAML, OIDC, web identity) enable external identity providers to grant AWS access. Roles issue temporary credentials with configurable session duration (15 minutes to 12 hours), automatically rotating the security concern away from static access keys.",
+      "best_practices": "1. Use service-linked roles where available for AWS service integrations. 2. Set maximum session duration appropriate to the use case (1 hour for human roles, longer for CI/CD). 3. Implement external ID in trust policies for cross-account roles used by third parties (confused deputy prevention). 4. Use session tags with ABAC for fine-grained, scalable authorization. 5. Restrict role assumption to specific principals (avoid 'Principal': '*' in trust policies). 6. Monitor AssumeRole events in CloudTrail for unauthorized role assumption attempts. 7. Use IAM Roles instead of access keys for all programmatic access scenarios. 8. Implement role chaining limits to prevent excessive privilege accumulation through role chains.",
+      "common_misconfigurations": [
+        {"issue": "Trust policy with 'Principal': '*' allowing any AWS account to assume the role", "impact": "Any AWS account in any organization can assume the role and access your resources", "severity": "critical"},
+        {"issue": "No external ID condition in cross-account trust policies for third-party access", "impact": "Confused deputy attack: third party directs service to assume your role on behalf of another customer", "severity": "high"},
+        {"issue": "EC2 instances running with IAM user access keys instead of instance profile roles", "impact": "Long-term credentials in instance metadata, code, or environment variables subject to theft and exposure", "severity": "high"},
+        {"issue": "Overly permissive role policies (AdministratorAccess) on Lambda execution roles", "impact": "Compromised Lambda function gains full account administrative access", "severity": "critical"},
+        {"issue": "Role session duration set to maximum (12 hours) for human interactive roles", "impact": "Stolen temporary credentials remain valid for extended period, expanding attack window", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(2)", "NIST-800-53-AC-6(5)", "NIST-800-53-IA-5", "ISO-27001-A.5.15", "ISO-27001-A.5.17", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Managed Identities + PIM JIT Roles", "gcp-iam": "Service Accounts + Workload Identity", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-iam-identity-center",
+      "vendor": "aws-iam",
+      "feature": "IAM Identity Center (AWS SSO)",
+      "category": "federation",
+      "description": "IAM Identity Center (formerly AWS SSO) provides centralized workforce identity management and single sign-on for all AWS accounts in an organization and supported business applications. It supports identity sources from its built-in directory, Active Directory (via AD Connector or AWS Managed AD), or external IdPs (Entra ID, Okta, Ping) via SAML 2.0 and SCIM provisioning. Permission Sets define the level of access within AWS accounts, combining managed policies, customer managed policies, inline policies, and permission boundaries. Multi-account permissions enable consistent access governance across dozens or hundreds of AWS accounts from a single management point. It also provides a unified access portal where users see all assigned accounts and applications.",
+      "best_practices": "1. Use an external identity provider (Entra ID, Okta) as the identity source for centralized lifecycle management. 2. Enable automatic provisioning (SCIM) to synchronize users and groups from IdP to Identity Center. 3. Design Permission Sets aligned to job functions rather than mirroring individual AWS managed policies. 4. Use attribute-based access control (ABAC) with session tags for scalable multi-account authorization. 5. Enforce MFA in the external IdP, not just in Identity Center, for defense in depth. 6. Limit the number of permission sets per user to reduce access complexity and audit burden. 7. Enable CloudTrail logging for all Identity Center events for audit and investigation. 8. Assign permission sets to groups, not individual users, for scalable management.",
+      "common_misconfigurations": [
+        {"issue": "Built-in directory used instead of external IdP with SCIM provisioning", "impact": "User lifecycle not synchronized with HR system; joiners/movers/leavers require manual AWS management", "severity": "high"},
+        {"issue": "AdministratorAccess permission set assigned to broad user groups", "impact": "Large number of users have full administrative access across all assigned AWS accounts", "severity": "critical"},
+        {"issue": "SCIM provisioning not enabled; manual user sync", "impact": "Identity drift between IdP and Identity Center; terminated users retain AWS access", "severity": "high"},
+        {"issue": "MFA not enforced for Identity Center authentication", "impact": "Single-factor authentication to access all AWS accounts in the organization", "severity": "critical"},
+        {"issue": "Permission sets assigned to individual users instead of groups", "impact": "Ungovernable per-user permission matrix that cannot be audited or reviewed at scale", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-IA-2(1)", "NIST-800-53-IA-8", "NIST-800-63C-FAL2", "ISO-27001-A.5.15", "ISO-27001-A.5.16", "SOC2-CC6.1", "SOC2-CC6.2"],
+      "equivalent_in": {"azure-entra": "Entra ID + Conditional Access + PIM", "gcp-iam": "Cloud Identity + Google Workspace SSO", "okta": "Okta Universal Directory + SSO"}
+    },
+    {
+      "id": "aws-organizations-scps",
+      "vendor": "aws-iam",
+      "feature": "Organizations Service Control Policies (SCPs)",
+      "category": "authorization",
+      "description": "Service Control Policies (SCPs) are organization-level policies that define the maximum available permissions for all accounts in an AWS Organization. SCPs do not grant permissions; they establish guardrails that limit what identity-based and resource-based policies in member accounts can effectively grant. SCPs apply to all principals in the account including the root user, making them the strongest governance control in AWS. Common SCP patterns include: deny unused AWS regions, prevent disabling CloudTrail or GuardDuty, require encryption for S3 and EBS, restrict VPC modifications, prevent account departure from the organization, and enforce tagging requirements. SCPs are essential for implementing preventive controls that cannot be overridden by account administrators.",
+      "best_practices": "1. Apply SCPs at the organizational unit (OU) level, not individual accounts, for consistent governance. 2. Start with an allowlist approach for new OUs (deny all except explicitly allowed services). 3. Protect security services: deny disabling CloudTrail, GuardDuty, Security Hub, Config. 4. Restrict unused AWS regions to prevent shadow infrastructure. 5. Prevent root user actions in member accounts via SCP (except organization management account). 6. Require encryption for data services (S3 SSE, EBS encryption, RDS encryption). 7. Test SCPs in a sandbox OU before applying to production OUs. 8. Document the SCP inheritance model for audit and troubleshooting.",
+      "common_misconfigurations": [
+        {"issue": "No SCPs applied; default FullAWSAccess SCP left as the only policy", "impact": "No organization-level guardrails; account administrators have unrestricted service access", "severity": "critical"},
+        {"issue": "Security services not protected by SCPs (CloudTrail can be disabled by account admins)", "impact": "Compromised account admin disables logging and monitoring, enabling undetected malicious activity", "severity": "critical"},
+        {"issue": "SCPs tested directly in production OUs instead of sandbox OUs", "impact": "Overly restrictive SCP breaks production workloads across all accounts in the affected OU", "severity": "high"},
+        {"issue": "SCP applied to management account (not supported; SCPs only affect member accounts)", "impact": "False sense of security; management account root user unrestricted regardless of SCPs", "severity": "high"},
+        {"issue": "No SCP restricting unused regions", "impact": "Resources created in unmonitored regions for crypto mining, data staging, or persistent backdoors", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6(7)", "NIST-800-53-AC-6(9)", "ISO-27001-A.5.1", "ISO-27001-A.8.3", "SOC2-CC6.1", "SOC2-CC5.2"],
+      "equivalent_in": {"azure-entra": "Azure Policy (preventive mode) + Management Group Policies", "gcp-iam": "Organization Policy Constraints", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-iam-access-analyzer",
+      "vendor": "aws-iam",
+      "feature": "IAM Access Analyzer",
+      "category": "monitoring",
+      "description": "IAM Access Analyzer uses automated reasoning (formal methods / Zelkova) to identify resources shared with external entities and validate IAM policies. External access analysis identifies S3 buckets, IAM roles, KMS keys, Lambda functions, SQS queues, and Secrets Manager secrets that are accessible from outside the account or organization. Policy validation checks IAM policies against best practices, generating warnings for security risks, errors for syntax issues, and suggestions for improvements. Custom policy checks validate policies against organization-specific requirements. Access Analyzer also generates least-privilege policies based on CloudTrail activity logs, creating policies that grant only the permissions actually used. This is the primary tool for detecting unintended external access and right-sizing IAM permissions.",
+      "best_practices": "1. Create an analyzer for the entire organization zone of trust, not just individual accounts. 2. Review Access Analyzer findings weekly and create a remediation workflow for external access findings. 3. Use policy generation to create least-privilege policies based on CloudTrail access patterns. 4. Integrate policy validation into CI/CD pipelines to catch overly permissive policies before deployment. 5. Archive resolved findings to track remediation progress over time. 6. Enable Access Analyzer in all regions, not just the primary region. 7. Create custom policy checks for organization-specific requirements (e.g., no wildcard principals).",
+      "common_misconfigurations": [
+        {"issue": "Access Analyzer not enabled or only enabled in primary region", "impact": "External access to resources in non-primary regions goes undetected", "severity": "high"},
+        {"issue": "Analyzer zone of trust set to account instead of organization", "impact": "Cross-account access within the organization flagged as external, creating noise; real external access mixed in", "severity": "medium"},
+        {"issue": "Findings generated but not reviewed or remediated", "impact": "Known external access exposures persist indefinitely without action", "severity": "high"},
+        {"issue": "Policy validation not integrated into CI/CD", "impact": "New overly permissive policies deployed without automated review, expanding attack surface", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-AC-3", "ISO-27001-A.5.15", "ISO-27001-A.8.4", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra Permissions Management (CIEM)", "gcp-iam": "Policy Intelligence (Analyzer, Recommender, Troubleshooter)", "sailpoint": "Cloud Access Management"}
+    },
+    {
+      "id": "aws-iam-credential-report",
+      "vendor": "aws-iam",
+      "feature": "IAM Credential Report",
+      "category": "monitoring",
+      "description": "The IAM Credential Report is a CSV export listing all IAM users in the account with the status of their credentials: password (enabled/disabled, last used, last rotated, next rotation), access keys (active/inactive, last used, last rotated, key age), MFA (enabled/disabled, device type), and certificates. The report provides a point-in-time snapshot for security auditing and compliance verification. It reveals common security hygiene issues: users with access keys not used in 90+ days (stale credentials), users without MFA enabled, access keys not rotated in 90+ days, root account access key existence, and users with both console password and access keys (indicating dual-use accounts). The credential report should be generated and reviewed regularly as part of IAM security operations.",
+      "best_practices": "1. Generate and review the credential report weekly or monthly as part of security operations. 2. Disable access keys not used in 90 days (stale key remediation). 3. Enforce MFA for all IAM users with console access. 4. Rotate access keys every 90 days maximum. 5. Alert on root account credential usage (root access keys should never exist). 6. Automate credential report analysis with Lambda for continuous compliance monitoring. 7. Track credential hygiene metrics over time for security posture improvement dashboards.",
+      "common_misconfigurations": [
+        {"issue": "Credential report never generated or reviewed", "impact": "Stale credentials, missing MFA, and unrotated keys accumulate without detection", "severity": "high"},
+        {"issue": "Root account has active access keys", "impact": "Unrestricted root credentials that bypass all IAM controls, including SCPs", "severity": "critical"},
+        {"issue": "Access keys not rotated in over 90 days", "impact": "Long-lived credentials increase exposure window from any past credential leak", "severity": "high"},
+        {"issue": "IAM users with console access but no MFA enabled", "impact": "Single-factor authentication for console access; credential theft enables direct access", "severity": "critical"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-IA-5(1)", "NIST-800-53-AC-2(3)", "ISO-27001-A.5.17", "ISO-27001-A.5.18", "SOC2-CC6.1", "SOC2-CC6.2", "CIS-5.1"],
+      "equivalent_in": {"azure-entra": "Entra ID Sign-In Logs + Authentication Methods Report", "gcp-iam": "IAM Service Account Key Report", "okta": "System Log + User Status Reports"}
+    },
+    {
+      "id": "aws-s3-bucket-policies",
+      "vendor": "aws-iam",
+      "feature": "S3 Bucket Policies & ACLs",
+      "category": "authorization",
+      "description": "S3 Bucket Policies are resource-based policies that define access controls directly on S3 buckets, complementing identity-based IAM policies. They support cross-account access grants, public access control, VPC endpoint restrictions, encryption enforcement, and IP-based access restrictions. S3 Access Points provide simplified per-application access policies for shared data lakes. Block Public Access settings (account-level and bucket-level) provide guardrails against accidental public exposure. S3 ACLs (Access Control Lists) are the legacy access mechanism that AWS now recommends disabling in favor of bucket policies. S3 is one of the most common sources of data breaches in AWS, making bucket policy security critical for data protection.",
+      "best_practices": "1. Enable S3 Block Public Access at the account level as a guardrail against accidental exposure. 2. Disable S3 ACLs (BucketOwnerEnforced) and use bucket policies exclusively for all access control. 3. Require SSE-S3 or SSE-KMS encryption via bucket policy condition keys. 4. Use VPC endpoint conditions (aws:sourceVpce) to restrict bucket access to specific VPCs. 5. Use S3 Access Points for multi-tenant data lake access patterns instead of complex bucket policies. 6. Enable S3 access logging and CloudTrail data events for sensitive buckets. 7. Use IAM Access Analyzer to identify buckets with external access.",
+      "common_misconfigurations": [
+        {"issue": "S3 Block Public Access disabled at account or bucket level", "impact": "Buckets can be made publicly accessible through ACLs or bucket policies, exposing data to the internet", "severity": "critical"},
+        {"issue": "Bucket policy with 'Principal': '*' without restrictive conditions", "impact": "Bucket is publicly accessible to anyone on the internet without authentication", "severity": "critical"},
+        {"issue": "Legacy ACLs still enabled alongside bucket policies", "impact": "Two overlapping access control mechanisms create confusion and potential security gaps", "severity": "medium"},
+        {"issue": "No encryption enforcement in bucket policy", "impact": "Unencrypted objects uploaded to sensitive buckets, violating data protection requirements", "severity": "high"},
+        {"issue": "Cross-account access granted without conditions (e.g., MFA, source VPC)", "impact": "Overly broad cross-account access without defense-in-depth conditions", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-4", "NIST-800-53-AC-6", "ISO-27001-A.8.3", "ISO-27001-A.8.4", "SOC2-CC6.1", "SOC2-CC6.7"],
+      "equivalent_in": {"azure-entra": "Azure Storage Access Policies + RBAC", "gcp-iam": "Cloud Storage IAM + Bucket Policies", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-lambda-execution-roles",
+      "vendor": "aws-iam",
+      "feature": "Lambda Execution Roles",
+      "category": "authorization",
+      "description": "Lambda execution roles define the permissions available to Lambda function code at runtime. Every Lambda function must have an execution role that grants it permissions to access AWS services (DynamoDB, S3, SQS, Secrets Manager, etc.) and to write logs to CloudWatch Logs. The execution role's trust policy allows the Lambda service to assume the role. Lambda functions are common targets for server-side request forgery (SSRF) and injection attacks that exploit overprivileged execution roles to pivot into other AWS services. Each function should have its own dedicated execution role with the minimum permissions required, rather than sharing a single broad execution role across multiple functions. Resource-based policies on Lambda control who can invoke the function.",
+      "best_practices": "1. Create a dedicated execution role per Lambda function; never share roles across functions. 2. Grant only the specific API actions and resource ARNs the function needs (no wildcards). 3. Use environment-specific execution roles (dev, staging, prod) with increasing restrictions. 4. Include only AWSLambdaBasicExecutionRole for CloudWatch Logs access as the baseline. 5. Use resource-based policies to restrict who can invoke the function. 6. Use IAM Access Analyzer policy generation to right-size permissions based on actual API calls. 7. Monitor Lambda API calls in CloudTrail for unexpected service access patterns. 8. Use VPC configuration for functions that access private resources instead of public endpoints.",
+      "common_misconfigurations": [
+        {"issue": "Single execution role with AdministratorAccess shared across all Lambda functions", "impact": "Any compromised function gains full administrative access to the entire AWS account", "severity": "critical"},
+        {"issue": "Execution role permits iam:PassRole without resource restriction", "impact": "Compromised function can create resources with any role, enabling privilege escalation", "severity": "critical"},
+        {"issue": "Wildcard resources in execution role policy ('Resource': '*')", "impact": "Function can access all resources of the permitted service type, not just its own data", "severity": "high"},
+        {"issue": "Lambda function invocable by any AWS account (resource-based policy too permissive)", "impact": "Unauthorized external invocation leads to function abuse or data exfiltration", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-AC-3", "ISO-27001-A.8.9", "ISO-27001-A.5.15", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Managed Identities for Azure Functions", "gcp-iam": "Cloud Functions Service Account", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-eks-irsa",
+      "vendor": "aws-iam",
+      "feature": "EKS IRSA (IAM Roles for Service Accounts)",
+      "category": "authorization",
+      "description": "IAM Roles for Service Accounts (IRSA) allows Kubernetes pods in Amazon EKS to assume specific IAM roles via an OIDC identity provider, replacing the legacy pattern of assigning a single IAM role to all pods on a node (via instance profile). Each Kubernetes ServiceAccount can be annotated with a specific IAM role ARN, and only pods using that ServiceAccount receive the corresponding AWS credentials via a projected service account token. The EKS OIDC provider issues tokens that are exchanged for AWS STS temporary credentials scoped to the specific IAM role. This implements least privilege at the pod level, preventing one compromised pod from accessing another pod's AWS resources. EKS Pod Identity is the newer, simplified alternative to IRSA that does not require OIDC provider configuration.",
+      "best_practices": "1. Use IRSA or EKS Pod Identity instead of node-level instance profiles for pod AWS access. 2. Create granular IAM roles per application workload, not per cluster or namespace. 3. Restrict the IRSA role trust policy to specific namespace and service account (sub claim). 4. Use EKS Pod Identity for new deployments as the simplified successor to IRSA. 5. Do not reuse Kubernetes ServiceAccount names across namespaces if they map to different IAM roles. 6. Monitor STS AssumeRoleWithWebIdentity events in CloudTrail for anomalous pod role assumptions. 7. Rotate OIDC thumbprints when the EKS OIDC issuer certificate changes.",
+      "common_misconfigurations": [
+        {"issue": "All pods use the node's instance profile IAM role instead of IRSA", "impact": "Every pod on the node inherits the same broad permissions; compromised pod accesses all node-level resources", "severity": "critical"},
+        {"issue": "IRSA trust policy does not restrict to specific namespace/service account", "impact": "Any pod in any namespace can assume the IAM role, defeating per-pod isolation", "severity": "high"},
+        {"issue": "Same ServiceAccount name reused across namespaces with different IAM role expectations", "impact": "Incorrect role assumption or privilege escalation due to ambiguous ServiceAccount-to-role mapping", "severity": "high"},
+        {"issue": "IRSA role has overly broad permissions not scoped to the specific workload", "impact": "Compromised pod accesses resources beyond its application scope via the over-privileged IRSA role", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-AC-3(7)", "ISO-27001-A.5.15", "ISO-27001-A.8.9", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Azure AD Workload Identity for AKS", "gcp-iam": "GKE Workload Identity", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-secrets-manager",
+      "vendor": "aws-iam",
+      "feature": "AWS Secrets Manager",
+      "category": "authentication",
+      "description": "AWS Secrets Manager stores, rotates, and manages access to credentials, API keys, database passwords, and other secrets. It supports automatic rotation for RDS, Redshift, DocumentDB, and custom secrets via Lambda rotation functions. Secrets are encrypted with KMS keys (AWS managed or customer managed) and accessed via IAM policies that control which identities can retrieve which secrets. Resource-based policies on secrets enable cross-account access patterns. Secrets Manager integrates with CloudFormation, ECS, EKS, Lambda, and other services for native secret injection. It replaces insecure patterns of storing credentials in environment variables, configuration files, code repositories, or parameter store without encryption.",
+      "best_practices": "1. Enable automatic rotation for all database credentials with rotation intervals of 30-90 days. 2. Use IAM policies to restrict secret access to specific principals and actions (secretsmanager:GetSecretValue). 3. Use resource-based policies for cross-account secret sharing instead of sharing credentials. 4. Encrypt secrets with customer-managed KMS keys for key management control. 5. Monitor GetSecretValue API calls in CloudTrail for unauthorized access patterns. 6. Use secret versioning (AWSCURRENT, AWSPREVIOUS) for safe rotation with rollback capability. 7. Never store secrets in Lambda environment variables, EC2 user data, or source code. 8. Tag secrets with owner, application, and rotation schedule for lifecycle management.",
+      "common_misconfigurations": [
+        {"issue": "Database credentials stored in environment variables or config files instead of Secrets Manager", "impact": "Credentials exposed in process listings, container images, CloudFormation outputs, or code repositories", "severity": "critical"},
+        {"issue": "Automatic rotation not enabled for database credentials", "impact": "Static credentials remain valid indefinitely; leaked credentials provide persistent access", "severity": "high"},
+        {"issue": "Secret resource policy allows broad cross-account access without conditions", "impact": "Any principal in the allowed account can retrieve the secret without MFA or IP restrictions", "severity": "high"},
+        {"issue": "CloudTrail not monitoring Secrets Manager API calls", "impact": "Unauthorized secret retrieval by compromised identities goes undetected", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-IA-5(1)", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "ISO-27001-A.8.24", "SOC2-CC6.1", "SOC2-CC6.7"],
+      "equivalent_in": {"azure-entra": "Azure Key Vault Secrets", "gcp-iam": "Secret Manager", "cyberark": "CyberArk Secrets Manager / Conjur"}
+    },
+    {
+      "id": "aws-kms-key-policies",
+      "vendor": "aws-iam",
+      "feature": "KMS Key Policies",
+      "category": "authorization",
+      "description": "AWS Key Management Service (KMS) key policies are resource-based policies that control access to customer-managed encryption keys. Unlike other AWS resource policies, KMS key policies are the primary access control mechanism (IAM policies alone cannot grant KMS access without the key policy also allowing it). Key policies define which principals can use keys for encryption/decryption, which can manage keys (enable/disable, rotate, delete), and which can grant others access via KMS Grants. KMS supports key rotation (annual automatic rotation for symmetric keys), cross-account key sharing, and multi-region keys. Proper KMS key policy management is essential because misconfigured key policies can either lock out legitimate users (including the root account) or grant unauthorized access to encrypted data.",
+      "best_practices": "1. Always include the root account principal in the key policy to prevent key lockout. 2. Use separate KMS keys per application or data classification level. 3. Enable automatic annual key rotation for symmetric CMKs. 4. Use key policies to restrict key usage to specific IAM roles, not IAM users. 5. Use KMS Grants for temporary key access rather than modifying key policies. 6. Monitor Decrypt and GenerateDataKey API calls in CloudTrail for unauthorized usage. 7. Use customer-managed CMKs instead of AWS-managed keys for greater control. 8. Apply condition keys (kms:ViaService, kms:CallerAccount) for defense-in-depth.",
+      "common_misconfigurations": [
+        {"issue": "Key policy does not include root account, creating risk of key lockout", "impact": "If all key administrators are deleted, the key becomes permanently inaccessible (only AWS Support can help)", "severity": "critical"},
+        {"issue": "Key policy grants kms:* to broad principals", "impact": "Over-privileged key access enables unauthorized encryption/decryption and key management", "severity": "high"},
+        {"issue": "Automatic key rotation not enabled for customer-managed keys", "impact": "Same key material used indefinitely, increasing impact of key compromise over time", "severity": "medium"},
+        {"issue": "Same KMS key used across all applications and data classifications", "impact": "Key compromise affects all encrypted data across the organization rather than a single application", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-SC-12", "NIST-800-53-AC-3", "NIST-800-53-AC-6", "ISO-27001-A.8.24", "ISO-27001-A.8.3", "SOC2-CC6.1", "SOC2-CC6.7"],
+      "equivalent_in": {"azure-entra": "Azure Key Vault Keys + RBAC Access Policies", "gcp-iam": "Cloud KMS Key IAM Policies", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-guardduty-iam",
+      "vendor": "aws-iam",
+      "feature": "GuardDuty IAM Findings",
+      "category": "monitoring",
+      "description": "Amazon GuardDuty uses machine learning, anomaly detection, and integrated threat intelligence to identify IAM-related threats. IAM-specific finding types include: credential exfiltration (IAM credentials used from external IP), unusual API calls from known or anonymous IPs, privilege escalation attempts, impossible travel (credentials used from geographically impossible locations), reconnaissance API calls (ListBuckets, DescribeInstances from unusual principals), and EC2 instance credential abuse (instance profile credentials used externally). GuardDuty correlates CloudTrail management events, VPC Flow Logs, and DNS logs without requiring any agents or log forwarding configuration. Findings are prioritized by severity and can trigger automated remediation via EventBridge rules and Lambda functions.",
+      "best_practices": "1. Enable GuardDuty in all AWS accounts across all regions via Organizations delegated administrator. 2. Create EventBridge rules for high-severity IAM findings to trigger automated response. 3. Integrate GuardDuty findings with Security Hub for centralized security posture management. 4. Investigate all high-severity credential exfiltration findings within 1 hour (SLA). 5. Protect GuardDuty with SCPs to prevent disabling by compromised account administrators. 6. Configure S3 protection and EKS audit log monitoring for additional IAM-adjacent findings. 7. Review medium-severity findings weekly for patterns indicating persistent threats. 8. Use GuardDuty findings to improve IAM policies based on detected anomalies.",
+      "common_misconfigurations": [
+        {"issue": "GuardDuty not enabled in all regions", "impact": "IAM threats in non-monitored regions go undetected (credentials work globally)", "severity": "critical"},
+        {"issue": "No automated response to high-severity credential exfiltration findings", "impact": "Stolen IAM credentials continue to be used externally during manual investigation delays", "severity": "high"},
+        {"issue": "GuardDuty findings not integrated with SIEM or Security Hub", "impact": "Findings siloed in GuardDuty console; no correlation with other security signals", "severity": "medium"},
+        {"issue": "No SCP preventing GuardDuty disabling in member accounts", "impact": "Compromised account admin disables GuardDuty as first action, eliminating detection capability", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(12)", "NIST-800-53-AC-7(2)", "ISO-27001-A.8.16", "ISO-27001-A.8.15", "SOC2-CC7.2", "CISA-ZTMM-VISIBILITY"],
+      "equivalent_in": {"azure-entra": "Entra ID Identity Protection + Microsoft Sentinel", "gcp-iam": "Security Command Center + Event Threat Detection", "okta": "ThreatInsight + System Log Analytics"}
+    },
+    {
+      "id": "aws-cloudtrail-iam",
+      "vendor": "aws-iam",
+      "feature": "CloudTrail IAM Events",
+      "category": "monitoring",
+      "description": "AWS CloudTrail records all API calls made to AWS services, providing a comprehensive audit trail for IAM activity. IAM-relevant events include: role assumption (AssumeRole, AssumeRoleWithSAML, AssumeRoleWithWebIdentity), policy changes (CreatePolicy, AttachRolePolicy, PutRolePolicy), user management (CreateUser, DeleteUser, CreateAccessKey), permission changes, and console sign-in events. CloudTrail supports organization-level trails that aggregate events from all member accounts, data event logging for S3 and Lambda invocations, and CloudTrail Insights for detecting unusual API call volumes. CloudTrail logs are the primary forensic evidence source for IAM security incident investigations and the data source for IAM Access Analyzer policy generation.",
+      "best_practices": "1. Create an organization-level trail that logs all accounts and all regions. 2. Enable CloudTrail log file validation (digest files) for tamper evidence. 3. Store CloudTrail logs in a centralized, restricted logging account with immutable retention. 4. Enable CloudTrail Insights for automated detection of unusual API activity patterns. 5. Create CloudWatch alarms for critical IAM events (root login, policy changes, access key creation). 6. Enable data event logging for sensitive S3 buckets and Lambda functions. 7. Retain CloudTrail logs for minimum 1 year (prefer 3-7 years for compliance). 8. Use Athena or CloudTrail Lake for efficient querying of historical trail data.",
+      "common_misconfigurations": [
+        {"issue": "CloudTrail not enabled in all regions or not an organization trail", "impact": "API calls in non-monitored regions or accounts not captured, creating audit gaps", "severity": "critical"},
+        {"issue": "Log file validation not enabled", "impact": "Tampering with CloudTrail logs goes undetected; forensic evidence integrity compromised", "severity": "high"},
+        {"issue": "CloudTrail logs stored in the same account they monitor (not centralized)", "impact": "Compromised account admin deletes or modifies trail logs to cover their tracks", "severity": "high"},
+        {"issue": "No alarms or alerts for critical IAM events", "impact": "Root account usage, access key creation, and policy modifications occur without notification", "severity": "high"},
+        {"issue": "CloudTrail log retention too short (default 90 days in S3 lifecycle)", "impact": "Historical audit evidence unavailable for incident investigation or compliance audits", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(12)", "NIST-800-53-AC-6(9)", "ISO-27001-A.8.15", "ISO-27001-A.8.16", "SOC2-CC7.2", "SOC2-CC5.2"],
+      "equivalent_in": {"azure-entra": "Entra ID Audit Logs + Azure Activity Log", "gcp-iam": "Cloud Audit Logs (Admin Activity + Data Access)", "okta": "System Log + Event Hooks"}
+    },
+    {
+      "id": "aws-mfa-configuration",
+      "vendor": "aws-iam",
+      "feature": "MFA Configuration",
+      "category": "authentication",
+      "description": "AWS IAM supports multiple MFA device types: virtual MFA devices (TOTP apps like Google Authenticator), hardware TOTP tokens (Gemalto/Thales), FIDO2 security keys (YubiKey), and passkeys. MFA can be enforced via IAM policy conditions (aws:MultiFactorAuthPresent, aws:MultiFactorAuthAge) for API/CLI access and is required by default for root account console access. IAM Identity Center supports MFA configuration at the directory level for SSO users. MFA enforcement is particularly critical for the root account, IAM users with console access, and any actions involving privileged operations (IAM changes, billing, account settings). AWS recommends FIDO2 security keys as the strongest MFA method, followed by virtual MFA devices.",
+      "best_practices": "1. Enable MFA on the root account with a hardware FIDO2 key stored in a physical safe. 2. Require MFA for all IAM users with console access via IAM policy conditions. 3. Enforce MFA for sensitive API actions (iam:*, s3:DeleteBucket, ec2:TerminateInstances) via policy conditions. 4. Use FIDO2 security keys for privileged IAM users for phishing-resistant authentication. 5. Register at least two MFA devices per root account for redundancy. 6. Use IAM Identity Center MFA for workforce users instead of per-user IAM MFA. 7. Monitor for IAM users who deregister their MFA devices. 8. Use aws:MultiFactorAuthAge condition to require recent MFA for time-sensitive operations.",
+      "common_misconfigurations": [
+        {"issue": "Root account without MFA enabled", "impact": "Compromised root credentials provide unrestricted, unrecoverable access to the entire AWS account", "severity": "critical"},
+        {"issue": "IAM users with console access but no MFA requirement", "impact": "Password-only authentication for console access; credential stuffing enables account compromise", "severity": "critical"},
+        {"issue": "MFA not required for sensitive API actions via policy conditions", "impact": "Stolen access keys perform privileged operations (IAM changes, data deletion) without MFA challenge", "severity": "high"},
+        {"issue": "Only virtual MFA used for root and privileged accounts (no FIDO2)", "impact": "TOTP MFA vulnerable to real-time phishing proxies and AitM attacks", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-2(1)", "NIST-800-63B-AAL2", "NIST-800-63B-AAL3", "NIST-800-63B-AUTH-MF-OTP", "ISO-27001-A.8.5", "SOC2-CC6.1", "CIS-6.2"],
+      "equivalent_in": {"azure-entra": "Conditional Access MFA + Authentication Strengths", "gcp-iam": "2-Step Verification + Titan Security Keys", "okta": "Okta MFA Enrollment Policies"}
+    },
+    {
+      "id": "aws-root-account-security",
+      "vendor": "aws-iam",
+      "feature": "Root Account Security",
+      "category": "privileged-access",
+      "description": "The AWS root account (account email and password) has unrestricted access to all AWS resources and services, cannot be limited by IAM policies or SCPs, and can perform actions no other principal can (close account, change support plan, enable MFA on root, restore IAM permissions). Root account security is the single most critical IAM configuration in AWS because a compromised root account means complete, irrecoverable loss of the AWS environment. AWS best practice is to lock down the root account after initial setup and never use it for daily operations. The root account should be secured with the strongest available MFA (FIDO2 hardware key), have no access keys, use a unique email address (not a personal mailbox), and be monitored for any usage. In AWS Organizations, root account access in member accounts should be restricted via SCPs and centrally managed root access.",
+      "best_practices": "1. Enable MFA on the root account using a FIDO2 hardware security key (not virtual MFA). 2. Delete all root account access keys immediately. 3. Use a unique, monitored email alias (aws-root@company.com) not tied to any individual. 4. Store root credentials in a physical safe or hardware security module, not in a password manager. 5. Create an SCP in Organizations to deny all root actions in member accounts. 6. Create a CloudWatch alarm for any root account console sign-in or API activity. 7. Never use root for daily operations; create IAM users or SSO roles for all tasks. 8. Register a secondary MFA device for root account recovery scenarios.",
+      "common_misconfigurations": [
+        {"issue": "Root account used for daily administrative tasks", "impact": "Constant root usage increases exposure, prevents access tracing, and risks account lockout", "severity": "critical"},
+        {"issue": "Root account has active access keys", "impact": "Programmatic root access bypasses all IAM controls; leaked keys enable total account takeover", "severity": "critical"},
+        {"issue": "Root account without MFA", "impact": "Password-only protection for the most privileged identity in the AWS account", "severity": "critical"},
+        {"issue": "No alerting on root account activity", "impact": "Unauthorized root usage goes undetected; compromise investigation delayed", "severity": "high"},
+        {"issue": "Root email address is a personal mailbox that can be compromised", "impact": "Email account takeover enables AWS account recovery and root password reset", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-AC-6(5)", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.2", "ISO-27001-A.5.15", "SOC2-CC6.1", "CIS-5.4", "CIS-5.5"],
+      "equivalent_in": {"azure-entra": "Global Administrator + Break-Glass Accounts", "gcp-iam": "Organization Admin + Super Admin Account", "okta": "Super Admin Role"}
+    },
+    {
+      "id": "aws-resource-access-manager",
+      "vendor": "aws-iam",
+      "feature": "Resource Access Manager (RAM)",
+      "category": "authorization",
+      "description": "AWS Resource Access Manager (RAM) enables secure sharing of AWS resources across accounts within an AWS Organization or with specific external accounts. Shareable resources include VPC subnets, Transit Gateway, Route 53 Resolver rules, License Manager configurations, Aurora DB clusters, EC2 Capacity Reservations, and more. RAM eliminates the need to create duplicate resources in each account, reducing cost and management overhead while maintaining centralized control. The resource owner retains ownership and management authority, while the consumer gains specified access. RAM integrates with AWS Organizations to enable automatic sharing with organization accounts without requiring explicit invitations. Resource shares can be restricted to specific OUs or accounts within the organization.",
+      "best_practices": "1. Enable RAM sharing within the organization to avoid individual account invitations. 2. Share resources only with the specific OUs or accounts that need them, not the entire organization. 3. Use RAM instead of cross-account IAM roles for resource sharing when RAM supports the resource type. 4. Review resource shares quarterly and remove stale shares for decommissioned accounts or projects. 5. Monitor RAM sharing events in CloudTrail for unauthorized resource sharing. 6. Use SCPs to restrict which account types can accept external RAM resource shares. 7. Document resource ownership and sharing relationships for audit purposes.",
+      "common_misconfigurations": [
+        {"issue": "Resources shared with the entire organization when only specific accounts need access", "impact": "All organization accounts can access shared resources, violating least privilege", "severity": "medium"},
+        {"issue": "External sharing enabled without SCP guardrails", "impact": "Account administrators can accept resource shares from external organizations without governance", "severity": "high"},
+        {"issue": "Stale resource shares not cleaned up after project completion", "impact": "Shared resources remain accessible to accounts that no longer need them", "severity": "medium"},
+        {"issue": "RAM sharing not used, relying on IAM cross-account roles for shareable resources", "impact": "More complex permission management and credential handling when RAM would be simpler and more secure", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-21", "ISO-27001-A.5.15", "ISO-27001-A.5.19", "SOC2-CC6.3", "SOC2-CC6.4"],
+      "equivalent_in": {"azure-entra": "Azure Lighthouse + Cross-Subscription RBAC", "gcp-iam": "Shared VPC + Resource Manager Sharing", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-sso-abac",
+      "vendor": "aws-iam",
+      "feature": "Attribute-Based Access Control (ABAC)",
+      "category": "authorization",
+      "description": "AWS ABAC uses tags on IAM principals and AWS resources as attributes in policy conditions to create scalable, dynamic authorization. Instead of creating separate policies for each project, team, or environment, ABAC policies use tag conditions (aws:ResourceTag, aws:PrincipalTag, aws:RequestTag) to grant access based on matching attributes. For example, a single policy can allow users to access EC2 instances only when the instance's Project tag matches the user's Project tag. ABAC scales with the organization because adding a new project only requires tagging users and resources, not creating new IAM policies. IAM Identity Center session tags pass user attributes from the identity provider as tags on assumed roles, enabling ABAC across SSO-provisioned access.",
+      "best_practices": "1. Define a mandatory tagging strategy with standardized keys (Project, Environment, CostCenter, Owner). 2. Enforce tagging via SCPs and IAM policy conditions (deny resource creation without required tags). 3. Use aws:PrincipalTag in combination with aws:ResourceTag for attribute-matching access control. 4. Pass IdP attributes as session tags via IAM Identity Center for federated ABAC. 5. Start ABAC implementation with a single dimension (e.g., Project tag) before adding complexity. 6. Monitor tag changes on resources to detect authorization bypass attempts. 7. Combine ABAC with permission boundaries for defense-in-depth. 8. Document the ABAC authorization model for developers and auditors.",
+      "common_misconfigurations": [
+        {"issue": "No tag enforcement via SCPs; resources created without required tags", "impact": "Untagged resources not governed by ABAC policies, creating authorization gaps", "severity": "high"},
+        {"issue": "Tag values not validated or standardized", "impact": "Inconsistent tag values cause policy mismatches (e.g., 'production' vs 'Production' vs 'prod')", "severity": "medium"},
+        {"issue": "Users can modify their own principal tags", "impact": "Users self-assign tags that grant elevated access, enabling privilege escalation", "severity": "critical"},
+        {"issue": "ABAC policies without fallback deny for untagged resources", "impact": "Resources without tags bypass ABAC controls and may be accessible to unintended principals", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3(7)", "NIST-800-53-AC-3(13)", "NIST-800-53-AC-16", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Azure ABAC Conditions on Role Assignments", "gcp-iam": "IAM Conditions (tag-based)", "okta": "N/A (use downstream IdP ABAC)"}
+    },
+    {
+      "id": "aws-iam-roles-anywhere",
+      "vendor": "aws-iam",
+      "feature": "IAM Roles Anywhere",
+      "category": "authorization",
+      "description": "IAM Roles Anywhere extends IAM role-based access to workloads running outside of AWS (on-premises servers, edge devices, other cloud providers) using X.509 certificates. Instead of distributing long-term AWS access keys to external systems, Roles Anywhere establishes a trust anchor with an existing private certificate authority (ACM Private CA or external CA), and workloads present their certificate to obtain temporary AWS credentials. The trust policy maps certificate attributes (CN, OU, issuer) to specific IAM roles, and session policies can further restrict permissions. This eliminates the need for long-term access keys on non-AWS workloads, applying the same temporary-credential model used by EC2 instance profiles to hybrid and multi-cloud environments.",
+      "best_practices": "1. Use IAM Roles Anywhere instead of long-term access keys for all on-premises and hybrid workloads. 2. Use ACM Private CA as the trust anchor for managed certificate lifecycle. 3. Scope role mapping conditions to specific certificate attributes (OU, CN) for fine-grained access. 4. Apply session policies to further restrict the permissions available in each Roles Anywhere session. 5. Enable CRL checking on the trust anchor to revoke access when certificates are compromised. 6. Set profile session duration to the minimum necessary for the workload. 7. Monitor CreateSession events in CloudTrail for anomalous certificate-based role assumptions.",
+      "common_misconfigurations": [
+        {"issue": "On-premises workloads still using long-term IAM access keys instead of Roles Anywhere", "impact": "Static credentials on external systems subject to theft, with no automatic rotation or session expiry", "severity": "high"},
+        {"issue": "Trust anchor accepts any certificate from the CA without attribute-based conditions", "impact": "Any certificate issued by the CA can assume the IAM role, regardless of the workload identity", "severity": "high"},
+        {"issue": "CRL checking not configured on the trust anchor", "impact": "Revoked certificates continue to obtain valid AWS credentials", "severity": "high"},
+        {"issue": "Session duration set to maximum (12 hours) for automated workloads", "impact": "Compromised temporary credentials from a certificate-based session remain valid for extended period", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-AC-6", "NIST-800-53-SC-12", "NIST-800-63B-AUTH-SF-CRYPTO", "ISO-27001-A.5.17", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Workload Identity Federation (certificate-based)", "gcp-iam": "Workload Identity Federation with X.509", "cyberark": "CyberArk Cloud Entitlements Manager"}
+    },
+    {
+      "id": "aws-iam-policy-simulator",
+      "vendor": "aws-iam",
+      "feature": "IAM Policy Simulator",
+      "category": "monitoring",
+      "description": "The IAM Policy Simulator enables testing of IAM policies without actually making API calls to AWS services. Users can select an IAM user, group, or role and simulate specific API actions against specific resources to determine whether the effective policy would allow or deny the request. The simulator evaluates all applicable policies: identity-based, resource-based, permission boundaries, session policies, and SCPs. It shows which specific policy statement resulted in the allow or deny decision, making it invaluable for debugging access issues and verifying policy correctness before deployment. The simulator is available as a console tool and via the iam:SimulatePrincipalPolicy and iam:SimulateCustomPolicy API actions for programmatic integration into CI/CD pipelines.",
+      "best_practices": "1. Test all new IAM policies in the simulator before deployment to production. 2. Integrate SimulateCustomPolicy API into CI/CD to validate policy changes automatically. 3. Use the simulator to verify least privilege by testing that unintended actions are denied. 4. Simulate cross-account scenarios to verify trust policy and resource policy interactions. 5. Use the simulator for access troubleshooting before modifying policies. 6. Document simulator test cases for audit evidence of policy validation. 7. Test permission boundary interactions with identity policies to verify the effective permission set.",
+      "common_misconfigurations": [
+        {"issue": "IAM policies deployed without simulation testing", "impact": "Policy errors grant unintended access or break application functionality in production", "severity": "medium"},
+        {"issue": "Policy simulator not used to verify deny effectiveness", "impact": "Assumed deny rules may not be effective due to resource-based policy or SCP interactions", "severity": "medium"},
+        {"issue": "Simulator results not documented for compliance evidence", "impact": "No audit evidence that policy changes were validated before deployment", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "SOC2-CC8.1"],
+      "equivalent_in": {"azure-entra": "Azure Policy Compliance + What-If", "gcp-iam": "Policy Troubleshooter", "okta": "N/A (no policy simulation tool)"}
+    },
+    {
+      "id": "aws-organizations-delegated-admin",
+      "vendor": "aws-iam",
+      "feature": "Organizations Delegated Administrator",
+      "category": "authorization",
+      "description": "AWS Organizations Delegated Administrator allows the management account to delegate administration of AWS services to specific member accounts, reducing the security exposure of the management account. Instead of performing all administrative tasks from the management account (which is exempt from SCPs and has unique privileges), services like GuardDuty, Security Hub, IAM Identity Center, CloudFormation StackSets, and AWS Config can be managed from designated member accounts. This follows the principle of least privilege for organizational administration: the management account is used only for organization-level operations (SCPs, account creation, billing), while day-to-day service administration occurs in delegated accounts with appropriate guardrails.",
+      "best_practices": "1. Designate a dedicated Security Tooling account as the delegated administrator for GuardDuty, Security Hub, and Config. 2. Never use the management account for daily administrative tasks. 3. Restrict management account access to a small number of break-glass administrators. 4. Enable MFA on the management account root with FIDO2 hardware keys. 5. Monitor management account console and API activity with dedicated CloudWatch alarms. 6. Document which accounts are delegated administrators for which services. 7. Review delegated administrator assignments quarterly.",
+      "common_misconfigurations": [
+        {"issue": "All security administration performed from the management account", "impact": "Management account overexposed; compromise of management account yields unrestricted organization access", "severity": "high"},
+        {"issue": "Delegated administrator not configured for security services", "impact": "Security operations team requires management account access for daily GuardDuty/Security Hub management", "severity": "medium"},
+        {"issue": "Multiple services delegated to different accounts without documentation", "impact": "Unclear administrative boundaries; incident response team cannot identify which account manages which service", "severity": "medium"},
+        {"issue": "Management account used for workload deployment alongside organization management", "impact": "Workload compromise in management account grants SCP-exempt access to all organization resources", "severity": "critical"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-5", "NIST-800-53-AC-6(7)", "ISO-27001-A.5.3", "ISO-27001-A.5.15", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Administrative Units + Delegated Admin Roles", "gcp-iam": "Organization Admin + Folder-Level Delegation", "okta": "Delegated Admin Roles with Group Scope"}
+    },
+    {
+      "id": "aws-iam-access-advisor",
+      "vendor": "aws-iam",
+      "feature": "IAM Access Advisor (Last Accessed Information)",
+      "category": "monitoring",
+      "description": "IAM Access Advisor shows when IAM principals last accessed each AWS service they have permissions for, enabling data-driven permission right-sizing. For each IAM user, group, or role, Access Advisor displays the service-level and action-level last accessed timestamp, revealing unused permissions that can be safely removed. Service-level data is retained for 400 days; action-level data (for supported services like S3, EC2, IAM, Lambda, STS) provides granular visibility into which specific API actions were used. Access Advisor data is accessible via the console and the GenerateServiceLastAccessedDetails API for programmatic analysis. Combined with IAM Access Analyzer's policy generation feature, Access Advisor enables a systematic approach to achieving least privilege across the organization.",
+      "best_practices": "1. Review Access Advisor data monthly for all IAM roles and remove unused service permissions. 2. Use action-level last accessed data for high-privilege services (IAM, S3, EC2, Lambda). 3. Automate Access Advisor analysis with Lambda to generate right-sizing recommendations. 4. Set a threshold (e.g., 90 days) for unused permissions before flagging for removal. 5. Focus first on roles with the largest gap between granted and used permissions. 6. Use Access Advisor alongside IAM Access Analyzer policy generation for automated least-privilege policies. 7. Document permission removal decisions for audit trail and rollback reference.",
+      "common_misconfigurations": [
+        {"issue": "Access Advisor data never reviewed or acted upon", "impact": "Overprivileged roles persist indefinitely despite available data showing unused permissions", "severity": "medium"},
+        {"issue": "Permissions removed without considering seasonal or periodic usage patterns", "impact": "Quarterly or annual processes break when needed permissions were removed based on recent inactivity", "severity": "medium"},
+        {"issue": "Only service-level data used when action-level data is available", "impact": "Permissions right-sized at service level may still be over-permissive at the action level", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-2(3)", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra Permissions Management + Access Reviews", "gcp-iam": "IAM Recommender + Policy Analyzer", "sailpoint": "Role Mining + AI-Driven Recommendations"}
+    },
+    {
+      "id": "aws-cognito",
+      "vendor": "aws-iam",
+      "feature": "Amazon Cognito (User Pools & Identity Pools)",
+      "category": "authentication",
+      "description": "Amazon Cognito provides CIAM (Customer Identity and Access Management) for consumer and B2B applications. User Pools handle authentication: user registration, sign-in, MFA, account recovery, and token issuance (JWT ID tokens, access tokens, refresh tokens). Identity Pools (Federated Identities) exchange User Pool tokens or social/enterprise IdP tokens for temporary AWS credentials, enabling authenticated users to access AWS services directly. Cognito supports adaptive authentication with risk-based MFA, compromise detection (leaked credential checks), and advanced security features. User Pool triggers (Lambda functions) enable custom authentication flows, pre/post-sign-up validation, token customization, and migration from legacy identity systems.",
+      "best_practices": "1. Use User Pools for authentication and Identity Pools only when direct AWS service access is needed. 2. Enable advanced security features for adaptive authentication and compromise detection. 3. Configure Lambda triggers for custom validation during registration (fraud prevention, email domain restriction). 4. Set appropriate token lifetimes: short access tokens (1 hour), longer refresh tokens based on session requirements. 5. Use custom domains for the hosted UI to present a branded authentication experience. 6. Implement client-side token caching and refresh logic to minimize authentication round-trips. 7. Monitor Cognito CloudWatch metrics for failed authentication attempts and throttling.",
+      "common_misconfigurations": [
+        {"issue": "Identity Pool granting overly broad IAM roles to authenticated users", "impact": "All authenticated users receive IAM roles with access beyond their application needs", "severity": "critical"},
+        {"issue": "Advanced security features not enabled (adaptive auth, compromise detection)", "impact": "No risk-based MFA or leaked credential detection for user authentication", "severity": "high"},
+        {"issue": "Refresh token lifetime set too long (years instead of days/weeks)", "impact": "Long-lived refresh tokens enable persistent access even after user should be deauthenticated", "severity": "high"},
+        {"issue": "Lambda triggers without error handling blocking authentication flow", "impact": "Lambda function error causes all user authentication to fail", "severity": "critical"},
+        {"issue": "Unauthenticated access enabled in Identity Pool without restrictions", "impact": "Anonymous users obtain AWS credentials with whatever role is configured for unauthenticated access", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-2", "NIST-800-53-AC-7", "NIST-800-63A-IAL1", "NIST-800-63B-AAL1", "ISO-27001-A.5.16", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Azure AD B2C", "gcp-iam": "Identity Platform (Firebase Auth)", "okta": "Okta Customer Identity Cloud", "auth0": "Auth0 Universal Login + User Management"}
+    },
+    {
+      "id": "aws-sso-permission-sets",
+      "vendor": "aws-iam",
+      "feature": "IAM Identity Center Permission Sets",
+      "category": "authorization",
+      "description": "Permission Sets in IAM Identity Center define the level of access that users and groups have within specific AWS accounts. A Permission Set is a collection of one or more IAM policies (AWS managed, customer managed, or inline) that is assigned to users or groups for specific AWS accounts. When assigned, the Permission Set creates an IAM role in the target account that SSO users assume during authentication. Permission Sets support session duration configuration, permission boundaries, and relay state (deep-link to specific AWS console page after authentication). Multiple Permission Sets can be assigned to the same user for different accounts, enabling differentiated access levels across the organization's AWS account portfolio (e.g., read-only in production, admin in development).",
+      "best_practices": "1. Design Permission Sets around job functions (SecurityAudit, NetworkAdmin, DeveloperAccess) not individual policies. 2. Apply the least-privilege principle: start with read-only and add write permissions incrementally. 3. Use Permission Boundaries within Permission Sets to cap the maximum permissions. 4. Assign Permission Sets to groups, not individual users, for scalable management. 5. Create account-specific Permission Sets for sensitive accounts (production) with tighter restrictions. 6. Set session duration appropriate to the role (1 hour for production admin, 8 hours for development). 7. Use relay state to deep-link users to the appropriate console page for their role. 8. Audit Permission Set assignments quarterly and remove unused assignments.",
+      "common_misconfigurations": [
+        {"issue": "AdministratorAccess Permission Set assigned broadly to development teams", "impact": "Developers have full admin access across assigned accounts, including IAM, billing, and security services", "severity": "critical"},
+        {"issue": "Same Permission Set used for production and development accounts", "impact": "No differentiation in access level; production accounts accessible with same permissions as development", "severity": "high"},
+        {"issue": "Permission Sets assigned to individual users instead of groups", "impact": "Per-user permission management does not scale; access reviews require per-user analysis", "severity": "medium"},
+        {"issue": "No Permission Boundary configured in Permission Sets", "impact": "Users can escalate privileges by creating new roles or policies within their assigned accounts", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra ID Roles + Azure RBAC Role Assignments", "gcp-iam": "IAM Role Bindings per Project/Folder", "okta": "App Assignments with entitlements"}
+    },
+    {
+      "id": "aws-security-hub",
+      "vendor": "aws-iam",
+      "feature": "Security Hub (IAM Security Posture)",
+      "category": "monitoring",
+      "description": "AWS Security Hub provides a centralized security posture dashboard that aggregates findings from multiple AWS security services (GuardDuty, IAM Access Analyzer, Inspector, Config, Macie) and third-party tools. For IAM, Security Hub runs automated security checks against the CIS AWS Foundations Benchmark and AWS Foundational Security Best Practices, covering: root account MFA, IAM password policy, access key rotation, unused credentials, IAM user MFA, overly permissive policies, and CloudTrail configuration. Each finding is scored by severity, linked to compliance standards, and includes remediation guidance. Security Hub supports cross-account aggregation via AWS Organizations, providing a single pane of glass for IAM security posture across all accounts.",
+      "best_practices": "1. Enable Security Hub in all accounts via Organizations delegated administrator. 2. Enable CIS AWS Foundations Benchmark and AWS Foundational Security Best Practices standards. 3. Remediate critical and high-severity IAM findings within defined SLAs (critical: 24h, high: 7d). 4. Integrate Security Hub findings with ticketing systems (Jira, ServiceNow) for remediation workflow. 5. Create custom insights for IAM-specific finding aggregation and trend analysis. 6. Use automated remediation (EventBridge + Lambda) for common IAM findings. 7. Track IAM security posture score trends over time as a KPI.",
+      "common_misconfigurations": [
+        {"issue": "Security Hub not enabled in all accounts or all regions", "impact": "IAM security posture gaps in non-monitored accounts or regions go undetected", "severity": "high"},
+        {"issue": "Findings generated but no remediation workflow established", "impact": "Security posture issues detected but never remediated; findings accumulate without action", "severity": "high"},
+        {"issue": "Only default standards enabled; CIS benchmark not activated", "impact": "Comprehensive IAM security checks from CIS benchmark not evaluated", "severity": "medium"},
+        {"issue": "No automated remediation for common findings", "impact": "Manual remediation of high-volume findings (unused access keys, missing MFA) creates backlog", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-6(9)", "ISO-27001-A.5.36", "ISO-27001-A.8.16", "SOC2-CC7.2", "SOC2-CC5.2"],
+      "equivalent_in": {"azure-entra": "Microsoft Defender for Cloud (Security Posture)", "gcp-iam": "Security Command Center Security Health Analytics", "okta": "Okta HealthInsight"}
+    },
+    {
+      "id": "aws-ecs-task-roles",
+      "vendor": "aws-iam",
+      "feature": "ECS Task Roles & Execution Roles",
+      "category": "authorization",
+      "description": "ECS Task Roles provide per-container IAM permissions for applications running in Amazon ECS (Elastic Container Service). Two role types exist: Task Role (permissions for the application code running in the container to access AWS services like S3, DynamoDB, SQS) and Task Execution Role (permissions for the ECS agent to pull container images from ECR, retrieve secrets from Secrets Manager, and write logs to CloudWatch). Each task definition specifies these roles independently, enabling least-privilege separation between the container agent and the application. Task roles use temporary credentials obtained from the ECS container credential provider endpoint, eliminating the need for access keys in container environments.",
+      "best_practices": "1. Create dedicated task roles per application or microservice; never share roles across different services. 2. Separate task role (application permissions) from execution role (infrastructure permissions). 3. Grant only the specific IAM actions and resource ARNs the container needs. 4. Use the ECS task metadata endpoint for credential retrieval; never inject access keys via environment variables. 5. Reference secrets in task definitions via Secrets Manager ARNs instead of environment variables. 6. Monitor AssumeRole events for task roles in CloudTrail for anomalous access. 7. Restrict execution role to specific ECR repositories and Secrets Manager secrets.",
+      "common_misconfigurations": [
+        {"issue": "Single IAM role shared across all ECS tasks", "impact": "All containers inherit the same permissions; compromise of any container grants access to all resources", "severity": "critical"},
+        {"issue": "Secrets injected via environment variables instead of Secrets Manager references", "impact": "Secrets visible in ECS task definition, console, and describe-tasks API output", "severity": "high"},
+        {"issue": "Task execution role has overly broad permissions", "impact": "ECS agent can access any ECR repository or Secrets Manager secret in the account", "severity": "medium"},
+        {"issue": "Access keys used in containers instead of task role credentials", "impact": "Long-term credentials in container images or environment; no automatic rotation", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-IA-5", "ISO-27001-A.8.9", "ISO-27001-A.5.15", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Managed Identities for Azure Container Apps", "gcp-iam": "Cloud Run Service Account + Secret Manager", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-iam-groups",
+      "vendor": "aws-iam",
+      "feature": "IAM Groups",
+      "category": "authorization",
+      "description": "IAM Groups are collections of IAM users that enable centralized permission management. Instead of attaching policies to individual users, policies are attached to groups, and users inherit permissions through group membership. This simplifies permission management: when a new team member joins, they are added to the appropriate groups (e.g., Developers, SecurityAuditors, BillingAdmins) and immediately receive the correct permissions. When policies need to change, they are updated on the group once rather than on each individual user. Groups can have up to 10 managed policies attached. IAM groups are flat (no nesting) and are specific to IAM users; they do not apply to IAM Identity Center users or federated identities.",
+      "best_practices": "1. Always attach policies to groups, never directly to individual IAM users. 2. Create groups aligned to job functions (Developers, Admins, Auditors, BillingAdmins). 3. Use group membership as the primary access management mechanism for IAM users. 4. Enforce MFA for all members of administrative groups via IAM policy conditions. 5. Review group memberships quarterly and remove users who no longer need the group's access. 6. Document the purpose and permissions of each group for audit purposes. 7. Migrate from IAM user groups to IAM Identity Center groups for centralized SSO management.",
+      "common_misconfigurations": [
+        {"issue": "Policies attached directly to IAM users instead of groups", "impact": "Per-user policy management does not scale; access reviews require per-user analysis", "severity": "medium"},
+        {"issue": "Users in multiple groups with overlapping or conflicting permissions", "impact": "Effective permissions are the union of all group policies; users may have more access than intended", "severity": "medium"},
+        {"issue": "Administrative group without MFA policy condition requirement", "impact": "Admin group members perform privileged actions without MFA verification", "severity": "high"},
+        {"issue": "Stale group memberships not reviewed or cleaned up", "impact": "Users retain permissions from previous roles through stale group membership", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-3", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.2"],
+      "equivalent_in": {"azure-entra": "Entra ID Security Groups + Role Assignments", "gcp-iam": "Cloud Identity Groups + IAM Bindings", "okta": "Okta Groups + Application Assignments"}
+    },
+    {
+      "id": "aws-config-iam-rules",
+      "vendor": "aws-iam",
+      "feature": "AWS Config IAM Compliance Rules",
+      "category": "monitoring",
+      "description": "AWS Config provides continuous compliance monitoring for IAM configurations through managed and custom rules. IAM-specific managed rules include: iam-root-access-key-check (root has no access keys), iam-user-mfa-enabled (all users have MFA), iam-user-unused-credentials-check (detect unused credentials), iam-policy-no-statements-with-admin-access (detect admin wildcard policies), iam-password-policy (password policy meets requirements), iam-user-no-policies-check (no inline policies on users), access-keys-rotated (keys rotated within threshold), and mfa-enabled-for-iam-console-access (console users have MFA). Config records IAM configuration changes over time, providing a configuration timeline for each resource. Remediation actions can automatically fix non-compliant resources via Systems Manager Automation documents.",
+      "best_practices": "1. Enable all IAM-related AWS Config managed rules across all accounts. 2. Configure automatic remediation for high-confidence rules (e.g., disable unused access keys). 3. Use Config aggregator for organization-wide compliance visibility. 4. Create custom Config rules for organization-specific IAM requirements. 5. Set up SNS notifications for compliance state changes on critical IAM rules. 6. Review Config compliance dashboard weekly and remediate non-compliant resources. 7. Export Config compliance data for audit evidence.",
+      "common_misconfigurations": [
+        {"issue": "AWS Config not enabled for IAM resource recording", "impact": "No configuration change history or compliance monitoring for IAM resources", "severity": "high"},
+        {"issue": "IAM Config rules enabled but no remediation workflow", "impact": "Non-compliant IAM configurations detected but never fixed; compliance debt accumulates", "severity": "medium"},
+        {"issue": "Config not aggregated across all organization accounts", "impact": "IAM compliance visible per-account only; no organization-wide posture assessment", "severity": "medium"},
+        {"issue": "No automatic remediation for safe, high-confidence IAM findings", "impact": "Manual remediation of clear-cut violations (unused keys, missing MFA) adds unnecessary delay", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-6(9)", "ISO-27001-A.5.36", "ISO-27001-A.8.16", "SOC2-CC5.2", "CIS-5.1"],
+      "equivalent_in": {"azure-entra": "Azure Policy (IAM compliance rules)", "gcp-iam": "Security Health Analytics + Organization Policy", "okta": "Okta HealthInsight recommendations"}
+    },
+    {
+      "id": "aws-iam-access-boundary",
+      "vendor": "aws-iam",
+      "feature": "IAM Permission Boundaries",
+      "category": "authorization",
+      "description": "Permission Boundaries are advanced IAM policies that set the maximum permissions an IAM entity (user or role) can have, regardless of what identity-based policies are attached. They work as an intersection with identity policies: the effective permissions are only those granted by both the identity policy AND allowed by the permission boundary. Permission boundaries are critical for secure delegation: an administrator can allow developers to create IAM roles (for their applications) while ensuring those roles cannot exceed specific permission boundaries. This prevents privilege escalation where a developer creates a role with more permissions than they themselves have. Permission boundaries apply to identity-based policies only and do not restrict resource-based policies.",
+      "best_practices": "1. Use permission boundaries whenever delegating IAM role creation to non-admin users. 2. Create boundary policies that exclude dangerous actions (iam:*, sts:*, organizations:*, account:*). 3. Include a condition requiring the permission boundary on all roles created by delegated users. 4. Combine with SCPs for defense-in-depth: SCP as account guardrail, boundary as identity guardrail. 5. Test permission boundary interactions with identity policies using the IAM Policy Simulator. 6. Document the permission boundary model for audit evidence of privilege escalation prevention. 7. Update permission boundaries when new services are adopted to ensure appropriate coverage.",
+      "common_misconfigurations": [
+        {"issue": "No permission boundaries used; developers create roles with AdministratorAccess", "impact": "Developers create roles with permissions exceeding their own, enabling privilege escalation", "severity": "critical"},
+        {"issue": "Permission boundary does not block IAM actions", "impact": "Roles created within the boundary can modify IAM policies or create new roles without boundaries", "severity": "critical"},
+        {"issue": "Boundary not required as a condition when delegating role creation", "impact": "Delegated users create roles without the boundary attached, bypassing the permission ceiling", "severity": "high"},
+        {"issue": "Boundary too restrictive, blocking legitimate application operations", "impact": "Application roles fail to access required services because the boundary is overly narrow", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(3)", "NIST-800-53-AC-3", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Azure Deny Assignments + Custom Role Definitions", "gcp-iam": "IAM Deny Policies", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-verified-access",
+      "vendor": "aws-iam",
+      "feature": "AWS Verified Access",
+      "category": "authorization",
+      "description": "AWS Verified Access provides zero trust network access (ZTNA) for corporate applications running on AWS, replacing VPN-based access with identity-centric, policy-driven connectivity. Verified Access evaluates user identity (from IAM Identity Center, Okta, or other OIDC providers) and device posture (from CrowdStrike, Jamf, or other device management providers) before granting access to specific applications. Each application has its own access policy using Cedar policy language, enabling fine-grained access decisions based on identity attributes, group membership, device compliance, and custom conditions. Verified Access creates application-specific access points, eliminating the broad network access that VPNs provide. Traffic logging provides visibility into access decisions and user activity.",
+      "best_practices": "1. Deploy Verified Access for all internal web applications before decommissioning VPN. 2. Configure device trust integration with your MDM (CrowdStrike, Jamf, Intune) for posture-based access decisions. 3. Create per-application Cedar policies with least-privilege access rules. 4. Enable access logging to CloudWatch for monitoring and compliance evidence. 5. Integrate with IAM Identity Center or your corporate IdP for consistent identity-based access decisions. 6. Test application access policies with pilot groups before broad deployment. 7. Use Verified Access endpoints instead of ALB internet-facing listeners for internal applications.",
+      "common_misconfigurations": [
+        {"issue": "VPN decommissioned before validating all application access through Verified Access", "impact": "Critical internal applications inaccessible, causing business disruption", "severity": "high"},
+        {"issue": "Device trust not integrated; identity-only access decisions", "impact": "Unmanaged devices access corporate applications without posture verification", "severity": "medium"},
+        {"issue": "Overly permissive Cedar policies allowing any authenticated user", "impact": "All authenticated users access all applications regardless of role or need-to-know", "severity": "high"},
+        {"issue": "Access logging not enabled", "impact": "No visibility into access decisions or user activity for security monitoring and audit", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-207-TENET-1", "NIST-800-207-TENET-3", "NIST-800-207-DEPLOYMENT-SDP", "NIST-800-53-AC-17", "ISO-27001-A.8.20", "SOC2-CC6.1", "SOC2-CC6.6"],
+      "equivalent_in": {"azure-entra": "Global Secure Access (Private Access)", "gcp-iam": "BeyondCorp Enterprise + Identity-Aware Proxy", "okta": "Okta Privileged Access (OPA)"}
+    },
+    {
+      "id": "aws-iam-identity-provider",
+      "vendor": "aws-iam",
+      "feature": "IAM Identity Providers (SAML/OIDC Federation)",
+      "category": "federation",
+      "description": "IAM Identity Providers enable federation of external identities to AWS IAM roles using SAML 2.0 or OpenID Connect. A SAML IdP configuration trusts assertions from enterprise identity providers (Entra ID, ADFS, Okta, Ping) and maps SAML attributes to IAM role assumptions. An OIDC IdP configuration trusts tokens from OIDC-compliant providers (GitHub Actions, GitLab CI, Kubernetes) for workload identity federation. When users authenticate to their corporate IdP, the IdP issues a SAML assertion or OIDC token that is exchanged for temporary AWS credentials via STS AssumeRoleWithSAML or AssumeRoleWithWebIdentity. This eliminates the need for IAM users with long-term credentials for workforce access and enables centralized identity lifecycle management through the corporate IdP.",
+      "best_practices": "1. Use IAM Identity Center instead of direct IAM IdP federation for workforce SSO (simplified management). 2. Use OIDC IdP federation for CI/CD workload identity (GitHub Actions, GitLab CI, Terraform Cloud). 3. Scope OIDC trust to specific subjects (repository, branch, environment) in the trust policy. 4. Map SAML attributes to specific IAM roles based on user group membership. 5. Set maximum session duration appropriate to the federation use case. 6. Rotate SAML signing certificates before expiration to prevent authentication outage. 7. Monitor AssumeRoleWithSAML and AssumeRoleWithWebIdentity events in CloudTrail.",
+      "common_misconfigurations": [
+        {"issue": "SAML trust allows any assertion from the IdP to assume any federated role", "impact": "Any authenticated user in the IdP can assume any federated IAM role regardless of group membership", "severity": "critical"},
+        {"issue": "OIDC trust policy does not restrict to specific subjects", "impact": "Any token from the OIDC provider can assume the role, regardless of repository or environment", "severity": "high"},
+        {"issue": "SAML IdP certificate not rotated before expiration", "impact": "Federation breaks when IdP rotates its signing certificate, locking out all federated users", "severity": "high"},
+        {"issue": "Direct IAM IdP federation used instead of IAM Identity Center for workforce", "impact": "Per-account role mapping instead of centralized multi-account SSO management", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-8", "NIST-800-63C-FAL1", "NIST-800-63C-FAL2", "NIST-800-53-AC-6", "ISO-27001-A.5.19", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Enterprise Applications (SAML/OIDC SSO)", "gcp-iam": "Workforce Identity Federation + Workload Identity Federation", "okta": "Inbound Federation + App Integration"}
+    },
+    {
+      "id": "aws-sts-session-policies",
+      "vendor": "aws-iam",
+      "feature": "STS Session Policies & Tags",
+      "category": "authorization",
+      "description": "AWS Security Token Service (STS) session policies allow further restricting the permissions of temporary credentials obtained via AssumeRole, AssumeRoleWithSAML, or AssumeRoleWithWebIdentity. Session policies are inline policies passed during the AssumeRole call that create an intersection with the role's identity policies: the effective permissions are limited to those allowed by both the role policy and the session policy. Session tags are key-value pairs passed during role assumption that can be referenced in IAM policy conditions for attribute-based access control (ABAC). Transitive session tags persist across role chaining. Session policies and tags enable dynamic, context-aware authorization without creating multiple roles for different access scenarios.",
+      "best_practices": "1. Use session policies to restrict permissions when assuming broad roles for specific tasks. 2. Pass session tags from identity providers for ABAC (project, department, environment). 3. Use transitive session tags for role chaining scenarios where tags must persist. 4. Reference session tags in resource policies for dynamic resource-level authorization. 5. Set appropriate session duration based on the task requirements (shorter for sensitive operations). 6. Log and monitor session policy usage in CloudTrail for authorization analysis. 7. Use session policies for CI/CD pipelines to further restrict role permissions per deployment stage.",
+      "common_misconfigurations": [
+        {"issue": "Session policies not used to scope broad roles for specific tasks", "impact": "Users assume broad roles with full permissions when only a subset is needed for the current task", "severity": "medium"},
+        {"issue": "Session tags not validated in IAM policies", "impact": "Tags passed during role assumption not used for authorization decisions; ABAC opportunity missed", "severity": "low"},
+        {"issue": "Session duration set to maximum without justification", "impact": "Long-lived temporary credentials from broad roles persist beyond task completion", "severity": "medium"},
+        {"issue": "Transitive tags not configured for role chaining scenarios", "impact": "Session tags lost during role chaining; ABAC policies fail in downstream role", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-3(7)", "ISO-27001-A.5.15", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Conditional Access session controls + ABAC conditions", "gcp-iam": "IAM Conditions with session context", "okta": "OAuth scope restrictions per session"}
+    },
+    {
+      "id": "aws-directory-service",
+      "vendor": "aws-iam",
+      "feature": "AWS Directory Service (Managed AD & AD Connector)",
+      "category": "federation",
+      "description": "AWS Directory Service provides managed Active Directory (AD) implementations for integrating on-premises identity infrastructure with AWS. AWS Managed Microsoft AD deploys a fully managed AD forest in AWS VPC, supporting AD-dependent workloads (EC2 instances, RDS SQL Server, Amazon WorkSpaces), trusts with on-premises AD, and integration with IAM Identity Center. AD Connector is a proxy that redirects directory requests to on-premises AD without caching data in AWS, suitable for organizations requiring AD authentication in AWS without deploying a full AD in the cloud. Simple AD is a Samba-based directory for basic LDAP needs without full AD capabilities. These services enable domain joining EC2 instances, seamless SSO for Amazon WorkSpaces, and centralized AD-based authentication for AWS workloads.",
+      "best_practices": "1. Use AWS Managed Microsoft AD for production workloads requiring AD features (Group Policy, trusts, MFA). 2. Use AD Connector only when no AD data should reside in AWS (compliance requirement). 3. Establish two-way trust between AWS Managed AD and on-premises AD for seamless authentication. 4. Deploy AWS Managed AD across two Availability Zones for high availability. 5. Enable MFA for AWS Managed AD using RADIUS integration. 6. Monitor directory health via CloudWatch metrics and set up alerts for replication failures. 7. Use AWS Managed AD with IAM Identity Center for consolidated AWS SSO.",
+      "common_misconfigurations": [
+        {"issue": "AWS Managed AD deployed in single AZ without multi-AZ HA", "impact": "AZ failure causes directory service outage, blocking authentication for all AD-dependent workloads", "severity": "high"},
+        {"issue": "No trust relationship with on-premises AD; duplicate identity management", "impact": "Separate user management in AWS AD creates identity drift and increases administration burden", "severity": "medium"},
+        {"issue": "AD Connector used for scenarios requiring AD features (Group Policy, LDAPS)", "impact": "AD Connector is a proxy only; Group Policy, AD-dependent apps, and LDAPS require Managed AD", "severity": "medium"},
+        {"issue": "MFA not configured for AWS Managed AD authentication", "impact": "AD-based authentication to AWS WorkSpaces, RDS, and domain-joined instances relies on password alone", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-IA-2", "NIST-800-53-IA-8", "ISO-27001-A.5.16", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Entra ID (cloud-native) + Entra Connect (hybrid)", "gcp-iam": "Google Cloud Directory Sync (GCDS) + Managed AD", "okta": "Okta AD Agent + Directory Integration"}
+    },
+    {
+      "id": "aws-lake-formation",
+      "vendor": "aws-iam",
+      "feature": "Lake Formation (Fine-Grained Data Access)",
+      "category": "authorization",
+      "description": "AWS Lake Formation provides fine-grained access control for data lake resources stored in S3, enabling column-level, row-level, and cell-level security for analytics workloads. Instead of managing complex S3 bucket policies and IAM policies for data access, Lake Formation provides a centralized permissions model where data stewards grant access to specific databases, tables, columns, and rows. Lake Formation permissions work with Athena, Redshift Spectrum, Glue, and EMR for query-time enforcement. Tag-based access control (LF-TBAC) enables attribute-based data governance where data columns tagged with classification labels are automatically accessible only to principals with matching tag permissions. This simplifies data governance for large-scale data lakes with complex access requirements.",
+      "best_practices": "1. Use Lake Formation as the centralized data access control layer instead of S3 bucket policies for analytics. 2. Implement tag-based access control (LF-TBAC) for classification-driven data governance. 3. Grant column-level permissions to prevent exposure of sensitive columns (PII, financial data). 4. Use row-level security for multi-tenant data isolation in shared tables. 5. Register all S3 data lake locations with Lake Formation for consistent governance. 6. Audit data access via CloudTrail data events for Lake Formation API calls. 7. Integrate Lake Formation permissions with IAM Identity Center for user-to-data access governance.",
+      "common_misconfigurations": [
+        {"issue": "S3 bucket policies used for data lake access control instead of Lake Formation", "impact": "Coarse-grained S3 permissions cannot enforce column-level or row-level security", "severity": "medium"},
+        {"issue": "All columns accessible to analytics users without column-level filtering", "impact": "Users query sensitive columns (SSN, credit card, salary) without data protection controls", "severity": "high"},
+        {"issue": "LF-TBAC not used; per-table manual permission grants", "impact": "Data access governance does not scale; new tables require manual permission configuration", "severity": "medium"},
+        {"issue": "Data access events not logged or monitored", "impact": "Unauthorized data access or excessive queries not detected or investigated", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-3(4)", "NIST-800-53-AC-16", "ISO-27001-A.8.3", "ISO-27001-A.8.4", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Microsoft Purview Data Governance + Azure RBAC", "gcp-iam": "BigQuery Column-Level Security + Row-Level Security", "okta": "N/A (data governance, not identity management)"}
+    },
+    {
+      "id": "aws-control-tower",
+      "vendor": "aws-iam",
+      "feature": "Control Tower (Multi-Account Governance)",
+      "category": "governance",
+      "description": "AWS Control Tower provides automated multi-account governance by establishing a well-architected landing zone with pre-configured guardrails. For IAM governance, Control Tower enforces: mandatory guardrails (preventive SCPs and detective Config rules) that cannot be disabled, strongly recommended guardrails for security best practices, and elective guardrails for specific compliance requirements. Control Tower automatically creates organizational units (Security, Sandbox), configures centralized logging, sets up audit accounts, enables CloudTrail and Config, and deploys IAM Identity Center for multi-account SSO. Account Factory provides a self-service mechanism for creating new accounts with standardized baselines. Control Tower addresses the challenge of maintaining consistent IAM governance across a growing AWS Organizations portfolio.",
+      "best_practices": "1. Use Control Tower for all new AWS Organizations deployments as the governance foundation. 2. Enable all strongly recommended guardrails for IAM security (MFA, access key rotation, root restrictions). 3. Use Account Factory for all new account creation to ensure baseline guardrails are applied. 4. Customize Account Factory with additional IAM baseline (password policy, default roles, logging). 5. Extend guardrails with custom SCPs and Config rules for organization-specific requirements. 6. Monitor Control Tower drift detection for guardrail compliance status. 7. Integrate Control Tower with IAM Identity Center for centralized multi-account SSO.",
+      "common_misconfigurations": [
+        {"issue": "AWS accounts created outside Control Tower Account Factory", "impact": "New accounts lack baseline guardrails, logging, and IAM governance configuration", "severity": "high"},
+        {"issue": "Strongly recommended guardrails not enabled", "impact": "IAM security best practices not enforced across the organization", "severity": "medium"},
+        {"issue": "Control Tower drift not monitored or remediated", "impact": "Guardrails modified or disabled in member accounts without detection", "severity": "medium"},
+        {"issue": "Custom guardrails not implemented for organization-specific requirements", "impact": "Only AWS-provided guardrails active; organization-specific IAM policies not enforced", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-1", "NIST-800-53-AC-6(7)", "ISO-27001-A.5.1", "ISO-27001-A.5.36", "SOC2-CC5.2", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Azure Landing Zones + Management Groups + Azure Policy", "gcp-iam": "Cloud Foundation Toolkit + Organization Policies", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "aws-verified-permissions",
+      "vendor": "aws-iam",
+      "feature": "Amazon Verified Permissions (Cedar)",
+      "category": "authorization",
+      "description": "Amazon Verified Permissions provides a managed fine-grained authorization service using the Cedar policy language for application-level access control. Unlike IAM (which controls AWS API access), Verified Permissions controls access within your application: who can view which records, which users can perform which business operations, and how data visibility is scoped. Cedar policies define authorization rules using a principal-action-resource model with conditions. Policies are evaluated by the Verified Permissions service via API calls from your application. The service provides a policy store (centralized management of authorization policies), a schema (defining entity types and relationships), and authorization APIs (IsAuthorized for individual decisions, BatchIsAuthorized for bulk checks). Verified Permissions integrates with Cognito for identity context and CloudTrail for authorization decision auditing.",
+      "best_practices": "1. Use Verified Permissions for application-level authorization instead of embedding authorization logic in code. 2. Define a schema that models your application's entity types and relationships. 3. Write Cedar policies in a separate policy store, not inline in application code. 4. Use BatchIsAuthorized for UI list filtering to determine which resources a user can see. 5. Integrate with Cognito ID tokens for user identity and group membership context. 6. Enable CloudTrail logging for all authorization decisions for audit and debugging. 7. Test Cedar policies using the built-in policy validation and testing tools.",
+      "common_misconfigurations": [
+        {"issue": "Authorization logic hardcoded in application code instead of using policy service", "impact": "Authorization rules scattered across codebase; cannot audit, update, or review centrally", "severity": "medium"},
+        {"issue": "Cedar policies too permissive; default-allow instead of default-deny", "impact": "Users access resources not explicitly permitted by policy", "severity": "high"},
+        {"issue": "Authorization decisions not logged to CloudTrail", "impact": "No audit trail for who accessed what within the application", "severity": "medium"},
+        {"issue": "Schema not defined; unstructured authorization without type safety", "impact": "Policy errors not caught by validation; authorization decisions may be incorrect", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-3(7)", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "App Roles + Custom Authorization Logic", "gcp-iam": "N/A (no managed fine-grained authz service)", "auth0": "Auth0 Fine-Grained Authorization (OpenFGA)", "okta": "API Access Management (scope-based, less granular)"}
+    }
+  ]
+}

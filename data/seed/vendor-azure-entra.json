@@ -1,0 +1,639 @@
+{
+  "vendor_configurations": [
+    {
+      "id": "azure-conditional-access",
+      "vendor": "azure-entra",
+      "feature": "Conditional Access Policies",
+      "category": "authentication",
+      "description": "Conditional Access is the zero trust policy engine in Microsoft Entra ID that evaluates signals (user, device, location, application, real-time risk) and enforces access decisions. Policies are if-then statements: when a user tries to access a resource, they must satisfy specific conditions. Policies can require MFA, device compliance, approved apps, session restrictions, or block access entirely. Conditional Access is the foundation of Microsoft's zero trust implementation and the primary mechanism for enforcing adaptive access control across all Microsoft 365 and Azure resources.",
+      "best_practices": "1. Deploy in report-only mode first to understand impact before enforcement. 2. Always create break-glass emergency access accounts excluded from all policies. 3. Block legacy authentication protocols (IMAP, SMTP, POP3) that cannot support MFA. 4. Require compliant or hybrid-joined devices for sensitive applications. 5. Use named locations to define trusted corporate networks for risk-based decisions. 6. Layer policies from broad baseline (all users/all apps require MFA) to specific exceptions. 7. Enable session controls with sign-in frequency and persistent browser settings. 8. Monitor the Conditional Access insights and reporting workbook weekly.",
+      "common_misconfigurations": [
+        {"issue": "No break-glass account excluded from all Conditional Access policies", "impact": "Complete lockout from tenant during Entra ID outage or misconfiguration with no recovery path", "severity": "critical"},
+        {"issue": "Legacy authentication protocols not blocked", "impact": "Attackers bypass MFA by authenticating via IMAP/SMTP/POP3 which cannot enforce MFA", "severity": "critical"},
+        {"issue": "Policies not covering all cloud apps", "impact": "Users access unprotected applications without MFA, creating gaps in zero trust enforcement", "severity": "high"},
+        {"issue": "No device compliance requirement for sensitive apps", "impact": "Unmanaged or compromised devices access corporate data without posture assessment", "severity": "high"},
+        {"issue": "Overly broad exclusions for service accounts", "impact": "Service accounts excluded from CA policies become prime targets for credential theft", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-7", "NIST-800-53-IA-2(1)", "NIST-800-207-PDP-PEP", "ISO-27001-A.8.5", "SOC2-CC6.1", "CIS-6.2"],
+      "equivalent_in": {"aws-iam": "IAM Identity Center Permission Sets + SCPs", "gcp-iam": "Context-Aware Access / BeyondCorp", "okta": "Authentication Policies + Network Zones"}
+    },
+    {
+      "id": "azure-pim",
+      "vendor": "azure-entra",
+      "feature": "Privileged Identity Management (PIM)",
+      "category": "privileged-access",
+      "description": "PIM provides just-in-time (JIT) privileged access to Azure AD roles and Azure resources. Instead of permanent role assignments, users activate roles on-demand with approval workflows, time-limited duration, MFA verification, and justification requirements. PIM supports access reviews, activation alerts, and audit history for all privileged role changes. It covers both Entra ID directory roles (Global Admin, User Admin) and Azure resource roles (Subscription Owner, Resource Group Contributor), making it the central governance mechanism for privileged access in the Microsoft cloud ecosystem.",
+      "best_practices": "1. Eliminate all permanent Global Administrator assignments except break-glass accounts. 2. Configure maximum activation duration of 4-8 hours for sensitive roles. 3. Require MFA and business justification for every role activation. 4. Set up approval workflows for critical roles (Global Admin, Privileged Role Admin). 5. Configure activation alerts to notify security team of privileged role activations. 6. Schedule quarterly access reviews for all eligible role assignments. 7. Use PIM for Azure resource roles in addition to Entra ID directory roles. 8. Monitor activation patterns for anomalies using PIM audit logs.",
+      "common_misconfigurations": [
+        {"issue": "Permanent Global Administrator assignments instead of eligible PIM roles", "impact": "Standing privileges create persistent attack surface; compromised GA account has unlimited access 24/7", "severity": "critical"},
+        {"issue": "No approval required for Global Admin role activation", "impact": "Compromised eligible user can self-activate GA role without human verification gate", "severity": "critical"},
+        {"issue": "Activation duration set to 24 hours or more", "impact": "Extended activation windows defeat the purpose of JIT access by creating prolonged privilege exposure", "severity": "high"},
+        {"issue": "MFA not required for role activation", "impact": "Stolen session token or credentials allow silent privilege escalation without additional verification", "severity": "high"},
+        {"issue": "No access reviews configured for eligible assignments", "impact": "Stale eligible role assignments accumulate, expanding the set of users who can activate privileges", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(7)", "ISO-27001-A.8.2", "SOC2-CC6.3", "CIS-5.4", "CISA-ZTMM-ID-PAM-MATURITY"],
+      "equivalent_in": {"aws-iam": "IAM Roles with STS AssumeRole + Session Policies", "gcp-iam": "PAM (Privileged Access Manager)", "cyberark": "Privileged Access Manager"}
+    },
+    {
+      "id": "azure-app-registrations",
+      "vendor": "azure-entra",
+      "feature": "App Registrations & Service Principals",
+      "category": "authorization",
+      "description": "App Registrations define application identities in Entra ID, creating a trust relationship between an application and the identity platform. Each registration creates a Service Principal in the tenant for authorization. Applications can request two types of permissions: delegated permissions (act on behalf of a signed-in user) and application permissions (act as the application itself without a user context). Application permissions are particularly sensitive because they operate without user context and typically have broad access. The app registration model supports OAuth 2.0 and OpenID Connect flows, certificate and secret-based authentication, and federated credentials for workload identity.",
+      "best_practices": "1. Prefer delegated permissions over application permissions whenever a user context is available. 2. Use certificates or federated credentials instead of client secrets for production applications. 3. Set client secret expiration to maximum 6 months and rotate proactively. 4. Apply the principle of least privilege: request only the specific API permissions needed. 5. Require admin consent for application permissions rather than allowing user consent. 6. Restrict user consent to verified publisher apps or disable entirely. 7. Regularly audit applications with high-privilege permissions (Mail.ReadWrite, Directory.ReadWrite.All). 8. Tag app registrations with ownership and purpose metadata for lifecycle management.",
+      "common_misconfigurations": [
+        {"issue": "Application permissions granted when delegated permissions would suffice", "impact": "Application has tenant-wide access without user context, bypassing user-level access controls", "severity": "high"},
+        {"issue": "Client secrets with no expiration or multi-year expiration", "impact": "Long-lived secrets increase exposure window; leaked secrets remain valid indefinitely", "severity": "high"},
+        {"issue": "Overly broad API permissions (Directory.ReadWrite.All, Mail.ReadWrite)", "impact": "Compromised application can read/modify all directory objects or all mailboxes in the tenant", "severity": "critical"},
+        {"issue": "User consent enabled for unverified publisher apps", "impact": "Users can inadvertently grant malicious OAuth apps access to organizational data (consent phishing)", "severity": "high"},
+        {"issue": "Orphaned app registrations with no identified owner", "impact": "No one monitors or rotates credentials for abandoned applications, creating hidden attack surface", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-3", "NIST-800-53-IA-5", "NIST-800-53-AC-2", "ISO-27001-A.5.18", "ISO-27001-A.8.9", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"aws-iam": "IAM Roles for Applications + OIDC Identity Providers", "gcp-iam": "Service Accounts + OAuth Clients", "okta": "OIDC App Integration", "auth0": "Machine-to-Machine Applications"}
+    },
+    {
+      "id": "azure-managed-identities",
+      "vendor": "azure-entra",
+      "feature": "Managed Identities",
+      "category": "authorization",
+      "description": "Managed Identities eliminate the need for developers to manage credentials for Azure service-to-service authentication. Azure automatically provisions and rotates the identity credentials behind the scenes. System-assigned managed identities are tied to a single Azure resource lifecycle (created and deleted with the resource). User-assigned managed identities are standalone resources that can be shared across multiple Azure resources. Managed identities authenticate to any service supporting Azure AD authentication by requesting tokens from the Azure Instance Metadata Service (IMDS). This is the recommended approach for authenticating Azure resources to other Azure services, replacing service principal client secrets and connection strings.",
+      "best_practices": "1. Use system-assigned managed identities for single-resource scenarios to bind identity lifecycle to resource lifecycle. 2. Use user-assigned managed identities when multiple resources need the same identity or when identity must persist across resource recreation. 3. Grant managed identities the minimum RBAC roles required (Reader, Storage Blob Data Contributor, etc.). 4. Never use managed identities as a bypass for proper RBAC role assignments. 5. Monitor managed identity token acquisition patterns in Entra ID sign-in logs. 6. Use managed identities for Key Vault access instead of storing connection strings in app settings. 7. Combine with Private Endpoints to ensure managed identity traffic stays on the Azure backbone.",
+      "common_misconfigurations": [
+        {"issue": "Using client secrets or connection strings when managed identities are available", "impact": "Unnecessary credential management burden and risk of secret exposure in code, config, or logs", "severity": "high"},
+        {"issue": "Granting Contributor or Owner role to managed identities instead of specific data-plane roles", "impact": "Overprivileged identity can modify resource configuration, not just access data", "severity": "high"},
+        {"issue": "User-assigned managed identity shared across trust boundaries", "impact": "Compromise of any resource sharing the identity grants access to all resources it can authenticate to", "severity": "medium"},
+        {"issue": "Not monitoring managed identity sign-in activity", "impact": "Anomalous token acquisition by compromised resources goes undetected", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-AC-6", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "IAM Roles for EC2/Lambda (Instance Profiles)", "gcp-iam": "Service Accounts with Workload Identity", "okta": "N/A (cloud-provider specific)"}
+    },
+    {
+      "id": "azure-b2b-collaboration",
+      "vendor": "azure-entra",
+      "feature": "B2B Collaboration (External Identities)",
+      "category": "federation",
+      "description": "Entra ID B2B Collaboration enables secure sharing of applications and resources with external users (partners, vendors, contractors) while maintaining control through your organization's policies. External users authenticate with their home organization's identity provider and are represented as guest user objects in your directory. B2B supports federation with other Entra ID tenants, Google, Facebook, SAML/WS-Fed identity providers, and email one-time passcodes. Cross-tenant access settings allow granular control over which organizations can collaborate, what applications are shared, and whether to trust MFA and device claims from the external organization. This replaces the legacy practice of creating local accounts for external users.",
+      "best_practices": "1. Configure cross-tenant access settings to explicitly allow or block collaboration with specific organizations. 2. Enable MFA trust for partner organizations that enforce MFA to avoid double-prompting. 3. Use Conditional Access policies that target guest users with appropriate restrictions. 4. Restrict guest users from enumerating directory objects (Users.Read.All). 5. Set guest user access restrictions to 'most restrictive' in external collaboration settings. 6. Implement access reviews for all guest accounts on a quarterly basis. 7. Use entitlement management access packages for structured external access with automatic expiration.",
+      "common_misconfigurations": [
+        {"issue": "Guest user access not restricted in external collaboration settings", "impact": "Guest users can enumerate all users, groups, and applications in the directory", "severity": "high"},
+        {"issue": "No Conditional Access policies targeting guest user type", "impact": "External users bypass MFA and device compliance requirements designed for internal users", "severity": "high"},
+        {"issue": "No access reviews for guest accounts", "impact": "Stale guest accounts from completed projects accumulate indefinitely, creating persistent external access", "severity": "medium"},
+        {"issue": "Cross-tenant access settings allow all organizations by default", "impact": "Any external organization can be invited for collaboration without vetting, expanding attack surface", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-20", "NIST-800-53-AC-21", "NIST-800-53-IA-8", "ISO-27001-A.5.19", "ISO-27001-A.5.20", "SOC2-CC6.1", "SOC2-CC6.4"],
+      "equivalent_in": {"aws-iam": "IAM Cross-Account Roles + Organizations", "gcp-iam": "Workload Identity Federation + Organization Policies", "okta": "Inbound Federation + Universal Directory"}
+    },
+    {
+      "id": "azure-b2c-custom-policies",
+      "vendor": "azure-entra",
+      "feature": "Azure AD B2C Custom Policies",
+      "category": "authentication",
+      "description": "Azure AD B2C is Microsoft's customer identity and access management (CIAM) solution for consumer-facing applications. Custom Policies (Identity Experience Framework) provide XML-based policy definitions for complex identity journeys including multi-step registration, progressive profiling, social identity federation, age verification, and custom MFA flows. Unlike standard B2C user flows, custom policies support full orchestration of claims transformations, REST API calls during authentication, custom validation logic, and integration with external identity verification services. B2C tenants are separate from Entra ID corporate tenants, providing isolation between employee and customer identities.",
+      "best_practices": "1. Start with B2C starter pack custom policies and customize incrementally rather than building from scratch. 2. Implement bot protection (CAPTCHA) on sign-up and sign-in pages. 3. Enable identity protection for B2C to detect risky sign-ins from consumer users. 4. Use custom claims providers (REST APIs) for fraud detection during registration. 5. Implement progressive profiling to reduce registration friction while collecting necessary attributes over time. 6. Configure token lifetime appropriate for consumer scenarios (longer than enterprise, shorter than indefinite). 7. Use branded, customized sign-in pages to prevent phishing by establishing visual trust. 8. Monitor B2C audit logs for credential stuffing and account takeover patterns.",
+      "common_misconfigurations": [
+        {"issue": "No bot protection on sign-up flows", "impact": "Automated account creation floods the directory with fake accounts used for abuse or fraud", "severity": "high"},
+        {"issue": "Custom policy REST API calls without error handling", "impact": "External API failures cause authentication flow to break, locking out all users", "severity": "high"},
+        {"issue": "Token lifetime set too long for consumer tokens", "impact": "Long-lived tokens remain valid after account compromise, enabling persistent unauthorized access", "severity": "medium"},
+        {"issue": "Using B2C tenant for employee identities instead of Entra ID", "impact": "Employees miss enterprise security controls (Conditional Access, PIM) only available in Entra ID tenants", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-2", "NIST-800-53-AC-7", "NIST-800-63A-IAL1", "NIST-800-63B-AAL1", "ISO-27001-A.5.16", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "Amazon Cognito User Pools", "gcp-iam": "Identity Platform (Firebase Auth)", "okta": "Okta Customer Identity Cloud (Auth0)", "auth0": "Universal Login + Actions"}
+    },
+    {
+      "id": "azure-access-reviews",
+      "vendor": "azure-entra",
+      "feature": "Access Reviews",
+      "category": "governance",
+      "description": "Entra ID Access Reviews automate periodic recertification of user access to groups, applications, and roles. Reviewers (managers, resource owners, or self-reviewers) confirm or deny continued access need. Reviews can be one-time or recurring, with configurable durations and auto-apply actions for non-responses. Access reviews support Entra ID roles, Azure resource roles, group memberships, application assignments, and access packages. Integration with PIM enables reviews of eligible privileged role assignments. Auto-apply can automatically remove access when reviewers deny or do not respond, enforcing the principle of least privilege continuously rather than relying on one-time provisioning decisions.",
+      "best_practices": "1. Create recurring quarterly access reviews for all privileged roles and sensitive application access. 2. Configure auto-apply to remove access when reviewers deny or do not respond within the review period. 3. Assign reviews to direct managers rather than IT administrators for business-relevant recertification decisions. 4. Use multi-stage reviews for high-sensitivity access: first stage manager review, second stage application owner review. 5. Review guest user access quarterly with automatic removal for denied or expired access. 6. Integrate access review results with PIM eligible role assignments. 7. Track review completion rates and hold managers accountable for timely responses.",
+      "common_misconfigurations": [
+        {"issue": "No auto-apply configured for non-responses", "impact": "Unresponsive reviewers effectively approve all access by default, defeating the purpose of reviews", "severity": "high"},
+        {"issue": "Review scope excludes PIM eligible role assignments", "impact": "Privileged role eligibility accumulates without periodic recertification", "severity": "high"},
+        {"issue": "Self-review used for sensitive access without manager oversight", "impact": "Users rubber-stamp their own access without objective evaluation of continued need", "severity": "medium"},
+        {"issue": "Review cadence too infrequent (annually instead of quarterly)", "impact": "Access drift accumulates for up to 12 months before detection and remediation", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(3)", "ISO-27001-A.5.18", "ISO-27001-A.5.15", "SOC2-CC6.2", "SOC2-CC6.3", "CIS-5.1"],
+      "equivalent_in": {"aws-iam": "IAM Access Analyzer + Custom Review Workflows", "okta": "Okta Identity Governance Access Certifications", "sailpoint": "Certification Campaigns"}
+    },
+    {
+      "id": "azure-entitlement-management",
+      "vendor": "azure-entra",
+      "feature": "Entitlement Management",
+      "category": "governance",
+      "description": "Entitlement Management in Entra ID Governance automates access request and lifecycle workflows through access packages. An access package bundles groups, applications, and SharePoint sites into a single requestable unit with defined policies for who can request, who must approve, and when access expires. Connected organizations enable external users to request access packages through a self-service portal. Automatic assignment policies can grant access based on user attributes (department, job title). Entitlement management shifts access provisioning from IT-driven ticket systems to policy-driven self-service with built-in governance, reducing provisioning delays while maintaining control and audit trails.",
+      "best_practices": "1. Design access packages around business roles (e.g., 'Marketing Team Member') rather than individual resources. 2. Configure automatic expiration for all access packages (90-365 days depending on sensitivity). 3. Require approval workflows with designated approvers from the business (not just IT). 4. Use automatic assignment policies for attribute-based access that should be granted to all users matching criteria. 5. Implement separation of duties by configuring incompatible access packages that cannot be held simultaneously. 6. Enable access reviews on access packages to verify continued need before renewal. 7. Use the self-service portal URL for external partner onboarding instead of manual guest invitations.",
+      "common_misconfigurations": [
+        {"issue": "Access packages with no expiration date", "impact": "Access granted indefinitely without periodic re-evaluation, violating least privilege over time", "severity": "high"},
+        {"issue": "No approval workflow for sensitive access packages", "impact": "Users self-provision access to sensitive resources without management authorization", "severity": "high"},
+        {"issue": "Incompatible access packages not configured for SoD", "impact": "Users can accumulate conflicting roles (e.g., AP requestor and AP approver) without detection", "severity": "medium"},
+        {"issue": "Access packages too granular, not aligned to business roles", "impact": "Users must request dozens of packages individually, increasing administrative burden and error rate", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-5", "NIST-800-53-AC-6", "ISO-27001-A.5.18", "ISO-27001-A.5.15", "SOC2-CC6.2", "SOC2-CC6.3"],
+      "equivalent_in": {"aws-iam": "IAM Identity Center Permission Sets + AWS SSO", "okta": "Okta Access Requests + Workflows", "sailpoint": "Access Request + Role-Based Access Packages"}
+    },
+    {
+      "id": "azure-identity-protection",
+      "vendor": "azure-entra",
+      "feature": "Identity Protection & Risk Policies",
+      "category": "monitoring",
+      "description": "Entra ID Identity Protection uses Microsoft's threat intelligence (processing trillions of signals daily from Windows, Office 365, Azure, Xbox, LinkedIn) to detect and respond to identity-based risks in real-time. It calculates two risk levels: sign-in risk (probability that the authentication request was not made by the account owner, e.g., unfamiliar location, anonymous IP, malware-linked IP, atypical travel) and user risk (probability that the account is compromised, e.g., leaked credentials found on dark web, anomalous user behavior). Risk-based Conditional Access policies automatically respond to detected risks by requiring MFA, forcing password change, or blocking access. Identity Protection also provides risk investigation dashboards, weekly digest reports, and Microsoft Graph API integration for SIEM correlation.",
+      "best_practices": "1. Configure sign-in risk policy to require MFA for medium and high risk sign-ins across all users. 2. Configure user risk policy to require secure password change for high risk users. 3. Integrate risk detections with your SIEM via Microsoft Graph API or diagnostic settings. 4. Review risky users and risky sign-ins weekly in the Identity Protection dashboard. 5. Do not set risk thresholds too aggressively (requiring MFA for low risk creates excessive friction). 6. Correlate Identity Protection alerts with Conditional Access sign-in logs for investigation context. 7. Configure weekly digest email to security operations for awareness of risk trends. 8. Use risk as a signal in Conditional Access policies rather than standalone Identity Protection policies.",
+      "common_misconfigurations": [
+        {"issue": "Risk policies not enabled or set to report-only without enforcement", "impact": "Detected risky sign-ins proceed without remediation, allowing compromised accounts to access resources", "severity": "critical"},
+        {"issue": "User risk policy not requiring password change for high-risk users", "impact": "Users with leaked or compromised credentials continue operating with known-compromised passwords", "severity": "critical"},
+        {"issue": "Risk detections not integrated with SIEM", "impact": "Security operations team lacks visibility into identity-layer threats, missing correlation opportunities", "severity": "high"},
+        {"issue": "Risky sign-in policy excludes break-glass accounts without alternative monitoring", "impact": "Compromised emergency access accounts bypass risk-based controls with no detection mechanism", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-7", "NIST-800-53-AC-7(2)", "NIST-800-53-IA-5", "ISO-27001-A.8.16", "ISO-27001-A.5.17", "SOC2-CC6.1", "SOC2-CC7.2", "CISA-ZTMM-VISIBILITY"],
+      "equivalent_in": {"aws-iam": "GuardDuty IAM findings + IAM Access Analyzer", "gcp-iam": "Policy Intelligence + Security Command Center", "okta": "ThreatInsight + Adaptive MFA"}
+    },
+    {
+      "id": "azure-auth-methods-fido2",
+      "vendor": "azure-entra",
+      "feature": "FIDO2 Security Keys",
+      "category": "authentication",
+      "description": "FIDO2 security keys provide phishing-resistant passwordless authentication in Entra ID. Users authenticate using hardware security keys (YubiKey, Feitian, etc.) that implement the FIDO2/WebAuthn standard. The private key never leaves the hardware token, and authentication is bound to the origin (website URL), making it immune to phishing attacks that redirect users to look-alike login pages. FIDO2 keys work for Entra ID sign-in (web and Windows), Azure AD-joined devices, and can be used as a primary authentication factor or as a second factor. FIDO2 is the strongest authentication method available in Entra ID and meets NIST AAL3 requirements when hardware-backed.",
+      "best_practices": "1. Require FIDO2 security keys for all Global Administrator and privileged role holders. 2. Deploy at least two FIDO2 keys per user (primary and backup) to prevent lockout. 3. Use FIDO2 key restriction policies to allow only approved key vendors (attestation GUID filtering). 4. Combine FIDO2 with Conditional Access policies that require phishing-resistant authentication for sensitive apps. 5. Establish a key registration process that verifies identity before allowing new key enrollment. 6. Maintain an inventory of issued security keys with assignment tracking. 7. Configure key recovery processes that require in-person identity verification.",
+      "common_misconfigurations": [
+        {"issue": "FIDO2 enabled but not enforced via Conditional Access authentication strength", "impact": "Users choose weaker methods (SMS, phone call) instead of using available FIDO2 keys", "severity": "high"},
+        {"issue": "No backup key registered for users", "impact": "Lost or damaged primary key causes account lockout requiring admin intervention", "severity": "medium"},
+        {"issue": "No key attestation restrictions allowing any FIDO2 key vendor", "impact": "Users register uncertified keys that may have implementation vulnerabilities", "severity": "low"},
+        {"issue": "FIDO2 not required for privileged accounts via authentication strength policies", "impact": "Admins use phishable MFA methods for the most sensitive accounts in the organization", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-63B-AAL3", "NIST-800-63B-AUTH-MF-CRYPTO-DEVICE", "NIST-800-63B-PHISHING-RESIST", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "SOC2-CC6.1", "OWASP-ASVS-V2.8"],
+      "equivalent_in": {"aws-iam": "FIDO2 MFA for IAM Users", "gcp-iam": "Titan Security Keys", "okta": "Okta FastPass + FIDO2 WebAuthn"}
+    },
+    {
+      "id": "azure-auth-methods-authenticator",
+      "vendor": "azure-entra",
+      "feature": "Microsoft Authenticator App",
+      "category": "authentication",
+      "description": "Microsoft Authenticator provides push notification-based MFA, passwordless phone sign-in, and passkey support for Entra ID authentication. Push notifications require the user to approve a sign-in request on their registered mobile device with biometric or PIN verification. Number matching (displaying a number on the sign-in screen that the user must enter in the Authenticator app) prevents MFA fatigue attacks where adversaries spam approval requests. Additional context (showing the application name and geographic location of the sign-in) helps users identify fraudulent requests. Authenticator also serves as an OATH TOTP token generator for third-party applications and can store verified IDs for decentralized identity scenarios.",
+      "best_practices": "1. Enable number matching for all push notifications to prevent MFA fatigue attacks. 2. Enable additional context (app name and location) for informed approval decisions. 3. Use Authenticator passwordless sign-in as the default method for all users. 4. Configure Authenticator app protection policy to require device PIN/biometric for app access. 5. Disable simple approve/deny push notifications (require number matching minimum). 6. Use Authenticator as backup for FIDO2 security keys for privileged accounts. 7. Configure registration campaigns to drive adoption from SMS/phone call to Authenticator.",
+      "common_misconfigurations": [
+        {"issue": "Number matching not enabled for push notifications", "impact": "Attackers succeed with MFA fatigue attacks by repeatedly sending approval requests until user accepts", "severity": "critical"},
+        {"issue": "Phone sign-in (passwordless) enabled without device compliance requirement", "impact": "Unmanaged personal devices used for passwordless auth without security posture verification", "severity": "medium"},
+        {"issue": "Users still using SMS or phone call MFA instead of Authenticator", "impact": "SMS is vulnerable to SIM swapping and SS7 interception; phone calls to social engineering", "severity": "high"},
+        {"issue": "Additional context (app name, location) not enabled", "impact": "Users cannot evaluate whether the sign-in request is legitimate before approving", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-63B-AAL2", "NIST-800-63B-AUTH-MF-CRYPTO-SW", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "SOC2-CC6.1", "OWASP-ASVS-V2.8"],
+      "equivalent_in": {"aws-iam": "Virtual MFA Device (TOTP)", "gcp-iam": "Google Authenticator / Passkeys", "okta": "Okta Verify with Push", "auth0": "Auth0 Guardian"}
+    },
+    {
+      "id": "azure-auth-methods-sms-voice",
+      "vendor": "azure-entra",
+      "feature": "SMS and Voice Call Authentication",
+      "category": "authentication",
+      "description": "SMS one-time passcodes and voice call verification are legacy MFA methods in Entra ID that deliver verification codes via text message or automated phone call. While still widely used for their simplicity, these methods are considered restricted authenticators by NIST SP 800-63B due to known vulnerabilities. SMS is susceptible to SIM swapping attacks (where an adversary convinces the carrier to transfer the victim's phone number), SS7 network interception, and real-time phishing relays. Voice calls are vulnerable to call forwarding attacks and social engineering of helpdesk operators. Microsoft and NIST recommend migrating users to stronger authentication methods (Authenticator app, FIDO2 keys) and reserving SMS only for self-service password reset or as a temporary onboarding factor.",
+      "best_practices": "1. Do not use SMS or voice as the sole MFA factor; treat as transitional method only. 2. Create a migration plan to move all users from SMS/voice to Authenticator app or FIDO2. 3. If SMS must be used, restrict to self-service password reset only, not primary MFA. 4. Monitor for SIM swap indicators (sudden phone number changes followed by password resets). 5. Use Conditional Access authentication strength policies to block SMS for sensitive applications. 6. Track and report SMS/voice usage metrics to drive migration to stronger methods. 7. Never use SMS verification for privileged accounts.",
+      "common_misconfigurations": [
+        {"issue": "SMS used as primary MFA for privileged accounts", "impact": "SIM swap attack against admin yields full tenant compromise via MFA bypass", "severity": "critical"},
+        {"issue": "No migration plan from SMS to stronger authentication methods", "impact": "Organization remains dependent on the weakest MFA method with no improvement trajectory", "severity": "high"},
+        {"issue": "SMS verification used for self-service password reset without additional controls", "impact": "SIM swap enables password reset and account takeover without any interaction with the legitimate user", "severity": "high"},
+        {"issue": "Voice call MFA without fraud detection or rate limiting", "impact": "Automated voice call bombing creates MFA fatigue similar to push notification spam", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-63B-RESTRICTED-AUTH", "NIST-800-63B-AUTH-OOB", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "SMS MFA (not recommended)", "okta": "Okta SMS Factor (restricted)", "auth0": "SMS Passwordless"}
+    },
+    {
+      "id": "azure-auth-methods-certificate",
+      "vendor": "azure-entra",
+      "feature": "Certificate-Based Authentication (CBA)",
+      "category": "authentication",
+      "description": "Entra ID Certificate-Based Authentication enables users to authenticate using X.509 certificates on smart cards or devices without requiring federation with ADFS. CBA validates the user's certificate against configured certificate authorities (CAs) in Entra ID, maps the certificate to a user account via subject name, SAN, or issuer+serial number, and supports both single-factor and multi-factor authentication depending on the certificate policy OID. CBA is phishing-resistant because the private key never leaves the smart card or device TPM, and the TLS handshake is bound to the legitimate server. This method is particularly important for government and regulated environments that require PIV/CAC card authentication and meets NIST AAL3 when backed by hardware.",
+      "best_practices": "1. Configure certificate authority trust chain correctly with all intermediate CAs. 2. Map certificate to user account using the most specific binding (issuer+serial or SAN UPN) rather than subject name alone. 3. Enable CRL or OCSP checking for certificate revocation validation. 4. Configure certificate authentication policy OIDs to differentiate single-factor vs multi-factor CBA. 5. Use CBA as the primary authentication method for users with smart cards, displacing password+MFA. 6. Test failover scenarios where CRL distribution points are unreachable. 7. Implement certificate lifecycle management with automated renewal reminders.",
+      "common_misconfigurations": [
+        {"issue": "Certificate revocation checking (CRL/OCSP) not configured or not enforced", "impact": "Revoked certificates continue to authenticate successfully, undermining the ability to terminate access", "severity": "critical"},
+        {"issue": "Certificate-to-user mapping using Subject Name only (not unique)", "impact": "Certificate from wrong user could authenticate if subject names are not globally unique", "severity": "high"},
+        {"issue": "Single-factor CBA configured when multi-factor is required", "impact": "Certificate alone satisfies MFA requirement without verifying PIN/biometric on the smart card", "severity": "high"},
+        {"issue": "Root CA trusted without limiting to specific intermediate CAs", "impact": "Any certificate issued by any intermediate under the root CA can authenticate, overly broad trust", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-63B-AAL3", "NIST-800-63B-AUTH-SF-CRYPTO", "NIST-800-63B-PHISHING-RESIST", "NIST-800-53-IA-2(1)", "NIST-800-53-SC-12", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "IAM Roles Anywhere (certificate-based)", "gcp-iam": "Workload Identity Federation with X.509", "okta": "Smart Card / PIV Authentication"}
+    },
+    {
+      "id": "azure-auth-methods-tap",
+      "vendor": "azure-entra",
+      "feature": "Temporary Access Pass (TAP)",
+      "category": "authentication",
+      "description": "Temporary Access Pass is a time-limited passcode issued by an administrator that enables users to register passwordless authentication methods (FIDO2, Authenticator passwordless, Windows Hello for Business) without having a pre-existing authentication method. TAP solves the bootstrapping problem of passwordless deployment: how does a user set up passwordless authentication if they do not have any authentication method registered yet? TAP can be configured as single-use (consumed on first authentication) or multi-use within a time window. It has a configurable lifetime (minimum 10 minutes, maximum 30 days) and is particularly valuable for new employee onboarding, device replacement scenarios, and recovery from lost authentication factors.",
+      "best_practices": "1. Default to single-use TAPs unless multi-use is specifically required (device setup scenarios). 2. Set TAP lifetime to the minimum necessary (prefer 1-8 hours for onboarding scenarios). 3. Restrict TAP issuance to specific administrator roles (Authentication Administrator, Privileged Authentication Administrator). 4. Use TAP exclusively for authentication method registration, not as a general-purpose temporary credential. 5. Monitor TAP creation and usage in the audit log for abuse patterns. 6. Combine TAP with identity verification procedures to confirm the requester's identity before issuance. 7. Document TAP issuance in helpdesk tickets for audit trail purposes.",
+      "common_misconfigurations": [
+        {"issue": "Multi-use TAP with long lifetime (>24 hours)", "impact": "Long-lived reusable credential becomes a persistent backdoor if intercepted or leaked", "severity": "high"},
+        {"issue": "TAP issuance without identity verification of the requester", "impact": "Social engineering of helpdesk to issue TAP enables account takeover via MFA method registration", "severity": "critical"},
+        {"issue": "TAP used as general-purpose temporary credential instead of for method registration only", "impact": "Misuse defeats passwordless security model by creating a password-like credential with admin privileges", "severity": "high"},
+        {"issue": "No monitoring of TAP creation and usage events", "impact": "Unauthorized TAP issuance by compromised admin accounts goes undetected", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-63B-CRED-LIFECYCLE", "NIST-800-63B-RECOVERY", "NIST-800-53-IA-5", "ISO-27001-A.5.17", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "Temporary Security Credentials (STS)", "okta": "Enrollment Tokens", "auth0": "Password Reset + Enrollment Ticket"}
+    },
+    {
+      "id": "azure-device-registration",
+      "vendor": "azure-entra",
+      "feature": "Device Registration & Join",
+      "category": "authentication",
+      "description": "Entra ID device registration creates a device identity in the directory that can be used for Conditional Access device-based policies. Three registration models exist: Azure AD Registered (BYOD personal devices with limited corporate management), Azure AD Joined (corporate devices fully managed by the organization with device-based SSO), and Hybrid Azure AD Joined (domain-joined devices that are also registered with Entra ID for cloud-based Conditional Access). Device registration enables device compliance as a Conditional Access grant control, where Intune or third-party MDM validates that the device meets security requirements (encryption, PIN, OS version, antivirus). Device identity is a core pillar of zero trust: knowing the device is as important as knowing the user.",
+      "best_practices": "1. Require device compliance as a Conditional Access grant control for all corporate application access. 2. Use Azure AD Join for corporate-owned devices and Azure AD Registered for BYOD scenarios. 3. Define clear device compliance policies in Intune covering encryption, PIN/password, OS version, and threat protection. 4. Implement Hybrid Join only as a transitional step toward full Azure AD Join. 5. Clean up stale device objects regularly (devices inactive >90 days). 6. Use device filters in Conditional Access to apply different policies to different device types. 7. Enable BitLocker key escrow to Entra ID for Azure AD Joined devices.",
+      "common_misconfigurations": [
+        {"issue": "Device compliance not required in Conditional Access policies", "impact": "Unpatched, unencrypted, or malware-infected devices access corporate resources without restriction", "severity": "high"},
+        {"issue": "Stale device objects not cleaned up", "impact": "Inactive device identities remain valid, potentially usable by adversaries who reuse device certificates", "severity": "medium"},
+        {"issue": "BYOD devices Azure AD Joined instead of Registered", "impact": "Personal devices get full corporate management enrollment, causing privacy concerns and user resistance", "severity": "low"},
+        {"issue": "No device compliance policy defined in Intune", "impact": "All registered devices appear compliant by default, rendering device-based CA controls ineffective", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-207-TENET-3", "NIST-800-53-AC-19", "CISA-ZTMM-DEVICE-ID", "ISO-27001-A.8.1", "SOC2-CC6.1", "SOC2-CC6.8"],
+      "equivalent_in": {"aws-iam": "AWS SSO with Device Trust (Jamf/Intune integration)", "gcp-iam": "BeyondCorp Enterprise Device Trust", "okta": "Okta Device Trust + Okta Verify"}
+    },
+    {
+      "id": "azure-workload-identities",
+      "vendor": "azure-entra",
+      "feature": "Workload Identity Federation",
+      "category": "authorization",
+      "description": "Workload Identity Federation enables external workloads (GitHub Actions, Terraform Cloud, Kubernetes, AWS, GCP) to access Azure resources without storing secrets. Instead of configuring a client secret or certificate on the app registration, a federated credential trust is established that accepts tokens from an external identity provider (e.g., GitHub OIDC provider). When the external workload runs, it obtains a token from its own identity provider and exchanges it for an Azure AD token via the OAuth 2.0 client credentials flow with federated assertion. This eliminates the need to store and rotate Azure credentials in CI/CD systems, external clouds, or Kubernetes clusters. The trust is scoped to specific subjects (e.g., a specific GitHub repository and branch).",
+      "best_practices": "1. Use workload identity federation instead of client secrets for all CI/CD pipelines (GitHub Actions, Azure DevOps, GitLab). 2. Scope federated credential subjects as narrowly as possible (specific repo, branch, environment). 3. Grant the app registration minimal RBAC roles on only the specific Azure resources needed. 4. Audit federated credential configurations quarterly to remove stale or unused trusts. 5. Use separate app registrations for different workloads rather than sharing one with multiple federated credentials. 6. Monitor token exchange events in Entra ID sign-in logs for anomalous patterns. 7. Combine with Conditional Access for workload identities (preview) to enforce location or risk conditions.",
+      "common_misconfigurations": [
+        {"issue": "Federated credential subject too broad (e.g., any branch in repository)", "impact": "Any branch push in the repo can obtain Azure tokens, including feature branches without review", "severity": "high"},
+        {"issue": "App registration with federated credential has overprivileged RBAC roles", "impact": "Compromised CI/CD pipeline inherits excessive Azure permissions (e.g., Subscription Contributor)", "severity": "critical"},
+        {"issue": "Multiple unrelated workloads sharing a single app registration", "impact": "Compromise of any workload grants access to all Azure resources assigned to the shared identity", "severity": "high"},
+        {"issue": "Federated credentials not audited or cleaned up", "impact": "Stale trust relationships to decommissioned external systems create hidden access paths", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-AC-6", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "ISO-27001-A.8.9", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "OIDC Identity Providers for IAM Roles", "gcp-iam": "Workload Identity Federation", "okta": "OAuth 2.0 Service Apps with Token Exchange"}
+    },
+    {
+      "id": "azure-administrative-units",
+      "vendor": "azure-entra",
+      "feature": "Administrative Units",
+      "category": "authorization",
+      "description": "Administrative Units (AUs) provide delegated administration scopes within a single Entra ID tenant. By grouping users, groups, and devices into AUs, organizations can assign administrative roles (User Administrator, Helpdesk Administrator, etc.) that are scoped to only the objects within that AU, rather than granting tenant-wide permissions. This enables organizational delegation patterns such as regional IT administrators who can manage users in their geography, departmental IT teams who can reset passwords for their department's users, or business unit administrators who can manage group memberships within their unit. AUs can be statically assigned or dynamically populated based on user attributes. Restricted management AUs prevent even Global Administrators from managing objects within the AU unless explicitly assigned.",
+      "best_practices": "1. Use AUs to implement least privilege for delegated administration rather than granting tenant-wide admin roles. 2. Define AU boundaries based on organizational structure (geography, department, business unit). 3. Use dynamic membership rules based on user attributes (department, location) for automatic AU population. 4. Consider restricted management AUs for sensitive user populations (executives, legal, HR). 5. Document AU delegation model and role assignments for audit purposes. 6. Review AU-scoped role assignments quarterly as part of access reviews. 7. Test AU-scoped admin operations in a non-production tenant before production deployment.",
+      "common_misconfigurations": [
+        {"issue": "Tenant-wide admin roles assigned when AU-scoped roles would suffice", "impact": "Helpdesk administrators can reset passwords for all users including executives and other admins", "severity": "high"},
+        {"issue": "AU membership not kept current with organizational changes", "impact": "Users moving between departments retain administrative oversight from wrong AU administrators", "severity": "medium"},
+        {"issue": "Restricted management AU not used for sensitive user populations", "impact": "Any Global Admin can manage executive accounts without specific authorization or audit trail", "severity": "medium"},
+        {"issue": "No documentation of AU delegation model", "impact": "Unclear administrative boundaries lead to gaps in user management coverage or redundant access", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(7)", "NIST-800-53-AC-5", "ISO-27001-A.5.15", "ISO-27001-A.5.3", "SOC2-CC6.3"],
+      "equivalent_in": {"aws-iam": "AWS Organizations OUs + Delegated Administrator", "gcp-iam": "Organization Hierarchy (Folders/Projects)", "okta": "Okta Admin Roles with Group Scope"}
+    },
+    {
+      "id": "azure-cross-tenant-access",
+      "vendor": "azure-entra",
+      "feature": "Cross-Tenant Access Settings",
+      "category": "federation",
+      "description": "Cross-Tenant Access Settings control how your organization collaborates with other Entra ID tenants. Inbound settings define which external users and applications from other tenants can access your resources. Outbound settings define which of your users can access resources in other tenants. B2B Direct Connect enables users to access resources in another tenant without being represented as guest objects (Teams shared channels). Trust settings allow accepting MFA claims, device compliance claims, and hybrid join claims from partner tenants, avoiding re-authentication friction. Default settings apply to all external organizations unless overridden by organization-specific policies. This is the granular governance layer for inter-organization identity federation.",
+      "best_practices": "1. Set default inbound access to block all external organizations, then explicitly allow trusted partners. 2. Configure MFA trust only for partner organizations whose MFA policies you have verified and trust. 3. Define organization-specific policies for key partners rather than relying on default settings. 4. Use B2B Direct Connect only with highly trusted partners due to the reduced visibility (no guest objects). 5. Regularly review cross-tenant access settings for stale partner configurations. 6. Disable outbound access to consumer tenants (outlook.com, live.com) unless required. 7. Monitor cross-tenant sign-in activity via Entra ID sign-in logs filtered by cross-tenant access type.",
+      "common_misconfigurations": [
+        {"issue": "Default inbound access allows all external organizations", "impact": "Any Entra ID tenant can invite your users or be invited into your tenant without vetting", "severity": "high"},
+        {"issue": "MFA trust enabled for all organizations by default", "impact": "Trusting MFA from unknown organizations that may have weak MFA policies", "severity": "high"},
+        {"issue": "B2B Direct Connect enabled without understanding visibility implications", "impact": "External users collaborate without guest objects, reducing audit trail and access review coverage", "severity": "medium"},
+        {"issue": "Stale organization-specific policies for decommissioned partnerships", "impact": "Former partners retain configured trust relationships and access permissions", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-20", "NIST-800-53-AC-21", "NIST-800-53-IA-8", "NIST-800-63C-FAL2", "ISO-27001-A.5.19", "ISO-27001-A.5.20", "SOC2-CC6.4"],
+      "equivalent_in": {"aws-iam": "Organizations Cross-Account Access + RAM Sharing", "gcp-iam": "Organization Policy Constraints + Domain Restricted Sharing", "okta": "Inbound Federation + Org2Org Integration"}
+    },
+    {
+      "id": "azure-diagnostic-logging",
+      "vendor": "azure-entra",
+      "feature": "Entra ID Diagnostic Logging",
+      "category": "monitoring",
+      "description": "Entra ID generates multiple log categories critical for IAM security monitoring: Sign-In Logs (interactive, non-interactive, service principal, managed identity authentications with detailed context including CA policy evaluation, device info, risk level), Audit Logs (all configuration changes to directory objects, roles, applications, policies), Provisioning Logs (SCIM-based user provisioning to SaaS applications), Identity Protection Logs (risk detections and remediation actions), and ADFS Sign-In Logs (for hybrid environments). Diagnostic Settings route these logs to Azure Monitor Logs (Log Analytics), Azure Storage, Event Hubs (for SIEM integration), or third-party partner solutions. Log retention in the Entra ID portal is limited (30 days for free, 30 days for P1/P2) making external log routing essential for compliance.",
+      "best_practices": "1. Route all log categories to a Log Analytics workspace for long-term retention and KQL querying. 2. Configure Event Hub streaming for real-time SIEM integration (Sentinel, Splunk, QRadar). 3. Set Log Analytics retention to minimum 1 year for compliance (SOC 2, ISO 27001). 4. Create alert rules for critical events: Global Admin role assignments, CA policy changes, bulk user deletions. 5. Monitor non-interactive and service principal sign-in logs, not just interactive sign-ins. 6. Archive logs to immutable Azure Storage for tamper-evident long-term retention. 7. Correlate Entra ID logs with Azure Activity Logs and Microsoft 365 Unified Audit Logs for comprehensive visibility. 8. Build workbooks for executive reporting on authentication trends, MFA adoption, and risk detection volume.",
+      "common_misconfigurations": [
+        {"issue": "No diagnostic settings configured; logs only retained 30 days in portal", "impact": "Historical log data unavailable for incident investigation; compliance audit failure for retention requirements", "severity": "critical"},
+        {"issue": "Only interactive sign-in logs monitored; non-interactive and SP logs ignored", "impact": "Service principal and managed identity authentication anomalies go undetected (common attack vector)", "severity": "high"},
+        {"issue": "No alert rules for critical administrative actions", "impact": "Malicious Global Admin role assignments or CA policy modifications occur without notification", "severity": "high"},
+        {"issue": "Logs sent to mutable storage without integrity protection", "impact": "Attackers with storage access can tamper with or delete audit evidence", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(12)", "NIST-800-53-AC-6(9)", "ISO-27001-A.8.15", "ISO-27001-A.8.16", "SOC2-CC7.2", "SOC2-CC5.2", "CISA-ZTMM-VISIBILITY"],
+      "equivalent_in": {"aws-iam": "CloudTrail + IAM Access Analyzer", "gcp-iam": "Cloud Audit Logs + Security Command Center", "okta": "System Log + Log Streaming (Splunk/S3)"}
+    },
+    {
+      "id": "azure-password-protection",
+      "vendor": "azure-entra",
+      "feature": "Password Protection",
+      "category": "authentication",
+      "description": "Entra ID Password Protection enforces password policies beyond basic complexity requirements by maintaining a global banned password list (automatically updated by Microsoft based on password spray attack telemetry) and supporting organization-specific custom banned password lists. When a user sets or changes a password, the normalized form is checked against both lists, and variations (leet speak, character substitution, appending numbers) are detected and blocked. For hybrid environments, Password Protection agents deployed on domain controllers extend the same protection to on-premises Active Directory password changes. This addresses the fundamental weakness of traditional password policies: users create predictable passwords that meet complexity requirements but are easily guessed (e.g., 'Summer2024!' meets complexity but is trivially crackable).",
+      "best_practices": "1. Add organization-specific terms to the custom banned password list (company name, product names, locations). 2. Deploy Password Protection agents on all domain controllers in hybrid environments. 3. Combine with self-service password reset (SSPR) to reduce helpdesk burden while maintaining security. 4. Align password policy with NIST 800-63B: focus on length (12+ characters) over complexity rules. 5. Monitor password change failures from banned password detection in audit logs. 6. Update custom banned password list quarterly based on threat intelligence and seasonal patterns. 7. Do not rely on Password Protection alone; enforce MFA to protect against credential theft.",
+      "common_misconfigurations": [
+        {"issue": "Custom banned password list not configured with organization-specific terms", "impact": "Users create passwords containing company name, product names, or common internal terms that are easily guessed", "severity": "medium"},
+        {"issue": "Password Protection not deployed on on-premises domain controllers in hybrid", "impact": "On-premises password changes bypass Entra ID password protection, allowing weak passwords", "severity": "high"},
+        {"issue": "Password policy still enforcing legacy complexity requirements instead of length", "impact": "Users create short, predictable passwords that meet complexity (uppercase+number+symbol) but are easily cracked", "severity": "medium"},
+        {"issue": "Password Protection used as sole defense without MFA", "impact": "Even strong passwords are vulnerable to phishing, credential stuffing, and replay attacks", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-63B-AUTH-MEMORIZED", "NIST-800-63B-VERIFIER-SECRETS", "NIST-800-53-IA-5(1)", "ISO-27001-A.5.17", "SOC2-CC6.1", "OWASP-ASVS-V2.1"],
+      "equivalent_in": {"aws-iam": "IAM Password Policy", "gcp-iam": "Cloud Identity Password Policy", "okta": "Password Policy with Common Password Detection", "auth0": "Breached Password Detection"}
+    },
+    {
+      "id": "azure-sspr",
+      "vendor": "azure-entra",
+      "feature": "Self-Service Password Reset (SSPR)",
+      "category": "authentication",
+      "description": "Self-Service Password Reset enables users to reset their own passwords or unlock their accounts without helpdesk intervention, reducing IT support costs while maintaining security through multi-factor verification. SSPR requires users to register multiple authentication methods (Authenticator app, phone, email, security questions) and verify identity using the configured number of methods before allowing a password reset. For hybrid environments with password writeback, password changes made in the cloud are synchronized back to on-premises Active Directory. SSPR can be enabled for all users, specific groups, or individual users during pilot deployments. Combined authentication method registration merges SSPR and MFA registration into a single user experience.",
+      "best_practices": "1. Enable combined registration for MFA and SSPR to streamline user enrollment experience. 2. Require minimum two authentication methods for SSPR verification. 3. Avoid security questions as a sole SSPR method; prefer Authenticator app and phone. 4. Enable password writeback for hybrid environments to synchronize cloud password resets to AD. 5. Configure SSPR for all users, not just select groups, to minimize helpdesk password reset volume. 6. Monitor SSPR activity logs for suspicious patterns (bulk password resets, unusual geographic activity). 7. Integrate SSPR with Conditional Access to enforce location and device restrictions on password reset flows.",
+      "common_misconfigurations": [
+        {"issue": "SSPR enabled with only one verification method required", "impact": "Single factor verification for password reset enables account takeover via compromised phone or email", "severity": "high"},
+        {"issue": "Security questions used as primary SSPR method", "impact": "Security question answers are often guessable or available through social media research", "severity": "medium"},
+        {"issue": "Password writeback not enabled in hybrid environments", "impact": "Cloud password resets do not synchronize to AD, causing password mismatch and user confusion", "severity": "medium"},
+        {"issue": "SSPR not protected by Conditional Access policies", "impact": "Password reset initiated from compromised or anonymous networks without additional verification", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-63B-RECOVERY", "NIST-800-63B-CRED-LIFECYCLE", "NIST-800-53-IA-5", "ISO-27001-A.5.17", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "IAM Password Reset (admin-only)", "okta": "Self-Service Password Reset with MFA", "auth0": "Password Reset Flow + Actions"}
+    },
+    {
+      "id": "azure-security-defaults",
+      "vendor": "azure-entra",
+      "feature": "Security Defaults",
+      "category": "authentication",
+      "description": "Security Defaults is Microsoft's baseline security configuration for Entra ID tenants that enforces a minimum set of security controls: requiring all users to register for MFA using Microsoft Authenticator within 14 days, requiring MFA for all administrator sign-ins, blocking legacy authentication protocols, requiring MFA for all users when accessing the Azure portal, Azure CLI, and Azure PowerShell, and protecting privileged actions with additional verification. Security Defaults is designed for organizations that do not have Entra ID P1/P2 licenses (required for Conditional Access) and provides a significant security improvement over default tenant configuration. However, it is an all-or-nothing switch with no customization, making it unsuitable for organizations needing granular policies.",
+      "best_practices": "1. Enable Security Defaults immediately for any tenant that does not use Conditional Access policies. 2. Migrate from Security Defaults to Conditional Access when the organization has P1/P2 licensing for granular control. 3. Do not run Security Defaults and Conditional Access simultaneously (they are mutually exclusive). 4. Ensure all users complete MFA registration within the 14-day grace period. 5. Verify that legacy authentication clients (older Outlook, older mobile mail clients) are updated before enabling. 6. Create break-glass accounts before enabling Security Defaults, as there are no exclusion mechanisms. 7. Communicate the MFA registration requirement to all users before enabling.",
+      "common_misconfigurations": [
+        {"issue": "Security Defaults disabled without Conditional Access policies in place", "impact": "Tenant has no MFA enforcement or legacy auth blocking, relying solely on password authentication", "severity": "critical"},
+        {"issue": "Security Defaults enabled alongside Conditional Access policies", "impact": "Configuration conflict causes unpredictable policy evaluation and potential security gaps", "severity": "high"},
+        {"issue": "No break-glass account created before enabling Security Defaults", "impact": "MFA service outage locks out all administrators including emergency recovery accounts", "severity": "critical"},
+        {"issue": "Legacy authentication clients not updated before enabling", "impact": "Users on older email clients are blocked from authentication, causing business disruption", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-2(1)", "NIST-800-53-AC-7", "ISO-27001-A.8.5", "SOC2-CC6.1", "CIS-6.2"],
+      "equivalent_in": {"aws-iam": "IAM Security Best Practices (no single equivalent)", "gcp-iam": "Organization Policy + Essential Contacts", "okta": "Okta Default Policies"}
+    },
+    {
+      "id": "azure-entra-connect",
+      "vendor": "azure-entra",
+      "feature": "Entra Connect Sync (Hybrid Identity)",
+      "category": "federation",
+      "description": "Microsoft Entra Connect (formerly Azure AD Connect) synchronizes on-premises Active Directory identities to Entra ID, enabling hybrid identity scenarios where users have a single identity across on-premises and cloud resources. Entra Connect supports three authentication methods: Password Hash Synchronization (PHS, recommended) which syncs a hash of the password hash to Entra ID, Pass-Through Authentication (PTA) which validates passwords against on-premises AD in real-time, and Federation with ADFS which redirects authentication entirely to on-premises infrastructure. Entra Connect Cloud Sync is the newer lightweight alternative using provisioning agents. The sync engine handles attribute mapping, scoping filters, and sync rules for objects including users, groups, contacts, and devices. Password writeback enables cloud password changes to update on-premises AD.",
+      "best_practices": "1. Use Password Hash Synchronization (PHS) as the primary authentication method for resilience (works when on-premises is unavailable). 2. Enable PHS even when using PTA or ADFS as a disaster recovery fallback. 3. Migrate from ADFS to PHS or PTA to reduce on-premises infrastructure dependency. 4. Use scoping filters to synchronize only required organizational units (OUs). 5. Enable password writeback for bidirectional password management. 6. Monitor Entra Connect health alerts in the Entra admin center for synchronization failures. 7. Keep the Entra Connect server updated and secure (it has domain admin-equivalent permissions). 8. Place the Entra Connect server in a Tier 0 administrative boundary (same as domain controllers).",
+      "common_misconfigurations": [
+        {"issue": "Entra Connect server not treated as Tier 0 asset", "impact": "Compromised sync server enables extraction of all password hashes and modification of cloud identities", "severity": "critical"},
+        {"issue": "PHS not enabled as failback when using PTA or ADFS", "impact": "On-premises outage blocks all cloud authentication with no fallback mechanism", "severity": "high"},
+        {"issue": "Synchronizing all OUs including service accounts and privileged groups", "impact": "On-premises service accounts and admin groups exposed to cloud-based attacks", "severity": "high"},
+        {"issue": "Entra Connect server not monitored for suspicious activity", "impact": "Attacker extraction of synced credentials or modification of sync rules goes undetected", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-AC-2", "NIST-800-63C-FAL2", "ISO-27001-A.8.5", "ISO-27001-A.5.16", "SOC2-CC6.1", "SOC2-CC6.7"],
+      "equivalent_in": {"aws-iam": "AWS Directory Service / AD Connector", "gcp-iam": "Google Cloud Directory Sync (GCDS)", "okta": "Okta AD Agent + Directory Integration"}
+    },
+    {
+      "id": "azure-token-protection",
+      "vendor": "azure-entra",
+      "feature": "Token Protection (Token Binding)",
+      "category": "authentication",
+      "description": "Token Protection binds Entra ID tokens to the device from which they were issued, preventing token theft and replay attacks. When enabled through Conditional Access, sign-in tokens are cryptographically bound to the device's TPM-backed key, making stolen tokens unusable on other devices. This directly addresses the Adversary-in-the-Middle (AitM) attack where adversaries proxy authentication sessions to steal the resulting tokens and replay them from their own devices. Token Protection is particularly critical because AitM attacks bypass MFA entirely: the user completes legitimate MFA on the phishing proxy, and the adversary captures the fully-authenticated session token. Currently supported for Windows devices with TPM and specific client applications (Outlook, Teams, Office).",
+      "best_practices": "1. Enable token protection in Conditional Access for sensitive applications as it becomes generally available. 2. Deploy on Windows devices with TPM 2.0 that support hardware-bound tokens. 3. Combine with Conditional Access requiring compliant devices to maximize protection. 4. Monitor token replay detection events in Entra ID sign-in logs. 5. Plan for gradual rollout since not all client applications support token protection yet. 6. Use in conjunction with FIDO2 keys for defense-in-depth against phishing and AitM attacks. 7. Educate security operations on token theft scenarios that token protection mitigates.",
+      "common_misconfigurations": [
+        {"issue": "Token protection not enabled for high-value applications despite device support", "impact": "Stolen tokens from AitM phishing attacks can be replayed from attacker devices without detection", "severity": "high"},
+        {"issue": "Token protection policy not scoped to compliant devices", "impact": "Non-TPM devices cannot enforce token binding, creating a bypass path for attackers", "severity": "medium"},
+        {"issue": "Relying solely on MFA without token protection for sensitive apps", "impact": "AitM attacks defeat MFA by proxying the session and stealing the post-authentication token", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-63B-TOKEN-BINDING", "NIST-800-63B-SESSION-BIND", "NIST-800-53-SC-23", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "Session token restrictions (source IP binding)", "gcp-iam": "BeyondCorp certificate-bound sessions", "okta": "Device-bound session tokens"}
+    },
+    {
+      "id": "azure-continuous-access-evaluation",
+      "vendor": "azure-entra",
+      "feature": "Continuous Access Evaluation (CAE)",
+      "category": "monitoring",
+      "description": "Continuous Access Evaluation enables near-real-time enforcement of access policy changes and critical security events without waiting for token expiration. Traditionally, access tokens are valid until they expire (default 1 hour), meaning a disabled user or revoked session continues to access resources for up to an hour. With CAE, critical events (user disabled, password changed, MFA requirement added, admin-initiated session revocation, network location change) are communicated from Entra ID to CAE-aware resource providers (Exchange Online, SharePoint, Teams, Microsoft Graph), which immediately challenge or block the token. CAE also enforces IP location policies for every token use, not just at authentication time. This moves Entra ID from periodic token-based access toward continuous verification aligned with zero trust principles.",
+      "best_practices": "1. Enable CAE for all Entra ID tenants (enabled by default for capable applications). 2. Verify CAE-capable applications are configured to participate (Exchange Online, SharePoint, Teams, Graph). 3. Use Conditional Access with CAE-aware location policies for IP-based access enforcement. 4. Test CAE by disabling a test user and verifying immediate session termination in CAE-capable apps. 5. Monitor CAE events in sign-in logs to verify enforcement is working as expected. 6. Design incident response procedures that leverage CAE for rapid session revocation. 7. Understand CAE limitations: not all applications support CAE; non-CAE apps still rely on token expiration.",
+      "common_misconfigurations": [
+        {"issue": "CAE disabled or not configured despite tenant supporting it", "impact": "Revoked sessions remain active for up to 1 hour until token expiration, enabling continued access after compromise detection", "severity": "high"},
+        {"issue": "Location-based policies not configured for CAE enforcement", "impact": "Tokens stolen and replayed from different networks continue to work until expiration", "severity": "medium"},
+        {"issue": "Incident response procedures do not leverage CAE revocation capabilities", "impact": "IR team disables user but does not verify immediate session termination via CAE", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-207-TRUST-ALGO", "NIST-800-53-AC-12", "NIST-800-53-SC-23(3)", "ISO-27001-A.8.5", "SOC2-CC6.1", "CISA-ZTMM-VISIBILITY"],
+      "equivalent_in": {"aws-iam": "IAM Policy evaluation (every request)", "gcp-iam": "Policy enforcement (every request)", "okta": "Continuous Access with Okta Identity Engine"}
+    },
+    {
+      "id": "azure-entra-permissions-management",
+      "vendor": "azure-entra",
+      "feature": "Entra Permissions Management (CIEM)",
+      "category": "governance",
+      "description": "Entra Permissions Management (formerly CloudKnox) is a Cloud Infrastructure Entitlement Management (CIEM) solution that provides visibility and remediation for permissions across multi-cloud environments (Azure, AWS, GCP). It discovers all identities (users, workload identities, service accounts) and their effective permissions, identifies overprivileged identities by comparing granted permissions to actual usage (Permission Creep Index), and enables right-sizing of permissions to least privilege. The platform provides a unified view of permissions across all three major cloud providers, enabling cross-cloud permission governance. Key capabilities include permission analytics, automated right-sizing recommendations, on-demand permission grants with JIT access, and activity-based authorization policies.",
+      "best_practices": "1. Onboard all cloud subscriptions (Azure, AWS, GCP) for comprehensive multi-cloud visibility. 2. Review Permission Creep Index (PCI) weekly to identify and remediate the most overprivileged identities. 3. Use activity-based authorization to automatically right-size permissions based on actual usage patterns. 4. Implement JIT access for high-privilege operations instead of standing permissions. 5. Create alerts for new high-privilege role assignments across all cloud providers. 6. Track permission right-sizing progress metrics over time to demonstrate least privilege improvement. 7. Focus initial remediation on inactive identities with high permissions (highest risk, lowest disruption).",
+      "common_misconfigurations": [
+        {"issue": "Only Azure environment monitored, missing AWS and GCP permissions", "impact": "Multi-cloud permission sprawl in non-Azure environments goes undetected and unremediated", "severity": "high"},
+        {"issue": "Permission Creep Index not reviewed or acted upon", "impact": "Tool provides visibility but no remediation, permissions continue to accumulate", "severity": "medium"},
+        {"issue": "JIT access not configured for high-privilege operations", "impact": "Standing high-privilege permissions remain despite CIEM visibility into overprivilege", "severity": "high"},
+        {"issue": "Recommendations auto-applied without review in production", "impact": "Automated right-sizing may remove permissions actively needed but not recently used, breaking applications", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(7)", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.3"],
+      "equivalent_in": {"aws-iam": "IAM Access Analyzer + IAM Access Advisor", "gcp-iam": "Policy Intelligence Recommender + IAM Recommender", "sailpoint": "Cloud Access Management"}
+    },
+    {
+      "id": "azure-verified-id",
+      "vendor": "azure-entra",
+      "feature": "Entra Verified ID",
+      "category": "authentication",
+      "description": "Entra Verified ID implements W3C Verifiable Credentials and Decentralized Identifiers (DIDs) for privacy-preserving identity verification. Organizations can issue verifiable credentials (proof of employment, education verification, membership attestation) that holders store in their digital wallet (Microsoft Authenticator). Verifiers can request and cryptographically validate credentials without contacting the issuer, enabling privacy-preserving verification. Use cases include employee onboarding (verify identity before provisioning accounts), contractor verification (prove current employment with contracting firm), customer identity verification (validate age, address without sharing full documents), and account recovery (verify identity using previously issued credentials instead of knowledge-based authentication).",
+      "best_practices": "1. Start with a high-value use case such as remote employee onboarding or contractor verification. 2. Design credential schemas that contain the minimum necessary claims for verification. 3. Implement credential revocation for issued credentials that should no longer be valid. 4. Use selective disclosure to allow holders to share only specific claims from a credential. 5. Integrate with Conditional Access as a verification step for high-assurance scenarios. 6. Plan for credential lifecycle management including issuance, renewal, and revocation. 7. Educate users on wallet-based credential management and the privacy benefits.",
+      "common_misconfigurations": [
+        {"issue": "Credential schemas include unnecessary personal information", "impact": "Over-disclosure of personal data when credentials are presented, violating privacy principles", "severity": "medium"},
+        {"issue": "No revocation mechanism for issued credentials", "impact": "Terminated employees or expired memberships continue to present valid credentials", "severity": "high"},
+        {"issue": "Verified ID used without understanding the trust model", "impact": "Relying on credentials from issuers whose verification processes are unknown or untrusted", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-63A-IAL2", "NIST-800-63C-ATTRIBUTE-DISCLOSURE", "ISO-27001-A.5.16", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "No direct equivalent", "gcp-iam": "No direct equivalent", "okta": "Okta Identity Verification (limited)"}
+    },
+    {
+      "id": "azure-global-secure-access",
+      "vendor": "azure-entra",
+      "feature": "Global Secure Access (SSE)",
+      "category": "authorization",
+      "description": "Global Secure Access is Microsoft's Security Service Edge (SSE) solution integrated with Entra ID, providing identity-centric network access for both internet traffic (Secure Web Gateway / Internet Access) and private corporate applications (ZTNA / Private Access). Internet Access applies Conditional Access policies and web content filtering to all outbound internet traffic, not just Microsoft cloud applications. Private Access replaces traditional VPN by providing application-specific access to on-premises resources through a lightweight connector, enforcing zero trust principles (no broad network access). Traffic is routed through Microsoft's global network with inline security inspection. The unified identity and network security plane enables Conditional Access policies that consider both identity and network signals for access decisions.",
+      "best_practices": "1. Deploy Private Access before decommissioning VPN to validate application connectivity. 2. Configure per-app access policies for private resources rather than broad network segments. 3. Enable Internet Access web content filtering for managed devices. 4. Use Conditional Access compliant network conditions for source IP-based policies. 5. Monitor Global Secure Access traffic logs for anomalous access patterns. 6. Deploy connectors in redundant pairs for high availability. 7. Integrate with Microsoft 365 traffic profiles for optimized Microsoft cloud access routing.",
+      "common_misconfigurations": [
+        {"issue": "VPN decommissioned before validating all applications work through Private Access", "impact": "Critical business applications become inaccessible, causing operational disruption", "severity": "high"},
+        {"issue": "Broad network segment access configured instead of per-app policies", "impact": "Users gain network-level access exceeding application requirements, replicating VPN over-access", "severity": "high"},
+        {"issue": "Internet Access bypass rules too permissive", "impact": "Sensitive internet destinations accessed without content filtering or Conditional Access evaluation", "severity": "medium"},
+        {"issue": "Connector redundancy not configured for high availability", "impact": "Single connector failure blocks access to all associated private applications", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-207-TENET-1", "NIST-800-207-TENET-4", "NIST-800-207-DEPLOYMENT-SDP", "NIST-800-53-AC-4", "NIST-800-53-AC-17", "ISO-27001-A.8.20", "SOC2-CC6.6"],
+      "equivalent_in": {"aws-iam": "AWS Verified Access", "gcp-iam": "BeyondCorp Enterprise + Identity-Aware Proxy", "okta": "Okta Privileged Access (OPA) + Advanced Server Access"}
+    },
+    {
+      "id": "azure-lifecycle-workflows",
+      "vendor": "azure-entra",
+      "feature": "Lifecycle Workflows",
+      "category": "governance",
+      "description": "Entra ID Lifecycle Workflows automate user identity lifecycle events: pre-hire (create accounts and provision access before start date), joiner (onboard with welcome emails, group memberships, license assignments on day one), mover (update access when users change departments or roles), and leaver (offboard by revoking access, disabling accounts, removing licenses on termination date). Workflows are triggered by HR-driven attribute changes (employeeHireDate, employeeLeaveDateTime, department changes) synchronized from HR systems like Workday or SAP SuccessFactors via Entra ID inbound provisioning. Custom tasks can call Logic Apps for complex provisioning scenarios. This automates the most security-critical identity lifecycle transitions, particularly the leaver workflow where delayed deprovisioning creates the highest risk.",
+      "best_practices": "1. Implement leaver workflows first as they address the highest security risk (delayed deprovisioning). 2. Integrate with HR system (Workday, SAP SuccessFactors) as the authoritative source for hire/termination dates. 3. Configure pre-hire workflows to provision accounts before start date, reducing day-one onboarding delays. 4. Use custom task extensions (Logic Apps) for provisioning to non-Entra ID systems. 5. Test all workflows in a non-production tenant with realistic HR data before production deployment. 6. Monitor workflow execution logs for failures that result in incomplete provisioning or deprovisioning. 7. Include manager notification tasks in leaver workflows for awareness and handoff coordination.",
+      "common_misconfigurations": [
+        {"issue": "No leaver workflow or leaver workflow not triggered by HR termination data", "impact": "Terminated employees retain active accounts and access for days or weeks after departure", "severity": "critical"},
+        {"issue": "Workflow tasks do not cover all access: only disables account but does not revoke app assignments", "impact": "Disabled accounts retain application-level access that may be reactivated or accessed via API tokens", "severity": "high"},
+        {"issue": "HR system not integrated as authoritative source; manual triggers relied upon", "impact": "Lifecycle events depend on IT ticket or manager notification, introducing delays and human error", "severity": "high"},
+        {"issue": "Mover workflows not implemented for internal transfers", "impact": "Users accumulate access from previous roles when changing departments, violating least privilege", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-2(1)", "NIST-800-53-AC-2(2)", "ISO-27001-A.5.16", "ISO-27001-A.5.18", "ISO-27001-A.6.1", "ISO-27001-A.6.5", "SOC2-CC6.2"],
+      "equivalent_in": {"aws-iam": "IAM user lifecycle (manual or custom automation)", "okta": "Okta Lifecycle Management + Workflows", "sailpoint": "Lifecycle Events + Provisioning Policies"}
+    },
+    {
+      "id": "azure-entra-id-governance",
+      "vendor": "azure-entra",
+      "feature": "Identity Governance Dashboard",
+      "category": "governance",
+      "description": "Entra ID Governance provides a unified governance dashboard that combines Access Reviews, Entitlement Management, Lifecycle Workflows, and Privileged Identity Management into a single pane of glass. The dashboard surfaces key governance metrics: pending access reviews, access packages awaiting approval, overdue lifecycle workflow tasks, expiring role assignments, and identity governance posture scores. It provides actionable insights such as users with access to resources they have not used, roles eligible for right-sizing, and guest accounts that have not been reviewed. The governance dashboard enables security and compliance teams to maintain continuous oversight of the identity access lifecycle and demonstrate governance maturity to auditors with exportable reports.",
+      "best_practices": "1. Review the governance dashboard weekly as part of security operations routine. 2. Configure governance alerts for overdue access reviews and expiring access packages. 3. Use the dashboard's posture scores to prioritize governance improvement efforts. 4. Export governance metrics for board-level and audit reporting. 5. Correlate governance insights with risk signals from Identity Protection for prioritized remediation. 6. Set up delegated access to the governance dashboard for business unit managers. 7. Track governance maturity improvement over quarterly periods.",
+      "common_misconfigurations": [
+        {"issue": "Governance dashboard not monitored; deployed but not operationalized", "impact": "Governance tools generate insights that are never acted upon, creating false sense of compliance", "severity": "medium"},
+        {"issue": "Governance alerts not configured or routed to appropriate teams", "impact": "Overdue access reviews and expiring access packages are not remediated in a timely manner", "severity": "medium"},
+        {"issue": "Governance metrics not reported to leadership", "impact": "No organizational accountability for governance posture; improvement efforts lack executive sponsorship", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-1", "NIST-800-53-AC-2(4)", "ISO-27001-A.5.1", "ISO-27001-A.5.36", "SOC2-CC1.4", "SOC2-CC5.2"],
+      "equivalent_in": {"aws-iam": "IAM Access Analyzer Dashboard", "okta": "Okta Identity Governance Dashboard", "sailpoint": "IdentityNow Dashboard + Compliance Reports"}
+    },
+    {
+      "id": "azure-named-locations",
+      "vendor": "azure-entra",
+      "feature": "Named Locations & Network Policies",
+      "category": "authentication",
+      "description": "Named Locations define trusted and untrusted network boundaries in Entra ID for use in Conditional Access policies. Locations can be defined by IP address ranges (corporate egress IPs, VPN exit points) or by country/region. Trusted locations can exempt users from MFA when connecting from corporate networks, while untrusted or unknown locations can trigger additional verification requirements. Countries/regions use GeoIP databases to determine the geographic origin of sign-in requests. Named locations are a fundamental building block for location-based Conditional Access policies that differentiate between corporate, remote, and suspicious sign-in origins. With Global Secure Access, compliant network conditions replace IP-based trusted locations with identity-aware network trust.",
+      "best_practices": "1. Define corporate office and VPN egress IP ranges as trusted named locations. 2. Block sign-ins from countries/regions where the organization has no business presence. 3. Do not exempt trusted locations from MFA for privileged accounts. 4. Regularly update IP ranges when network infrastructure changes. 5. Use named locations as risk signals, not as sole access controls. 6. Monitor sign-in logs for successful authentications from unexpected locations. 7. Migrate from IP-based trusted locations to Global Secure Access compliant network conditions. 8. Use impossible travel detection (Identity Protection) to complement location-based policies.",
+      "common_misconfigurations": [
+        {"issue": "Trusted location IP ranges not updated when network infrastructure changes", "impact": "Users from new corporate networks are incorrectly classified as untrusted, or old IPs still trusted after decommission", "severity": "medium"},
+        {"issue": "MFA bypassed for all users from trusted locations", "impact": "Attacker who gains access to corporate network (or VPN) bypasses MFA entirely", "severity": "high"},
+        {"issue": "Country-based blocking not implemented despite no global business presence", "impact": "Attacks from regions where the organization has no users proceed without additional controls", "severity": "medium"},
+        {"issue": "Named locations used as primary security control without layering", "impact": "IP spoofing or VPN from blocked countries bypasses location-based policies", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-17(1)", "NIST-800-53-AC-17(4)", "NIST-800-207-TENET-2", "ISO-27001-A.8.5", "SOC2-CC6.1", "SOC2-CC6.6"],
+      "equivalent_in": {"aws-iam": "IAM Policy Conditions (aws:SourceIp)", "gcp-iam": "Access Context Manager (IP/Geo conditions)", "okta": "Network Zones"}
+    },
+    {
+      "id": "azure-tenant-restrictions",
+      "vendor": "azure-entra",
+      "feature": "Tenant Restrictions v2",
+      "category": "authorization",
+      "description": "Tenant Restrictions v2 prevents users on managed devices from authenticating to unauthorized Entra ID tenants, mitigating data exfiltration via personal or unauthorized organizational accounts. When a user on a corporate device opens a Microsoft sign-in page, Tenant Restrictions inject headers that inform Entra ID which tenants are allowed. Authentication to unauthorized tenants is blocked by the identity platform itself. Version 2 (via Universal Tenant Restrictions with Global Secure Access) extends this to anonymous access and personal accounts, blocking scenarios where users upload corporate data to personal OneDrive or SharePoint. This addresses the significant data loss vector of employees authenticating to personal Microsoft accounts on corporate devices to exfiltrate data to unmanaged locations.",
+      "best_practices": "1. Deploy Tenant Restrictions v2 with Global Secure Access for comprehensive coverage including anonymous access. 2. Explicitly allow partner tenants that require cross-tenant collaboration. 3. Block personal Microsoft accounts (consumer tenants) on managed devices. 4. Test with a pilot group before broad deployment to identify legitimate cross-tenant workflows. 5. Coordinate with B2B collaboration settings to ensure consistent partner tenant policies. 6. Monitor blocked tenant access attempts for data exfiltration investigation. 7. Apply Tenant Restrictions at the proxy/firewall level for legacy enforcement on unmanaged devices.",
+      "common_misconfigurations": [
+        {"issue": "Tenant Restrictions not deployed despite data loss prevention requirements", "impact": "Users authenticate to personal Microsoft accounts and exfiltrate corporate data to unmanaged locations", "severity": "high"},
+        {"issue": "Partner tenants not allowlisted before enabling restrictions", "impact": "Legitimate cross-tenant collaboration workflows blocked, causing business disruption", "severity": "medium"},
+        {"issue": "Only v1 deployed (header injection) without Global Secure Access v2 coverage", "impact": "Users bypass restrictions via incognito mode, personal devices, or non-proxy network paths", "severity": "medium"},
+        {"issue": "Blocked access attempts not monitored", "impact": "Potential data exfiltration attempts not investigated or correlated with insider threat programs", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-4", "NIST-800-53-AC-20", "ISO-27001-A.8.4", "ISO-27001-A.8.3", "SOC2-CC6.7"],
+      "equivalent_in": {"aws-iam": "SCP restricting AssumeRole to specific accounts", "gcp-iam": "Organization Policy (domain restricted sharing)", "okta": "App Sign-On Policy with network restrictions"}
+    },
+    {
+      "id": "azure-privileged-access-groups",
+      "vendor": "azure-entra",
+      "feature": "Privileged Access Groups",
+      "category": "privileged-access",
+      "description": "Privileged Access Groups extend PIM just-in-time access capabilities to Azure AD group memberships and group ownership. When a group is designated as role-assignable and enabled for privileged access, members can be assigned as eligible rather than permanent. Eligible members must activate their membership through PIM with the same approval workflows, MFA requirements, justification, and time limits as directory role activations. This is particularly powerful for groups that are assigned to Azure AD roles, Azure RBAC roles, or used for application access control. Privileged Access Groups enable JIT access for any resource that uses group-based access control, extending the PIM governance model beyond built-in directory roles to custom groups.",
+      "best_practices": "1. Use Privileged Access Groups for all groups assigned to sensitive Entra ID or Azure roles. 2. Configure eligible membership with approval workflows for critical group assignments. 3. Set activation duration appropriate to the task (2-8 hours, not 24 hours). 4. Require MFA and justification for all group membership activations. 5. Schedule access reviews for eligible group membership assignments. 6. Use separate groups for eligible vs permanent membership to maintain clarity. 7. Monitor group activation patterns for anomalous frequency or timing.",
+      "common_misconfigurations": [
+        {"issue": "Role-assignable groups with permanent members instead of eligible PIM assignments", "impact": "Standing group membership provides persistent access without JIT controls or activation audit trail", "severity": "high"},
+        {"issue": "No approval workflow for group membership activation", "impact": "Eligible members self-activate without oversight, reducing governance effectiveness", "severity": "medium"},
+        {"issue": "Group used for both privileged and non-privileged access", "impact": "JIT activation grants both privileged and non-privileged access simultaneously, over-provisioning", "severity": "medium"},
+        {"issue": "Access reviews not configured for eligible group assignments", "impact": "Stale eligible assignments accumulate, expanding the pool of users who can activate privileged access", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(2)", "NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(7)", "ISO-27001-A.8.2", "SOC2-CC6.3", "CISA-ZTMM-ID-PAM-MATURITY"],
+      "equivalent_in": {"aws-iam": "IAM Roles with STS + Permission Boundaries", "gcp-iam": "Conditional Role Bindings with time-bound access", "cyberark": "Safe Membership with Just-In-Time Access"}
+    },
+    {
+      "id": "azure-microsoft-graph-permissions",
+      "vendor": "azure-entra",
+      "feature": "Microsoft Graph API Permissions Governance",
+      "category": "authorization",
+      "description": "Microsoft Graph API permissions control what data and actions applications can access across the Microsoft 365 ecosystem. The permission model distinguishes between delegated permissions (application acts on behalf of signed-in user, constrained to user's access) and application permissions (application acts as itself with tenant-wide scope). High-privilege application permissions like Directory.ReadWrite.All, Mail.ReadWrite, Sites.ReadWrite.All, and User.ReadWrite.All grant sweeping access across the tenant. The user consent settings control whether end users can grant permissions to applications, with three tiers: users can consent to all permissions (least restrictive), users can consent to verified publisher apps for selected permissions (recommended), and admin consent required for all permissions (most restrictive). Misconfigured Graph permissions are one of the most common enterprise security gaps in Microsoft 365 environments.",
+      "best_practices": "1. Set user consent to 'Allow user consent for apps from verified publishers, for selected permissions' minimum. 2. Require admin consent workflow for all application permissions and high-privilege delegated permissions. 3. Audit existing application Graph permissions quarterly and remove unnecessary grants. 4. Use granular permissions (Mail.Read for specific mailbox) instead of broad permissions (Mail.ReadWrite for all). 5. Implement app governance policies in Microsoft Defender for Cloud Apps for Graph API monitoring. 6. Block consent to applications requesting high-risk permissions combinations. 7. Use Conditional Access for workload identities to restrict high-privilege service principals. 8. Create an application permissions catalog documenting approved permissions per app type.",
+      "common_misconfigurations": [
+        {"issue": "User consent enabled for all permissions from any publisher", "impact": "Users grant malicious OAuth apps access to mail, files, and directory data via consent phishing", "severity": "critical"},
+        {"issue": "Application permissions granted for tenant-wide Mail.ReadWrite.All or Files.ReadWrite.All", "impact": "Compromised app can read/modify all mailboxes or all OneDrive/SharePoint files in the tenant", "severity": "critical"},
+        {"issue": "No monitoring of Graph API permissions and consent events", "impact": "New high-privilege permission grants to applications go undetected until breach occurs", "severity": "high"},
+        {"issue": "Admin consent granted to unverified publisher applications", "impact": "Potentially malicious applications receive admin-consented tenant-wide permissions", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-6(10)", "ISO-27001-A.8.9", "ISO-27001-A.5.18", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"aws-iam": "IAM Policies (resource-level permissions)", "gcp-iam": "OAuth Scopes + API Restrictions", "okta": "API Access Management + OAuth Scopes"}
+    },
+    {
+      "id": "azure-authentication-strengths",
+      "vendor": "azure-entra",
+      "feature": "Authentication Strengths (Conditional Access)",
+      "category": "authentication",
+      "description": "Authentication Strengths in Conditional Access allow administrators to specify which combinations of authentication methods are acceptable for a given access scenario. Built-in strength levels include: MFA strength (any MFA method), Passwordless MFA strength (Windows Hello, FIDO2, Authenticator passwordless), and Phishing-resistant MFA strength (FIDO2, CBA, passkeys). Custom authentication strengths can define specific combinations. Authentication strengths are used as grant controls in Conditional Access policies, replacing the generic 'Require MFA' control with nuanced requirements. For example, accessing highly sensitive applications can require phishing-resistant MFA (FIDO2 only), while standard applications accept any MFA method. This enables progressive MFA strength enforcement aligned to resource sensitivity.",
+      "best_practices": "1. Require phishing-resistant MFA strength for Global Administrators and privileged roles. 2. Require passwordless MFA strength for accessing sensitive applications and data. 3. Use standard MFA strength as the baseline for all users and all cloud apps. 4. Create custom authentication strengths for specific compliance requirements. 5. Combine authentication strengths with risk-based policies (high risk = phishing-resistant only). 6. Use authentication strength requirements to drive adoption of stronger methods (users forced to register FIDO2 to access critical apps). 7. Regularly review and update authentication strength definitions as new methods become available.",
+      "common_misconfigurations": [
+        {"issue": "Generic 'Require MFA' used instead of authentication strength for privileged access", "impact": "Administrators satisfy MFA with SMS or phone call, which are phishable and bypassable", "severity": "high"},
+        {"issue": "No phishing-resistant MFA requirement for any access scenario", "impact": "All MFA can be defeated by Adversary-in-the-Middle phishing proxies", "severity": "high"},
+        {"issue": "Custom authentication strength allows weak method combinations", "impact": "Custom strength definition inadvertently includes methods that do not meet the intended security level", "severity": "medium"},
+        {"issue": "Authentication strength not aligned to resource classification", "impact": "Same MFA strength required for low-sensitivity and high-sensitivity applications, creating friction or risk", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-63B-AAL2", "NIST-800-63B-AAL3", "NIST-800-63B-PHISHING-RESIST", "NIST-800-53-IA-2(1)", "NIST-800-53-IA-2(6)", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "IAM MFA device type requirements", "gcp-iam": "Login security settings + Titan key enforcement", "okta": "Authenticator enrollment policies with factor type restrictions"}
+    },
+    {
+      "id": "azure-protected-actions",
+      "vendor": "azure-entra",
+      "feature": "Protected Actions",
+      "category": "privileged-access",
+      "description": "Protected Actions in Entra ID require additional Conditional Access policy evaluation when users perform specific sensitive administrative operations, regardless of their current session's authentication state. Even if an administrator has already authenticated with MFA and has an active session, performing a protected action (such as modifying Conditional Access policies, deleting tenants, changing authentication methods policy, or modifying cross-tenant access settings) triggers a step-up authentication challenge defined by a separate Conditional Access policy. This provides defense-in-depth for the most impactful administrative operations, requiring re-verification at the point of action rather than relying solely on session-level authentication. Protected Actions complement PIM by adding verification at the operation level in addition to the role activation level.",
+      "best_practices": "1. Protect all Conditional Access policy modification operations with phishing-resistant MFA re-authentication. 2. Protect Entra ID role assignment operations to prevent privilege escalation from compromised admin sessions. 3. Require phishing-resistant authentication strength for protected actions, not just standard MFA. 4. Monitor protected action challenges in sign-in logs for unauthorized attempts. 5. Test protected actions configuration with non-production administrator accounts. 6. Document which operations are protected and communicate to administrators. 7. Combine with PIM: eligible role activation (PIM) + protected action verification (CA) for layered defense.",
+      "common_misconfigurations": [
+        {"issue": "No protected actions configured for tenant-critical operations", "impact": "Compromised admin session can modify CA policies, assign roles, or delete the tenant without re-verification", "severity": "critical"},
+        {"issue": "Protected actions use standard MFA instead of phishing-resistant authentication", "impact": "Step-up challenge can be defeated by the same AitM proxy that captured the initial session", "severity": "high"},
+        {"issue": "Too many operations protected, causing admin fatigue", "impact": "Frequent step-up prompts lead administrators to seek workarounds or delay necessary changes", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-IA-11", "ISO-27001-A.8.2", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"aws-iam": "IAM Policy Conditions requiring MFA for sensitive actions", "gcp-iam": "Organization Policy Administrator with 2FA enforcement", "okta": "Admin MFA enforcement for policy changes"}
+    },
+    {
+      "id": "azure-conditional-access-for-workloads",
+      "vendor": "azure-entra",
+      "feature": "Conditional Access for Workload Identities",
+      "category": "authorization",
+      "description": "Conditional Access for Workload Identities extends the zero trust policy engine to non-human identities: service principals and managed identities. While traditional Conditional Access only evaluates user sign-ins, this capability enables policies that control workload identity authentication based on location (IP address ranges) and risk signals from Identity Protection for workload identities. Policies can block service principal authentication from outside trusted network ranges, require specific authentication methods, or respond to detected anomalous service principal behavior. This addresses the growing attack surface of machine identities, which outnumber human identities 10:1 in most organizations and are frequently targeted through credential theft, token replay, and OAuth consent phishing attacks targeting service principals.",
+      "best_practices": "1. Create Conditional Access policies for high-privilege service principals (those with Directory.ReadWrite.All or similar). 2. Restrict service principal authentication to known IP ranges where workloads are deployed. 3. Enable Identity Protection for workload identities to detect anomalous service principal behavior. 4. Start in report-only mode to understand service principal authentication patterns before enforcement. 5. Exclude managed identities from IP-based restrictions (their traffic originates from Azure backbone). 6. Monitor workload identity Conditional Access policy evaluation in sign-in logs.",
+      "common_misconfigurations": [
+        {"issue": "No Conditional Access policies for workload identities; only user sign-ins controlled", "impact": "Service principals authenticate from any network without policy evaluation; compromised SP tokens usable globally", "severity": "high"},
+        {"issue": "IP restrictions not configured for high-privilege service principals", "impact": "Stolen service principal credentials usable from attacker infrastructure without network restrictions", "severity": "high"},
+        {"issue": "Managed identities incorrectly blocked by IP-based workload CA policies", "impact": "Azure services using managed identities fail authentication when their egress IPs are not in the allowed list", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-207-PDP-PEP", "ISO-27001-A.8.9", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "IAM Policy Conditions (aws:SourceIp) for roles", "gcp-iam": "IAM Conditions + VPC Service Controls for service accounts", "okta": "N/A (Okta does not manage workload identity policies)"}
+    },
+    {
+      "id": "azure-passkeys",
+      "vendor": "azure-entra",
+      "feature": "Passkeys (Device-Bound & Synced)",
+      "category": "authentication",
+      "description": "Entra ID supports passkeys as a phishing-resistant passwordless authentication method based on FIDO2/WebAuthn standards. Two types exist: device-bound passkeys stored in platform authenticators (Windows Hello, Touch ID, Android biometric) or hardware security keys that never leave the device, and synced passkeys stored in password managers or cloud keychain services (iCloud Keychain, Google Password Manager, 1Password) that synchronize across a user's devices. Device-bound passkeys provide the strongest security (equivalent to FIDO2 hardware keys) because the private key cannot be extracted. Synced passkeys trade some security for convenience by allowing users to authenticate from any synced device. Passkeys are integrated into Entra ID authentication methods and can be required via authentication strength policies in Conditional Access.",
+      "best_practices": "1. Enable passkey support in the authentication methods policy for all users. 2. Use device-bound passkeys for privileged accounts (admins, break-glass accounts). 3. Allow synced passkeys for general users to improve adoption while maintaining phishing resistance. 4. Create authentication strength policies requiring passkeys or FIDO2 for sensitive applications. 5. Educate users on passkey registration and recovery procedures. 6. Define which passkey providers are allowed or blocked via attestation GUID restrictions. 7. Plan passkey deployment alongside existing FIDO2 security key and Windows Hello programs.",
+      "common_misconfigurations": [
+        {"issue": "Passkeys not enabled; users limited to older MFA methods", "impact": "Users cannot benefit from phishing-resistant passwordless authentication on platforms that support passkeys", "severity": "medium"},
+        {"issue": "Synced passkeys allowed for privileged accounts without restriction", "impact": "Admin passkeys synced to personal devices or cloud services outside organizational control", "severity": "high"},
+        {"issue": "No attestation restrictions on passkey providers", "impact": "Passkeys created in uncertified or unsecured providers accepted without validation", "severity": "low"},
+        {"issue": "Passkey registration not integrated with identity proofing", "impact": "Attacker with stolen session can register passkey on their device, establishing persistent phishing-resistant access", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-63B-AAL2", "NIST-800-63B-PHISHING-RESIST", "NIST-800-63B-AUTH-MF-CRYPTO-SW", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "Passkey MFA for IAM Users", "gcp-iam": "Passkeys in Google Accounts", "okta": "Okta FastPass + Passkey support", "auth0": "WebAuthn Passkeys"}
+    },
+    {
+      "id": "azure-external-auth-methods",
+      "vendor": "azure-entra",
+      "feature": "External Authentication Methods (EAM)",
+      "category": "authentication",
+      "description": "External Authentication Methods allow integration of third-party MFA providers (Duo, RSA SecurID, Symantec VIP, custom OIDC providers) directly into Entra ID Conditional Access authentication flows. Previously, integrating third-party MFA required complex federation configurations or Azure MFA custom controls (deprecated). EAM enables Conditional Access to treat third-party authentication as a native authenticator, including support for authentication strength policies that can require specific external methods for specific scenarios. The third-party provider implements an OIDC-compliant API that Entra ID calls during authentication. This allows organizations with existing MFA infrastructure investments to use their preferred MFA solution while benefiting from Entra ID Conditional Access policy engine capabilities.",
+      "best_practices": "1. Use EAM to integrate existing enterprise MFA investments (Duo, RSA) with Entra ID Conditional Access. 2. Define authentication strength policies that include external methods alongside native Entra ID methods. 3. Test external authentication method integration in a pilot group before organization-wide deployment. 4. Configure fallback to native Entra ID MFA in case the external provider is unavailable. 5. Monitor external authentication method success rates and latency in sign-in logs. 6. Map external authentication method strengths to NIST AAL levels for compliance alignment.",
+      "common_misconfigurations": [
+        {"issue": "External MFA provider outage blocks all authentication with no fallback", "impact": "Complete authentication outage when the third-party MFA provider is unavailable", "severity": "critical"},
+        {"issue": "External authentication method not mapped to authentication strength levels", "impact": "Cannot require specific external methods for sensitive applications via authentication strength policies", "severity": "medium"},
+        {"issue": "Legacy custom controls still in use instead of migrating to EAM", "impact": "Deprecated custom controls may be removed, breaking MFA enforcement for affected users", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-2(1)", "NIST-800-63B-AAL2", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"aws-iam": "Custom Identity Provider for MFA", "gcp-iam": "Third-party IdP Federation", "okta": "Third-Party MFA Factor Integrations"}
+    },
+    {
+      "id": "azure-entra-internet-access",
+      "vendor": "azure-entra",
+      "feature": "Microsoft Entra Internet Access (SWG)",
+      "category": "monitoring",
+      "description": "Microsoft Entra Internet Access is the Secure Web Gateway (SWG) component of Global Secure Access that applies identity-aware security policies to all outbound internet traffic. Unlike traditional proxy-based SWGs that use IP-based policies, Entra Internet Access applies Conditional Access policies to internet destinations, enabling user-identity-aware web filtering, tenant restrictions enforcement, and data loss prevention for internet traffic. Web content filtering categories allow blocking or allowing access to website categories based on user identity, group membership, and device compliance. Traffic logs provide per-user internet activity visibility integrated with Entra ID identity context. This extends the zero trust security perimeter from cloud applications to all internet traffic.",
+      "best_practices": "1. Deploy Entra Internet Access on all managed devices for comprehensive internet traffic governance. 2. Configure web content filtering policies based on user groups and device compliance. 3. Enable Universal Tenant Restrictions to prevent data exfiltration via personal Microsoft accounts on all internet traffic. 4. Integrate internet access logs with Microsoft Sentinel for security analytics. 5. Create Conditional Access policies that apply to internet traffic destinations. 6. Start with audit mode to understand internet traffic patterns before enforcement. 7. Use compliant network conditions to replace IP-based trusted locations.",
+      "common_misconfigurations": [
+        {"issue": "Internet traffic not routed through Entra Internet Access", "impact": "Internet-bound traffic bypasses identity-aware security policies; no user-attributed web filtering", "severity": "medium"},
+        {"issue": "Web content filtering policies too permissive", "impact": "Users access risky or non-compliant websites without restriction or monitoring", "severity": "medium"},
+        {"issue": "Tenant Restrictions not enforced on internet traffic", "impact": "Users access personal Microsoft accounts and exfiltrate data via unmanaged cloud storage", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-4", "NIST-800-53-AC-17", "NIST-800-207-TENET-4", "ISO-27001-A.8.20", "SOC2-CC6.6", "SOC2-CC6.7"],
+      "equivalent_in": {"aws-iam": "AWS Network Firewall + WAF", "gcp-iam": "Cloud Armor + Secure Web Proxy", "okta": "N/A (Okta does not provide SWG)"}
+    }
+  ]
+}

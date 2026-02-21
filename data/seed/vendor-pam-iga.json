@@ -1,0 +1,324 @@
+{
+  "vendor_configurations": [
+    {
+      "id": "cyberark-vault",
+      "vendor": "cyberark",
+      "feature": "Digital Vault (Enterprise Password Vault)",
+      "category": "privileged-access",
+      "description": "CyberArk Digital Vault is the hardened, encrypted repository at the core of the CyberArk Privileged Access Manager solution. It stores privileged credentials (passwords, SSH keys, certificates, API keys) in encrypted safes with granular access control based on safe membership and permissions. The vault operates as an isolated, hardened server with its own operating system security layer, proprietary encryption (AES-256), and an auditable access log for every credential retrieval. Safes provide logical separation of credentials by business unit, application, or classification level. Vault high availability uses synchronous replication between primary and disaster recovery vaults. The Digital Vault eliminates shared passwords, enables automatic credential rotation, and provides a tamper-proof audit trail of all credential access.",
+      "best_practices": "1. Deploy the vault server on a hardened, dedicated system in a physically secured environment. 2. Design safe architecture aligned to organizational boundaries (by team, application, or classification). 3. Implement dual control (two approvals required) for accessing the most sensitive credentials. 4. Configure automatic password rotation after every check-in or on a defined schedule (30-90 days). 5. Enable one-time passwords (OTP) for highest-sensitivity accounts that rotate after each use. 6. Set up vault high availability with synchronous DR replication in a separate physical location. 7. Monitor vault activity logs and integrate with SIEM for real-time alerting on credential access. 8. Use CPM (Central Policy Manager) for automated credential rotation across target systems.",
+      "common_misconfigurations": [
+        {"issue": "Vault master key stored in an accessible location instead of HSM or split custody", "impact": "Master key compromise decrypts the entire vault, exposing all stored credentials", "severity": "critical"},
+        {"issue": "Automatic password rotation not configured; static passwords in vault", "impact": "Vault stores credentials but does not rotate them, providing no advantage over a spreadsheet for rotation", "severity": "high"},
+        {"issue": "Single safe used for all credentials without segmentation", "impact": "Users with safe access can retrieve credentials for systems outside their responsibility", "severity": "high"},
+        {"issue": "Vault DR replication not configured or not tested", "impact": "Primary vault failure results in loss of all credential access until manual recovery", "severity": "high"},
+        {"issue": "Vault audit logs not forwarded to SIEM", "impact": "Credential access events not correlated with other security signals; insider threats undetected", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-IA-5", "NIST-800-53-IA-5(1)", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "ISO-27001-A.8.24", "SOC2-CC6.1", "SOC2-CC6.7"],
+      "equivalent_in": {"azure-entra": "Azure Key Vault (secrets + keys)", "aws-iam": "AWS Secrets Manager + KMS", "gcp-iam": "Secret Manager + Cloud KMS", "okta": "N/A (CyberArk complements Okta)"}
+    },
+    {
+      "id": "cyberark-psm",
+      "vendor": "cyberark",
+      "feature": "Privileged Session Manager (PSM)",
+      "category": "privileged-access",
+      "description": "CyberArk Privileged Session Manager (PSM) provides a secure proxy and recording mechanism for privileged sessions to target systems. Users connect to target servers through PSM, which establishes the connection using vaulted credentials (the user never sees or handles the actual password). PSM records the entire session as video with keystroke logging, enabling forensic review of all administrative actions. Session recording supports search by command, timestamp, and user. PSM supports multiple connection protocols: RDP (Windows), SSH (Linux/Unix), HTTPS (web applications), and database clients (SQL Server, Oracle). The proxy architecture provides session isolation (users never directly connect to targets), credential injection (passwords retrieved from vault and injected into the connection), and full audit trail (every administrative action recorded).",
+      "best_practices": "1. Route all privileged sessions through PSM; block direct administrative access to target systems. 2. Enable session recording for all privileged sessions, with retention aligned to compliance requirements. 3. Configure session monitoring to alert on high-risk commands (rm -rf, format, DROP TABLE). 4. Use PSM for HTML5 Gateway to provide agentless browser-based privileged access. 5. Implement session isolation to prevent copy-paste and file transfer from privileged sessions to user workstations. 6. Review session recordings for root cause analysis during incident investigation. 7. Integrate session recording metadata with SIEM for command-level alerting.",
+      "common_misconfigurations": [
+        {"issue": "Direct administrative access not blocked; PSM bypass possible via direct SSH/RDP", "impact": "Users circumvent PSM to avoid recording, eliminating audit trail for privileged actions", "severity": "critical"},
+        {"issue": "Session recording not enabled or storage insufficient", "impact": "No forensic evidence of privileged session activity for incident investigation or compliance audit", "severity": "high"},
+        {"issue": "No real-time command monitoring; only post-session review", "impact": "Malicious commands executed and completed before session review detects them", "severity": "medium"},
+        {"issue": "Copy-paste and file transfer not restricted in privileged sessions", "impact": "Data exfiltration via clipboard or file transfer from privileged sessions to user workstations", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-2(4)", "NIST-800-53-AC-17(1)", "ISO-27001-A.8.2", "ISO-27001-A.8.15", "SOC2-CC6.1", "SOC2-CC7.2", "CISA-ZTMM-ID-PAM-MATURITY"],
+      "equivalent_in": {"azure-entra": "Azure Bastion + PIM", "aws-iam": "Systems Manager Session Manager", "gcp-iam": "IAP TCP Forwarding + OS Login", "okta": "Okta Privileged Access (OPA)"}
+    },
+    {
+      "id": "cyberark-epm",
+      "vendor": "cyberark",
+      "feature": "Endpoint Privilege Manager (EPM)",
+      "category": "privileged-access",
+      "description": "CyberArk Endpoint Privilege Manager removes local administrator privileges from end-user workstations and servers while enabling users to perform approved administrative tasks through policy-based privilege elevation. EPM implements the principle of least privilege at the endpoint level by: removing local admin rights from all users by default, allowing specific applications to run with elevated privileges based on policy (application allowlisting), providing just-in-time privilege elevation for approved tasks, and detecting and blocking credential theft tools (Mimikatz, LaZagne) and ransomware. EPM supports Windows, macOS, and Linux endpoints. Policies can be based on application hash, publisher certificate, path, and command-line arguments. Self-service elevation requests can be configured with business justification and approval workflows.",
+      "best_practices": "1. Remove local administrator privileges from all standard user workstations as the baseline policy. 2. Create application elevation policies for known legitimate applications requiring admin (installers, tools). 3. Use publisher-based policies for trusted software vendors instead of path-based policies (more secure). 4. Enable credential theft detection and blocking (Mimikatz, pass-the-hash tools). 5. Implement self-service elevation requests with justification for infrequent admin tasks. 6. Deploy EPM in audit mode first to discover which applications require elevated privileges. 7. Monitor elevation requests and blocked applications for policy tuning. 8. Enable ransomware protection modules for file encryption detection and prevention.",
+      "common_misconfigurations": [
+        {"issue": "Local admin rights not removed; EPM in monitoring mode only", "impact": "Users retain full local admin; EPM provides visibility but no enforcement of least privilege", "severity": "high"},
+        {"issue": "Path-based elevation policies used instead of publisher certificate or hash", "impact": "Malicious applications placed in the allowed path run with elevated privileges", "severity": "high"},
+        {"issue": "Credential theft detection module not enabled", "impact": "Mimikatz and similar tools run on endpoints without detection or blocking", "severity": "high"},
+        {"issue": "Too many applications on the elevation allowlist", "impact": "Excessive number of applications run elevated, approaching the equivalent of local admin", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(10)", "ISO-27001-A.8.2", "ISO-27001-A.8.1", "SOC2-CC6.1", "SOC2-CC6.8"],
+      "equivalent_in": {"azure-entra": "Microsoft LAPS + Intune Endpoint Privilege Management", "aws-iam": "N/A (endpoint-specific, not cloud IAM)", "okta": "N/A (Okta does not manage endpoint privileges)"}
+    },
+    {
+      "id": "cyberark-pta",
+      "vendor": "cyberark",
+      "feature": "Privileged Threat Analytics (PTA)",
+      "category": "monitoring",
+      "description": "CyberArk Privileged Threat Analytics uses behavioral analytics and machine learning to detect anomalous privileged account activity in real-time. PTA analyzes data from multiple sources: CyberArk vault access logs, Active Directory authentication events, SIEM feeds, and network traffic. It establishes behavioral baselines for each privileged account (normal access times, typical target systems, standard command patterns) and alerts on deviations. Key detection capabilities include: suspected credential theft (pass-the-hash, golden ticket), unmanaged privileged account usage (accounts not in the vault), abnormal privileged session behavior (unusual commands, access at unusual times), and risky privilege escalation. PTA provides risk scoring and prioritized alerts, reducing the alert fatigue common in SOC environments by focusing on privileged account threats.",
+      "best_practices": "1. Integrate PTA with all CyberArk components (vault, PSM, EPM) for comprehensive privileged activity visibility. 2. Configure SIEM integration for PTA alerts to correlate with other security signals. 3. Tune behavioral baselines during the initial learning period (30-60 days). 4. Create incident response playbooks for each PTA alert type (credential theft, unmanaged account, abnormal session). 5. Monitor unmanaged privileged accounts detected by PTA and onboard them to the vault. 6. Review PTA risk scores weekly and investigate high-risk accounts. 7. Use PTA to validate that all privileged accounts are managed through CyberArk.",
+      "common_misconfigurations": [
+        {"issue": "PTA not integrated with Active Directory for authentication event analysis", "impact": "Credential theft attacks (pass-the-hash, golden ticket) in AD not detected by PTA", "severity": "high"},
+        {"issue": "Behavioral baseline not tuned; excessive false positive alerts", "impact": "Alert fatigue causes SOC team to ignore PTA alerts, missing genuine threats", "severity": "high"},
+        {"issue": "PTA alerts not integrated with SIEM or SOC workflow", "impact": "PTA detections not investigated within incident response SLA; threats persist unaddressed", "severity": "medium"},
+        {"issue": "Unmanaged privileged accounts detected by PTA not onboarded to vault", "impact": "Known unmanaged accounts continue to operate outside CyberArk governance", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(12)", "NIST-800-53-AC-6(9)", "NIST-800-53-AC-7(2)", "ISO-27001-A.8.16", "ISO-27001-A.8.15", "SOC2-CC7.2", "CISA-ZTMM-VISIBILITY"],
+      "equivalent_in": {"azure-entra": "Entra ID Identity Protection + Microsoft Sentinel", "aws-iam": "GuardDuty IAM findings + CloudTrail anomaly detection", "gcp-iam": "Security Command Center Event Threat Detection", "okta": "ThreatInsight + Adaptive MFA risk signals"}
+    },
+    {
+      "id": "cyberark-secrets-manager",
+      "vendor": "cyberark",
+      "feature": "Secrets Manager (Credential Providers)",
+      "category": "privileged-access",
+      "description": "CyberArk Secrets Manager provides secure credential retrieval for applications, scripts, and automation workflows. Multiple credential provider mechanisms are available: Central Credential Provider (CCP) for web-service-based retrieval, Application Access Manager (AAM) for agent-based retrieval on the application host, Credential Provider SDK for embedded retrieval in application code, and Conjur for cloud-native and DevOps secret management. Applications authenticate to the credential provider using application identity (path, hash, IP address, certificate) and retrieve credentials without storing them locally. Credentials are dynamically retrieved from the vault at runtime, ensuring automatic rotation is immediately effective. This eliminates hardcoded credentials, environment variables, and configuration file passwords throughout the application estate.",
+      "best_practices": "1. Eliminate all hardcoded credentials and replace with CyberArk credential provider API calls. 2. Use Conjur for Kubernetes and cloud-native workloads; CCP/AAM for traditional server applications. 3. Authenticate applications using the most secure method available (certificate > IP+path > path alone). 4. Cache retrieved credentials with a short TTL (5-15 minutes) to handle vault unavailability. 5. Implement fallback behavior when the credential provider is unreachable (retry with backoff). 6. Monitor credential retrieval events for anomalous application access patterns. 7. Test automatic credential rotation with application credential caching to verify seamless rotation.",
+      "common_misconfigurations": [
+        {"issue": "Applications authenticate to credential provider using only path (weakest authentication)", "impact": "Any process running from the same path can retrieve credentials, enabling lateral credential access", "severity": "high"},
+        {"issue": "Retrieved credentials cached indefinitely without TTL", "impact": "Rotated credentials not picked up by the application; cached credential becomes invalid after rotation", "severity": "high"},
+        {"issue": "No fallback behavior when vault is unreachable", "impact": "Application fails completely during vault maintenance or network issues", "severity": "medium"},
+        {"issue": "Conjur/CCP not used for containerized workloads; secrets injected via environment variables", "impact": "Credentials visible in container metadata, orchestration logs, and process listings", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-IA-5(1)", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "ISO-27001-A.8.24", "SOC2-CC6.1", "SOC2-CC6.7"],
+      "equivalent_in": {"azure-entra": "Azure Key Vault + Managed Identities", "aws-iam": "AWS Secrets Manager + IAM Roles", "gcp-iam": "Secret Manager + Workload Identity", "okta": "N/A (Okta does not manage application secrets)"}
+    },
+    {
+      "id": "cyberark-conjur",
+      "vendor": "cyberark",
+      "feature": "Conjur (Cloud & DevOps Secrets)",
+      "category": "privileged-access",
+      "description": "CyberArk Conjur is a secrets management solution purpose-built for cloud-native, containerized, and DevOps environments. It provides machine identity-based authentication and secrets retrieval for Kubernetes pods, CI/CD pipelines (Jenkins, GitLab, GitHub Actions), Terraform, Ansible, and other automation tools. Conjur uses policy-as-code (YAML policy files) for defining access control, making secrets management auditable and version-controllable. Authentication methods include: Kubernetes service account authentication, IAM role authentication (AWS, Azure, GCP), host identity (hostname, IP), and API key. Conjur Community Edition (open source) provides core secrets management, while Conjur Enterprise (integrated with CyberArk PAM) adds vault synchronization, automatic rotation, and enterprise management. Conjur's REST API enables integration with any application or tool.",
+      "best_practices": "1. Use Kubernetes authenticator for native K8s workload authentication without external credentials. 2. Define secrets access policies as code (YAML) and version control in git. 3. Use Conjur's automatic rotation for database credentials consumed by applications. 4. Deploy Conjur followers (read replicas) close to workloads for low-latency credential retrieval. 5. Integrate Conjur with CyberArk PAM for centralized credential management across traditional and cloud-native. 6. Use Summon (Conjur CLI tool) for secret injection in CI/CD pipelines without code changes. 7. Monitor Conjur audit logs for unauthorized secret retrieval attempts.",
+      "common_misconfigurations": [
+        {"issue": "API keys used for Conjur authentication instead of native authenticators (K8s, IAM)", "impact": "Long-lived API keys stored in CI/CD or application config; no automatic rotation of authentication credential", "severity": "high"},
+        {"issue": "Conjur policies not version controlled", "impact": "No audit trail of access policy changes; cannot rollback policy mistakes or track authorization evolution", "severity": "medium"},
+        {"issue": "Single Conjur leader without followers for high availability", "impact": "Leader failure blocks all secret retrieval across all workloads", "severity": "high"},
+        {"issue": "Conjur not integrated with CyberArk PAM vault", "impact": "Separate credential management for traditional and cloud-native, creating governance gaps", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-AC-6", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "ISO-27001-A.8.9", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Azure Key Vault + Managed Identities for AKS", "aws-iam": "AWS Secrets Manager + IRSA for EKS", "gcp-iam": "Secret Manager + GKE Workload Identity", "okta": "N/A (secrets management, not identity provider)"}
+    },
+    {
+      "id": "cyberark-cpc",
+      "vendor": "cyberark",
+      "feature": "Cloud Privilege Cloud (CPC)",
+      "category": "privileged-access",
+      "description": "CyberArk Cloud Privilege Cloud is the SaaS-delivered version of CyberArk Privileged Access Manager, providing privileged access management without on-premises vault infrastructure. CPC provides all core PAM capabilities in a cloud-hosted model: credential vaulting, automatic rotation, session isolation and recording, threat analytics, and secure remote access. Privilege Cloud supports managing credentials for on-premises systems (via CyberArk Connector deployed in the customer network), cloud infrastructure (AWS, Azure, GCP), SaaS applications, and databases. The connector architecture enables the SaaS platform to manage on-premises targets without opening inbound firewall rules. CPC includes just-in-time access, dual authorization workflows, and integration with identity providers for SSO-based access to the privileged access portal.",
+      "best_practices": "1. Deploy CyberArk Connectors in each network segment where target systems reside. 2. Configure just-in-time access with approval workflows for all privileged credential checkout. 3. Enable session recording for all privileged sessions managed through CPC. 4. Integrate CPC with your corporate IdP (Entra ID, Okta) for SSO access to the privileged access portal. 5. Use CPC's built-in dashboards to monitor privilege usage patterns and compliance status. 6. Configure automatic credential rotation for all managed accounts (30-90 day schedules). 7. Implement safe-level access control aligned to organizational teams and responsibilities.",
+      "common_misconfigurations": [
+        {"issue": "Connector not deployed in all network segments; some targets unreachable", "impact": "Privileged accounts on unreachable targets cannot be managed, rotated, or monitored", "severity": "high"},
+        {"issue": "Just-in-time access not configured; permanent credential access for all vault users", "impact": "Users can retrieve privileged credentials at any time without approval, defeating JIT principles", "severity": "high"},
+        {"issue": "Session recording not enabled for privileged sessions", "impact": "No forensic record of administrative actions during privileged sessions", "severity": "high"},
+        {"issue": "No IdP integration; separate CPC credentials for privileged access", "impact": "Separate credential set creates management overhead and potential for credential sprawl", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-AC-6(5)", "NIST-800-53-IA-5", "ISO-27001-A.8.2", "SOC2-CC6.1", "SOC2-CC6.3", "CISA-ZTMM-ID-PAM-MATURITY"],
+      "equivalent_in": {"azure-entra": "Entra PIM + Azure Key Vault + Azure Bastion", "aws-iam": "IAM Roles + Secrets Manager + Session Manager", "gcp-iam": "PAM + Secret Manager + IAP TCP Forwarding", "sailpoint": "SailPoint integrates with CyberArk for PAM governance"}
+    },
+    {
+      "id": "cyberark-identity-security",
+      "vendor": "cyberark",
+      "feature": "CyberArk Identity (Workforce SSO & MFA)",
+      "category": "authentication",
+      "description": "CyberArk Identity provides single sign-on and multi-factor authentication for workforce access, extending CyberArk's identity security platform beyond privileged accounts to all users. It includes: SSO portal with SAML/OIDC application integration, adaptive MFA with risk-based authentication, directory services (Cloud Directory, AD integration), endpoint authentication (Windows/Mac login with MFA), and self-service capabilities (password reset, account unlock). CyberArk Identity differentiates from other IdPs by deep integration with CyberArk PAM: users authenticate through CyberArk Identity and seamlessly access privileged sessions through PAM without additional authentication. This provides a unified identity platform that covers both standard workforce access and privileged access management.",
+      "best_practices": "1. Use CyberArk Identity as the SSO portal for accessing CyberArk PAM for a unified authentication experience. 2. Enable adaptive MFA for all users with risk-based step-up authentication. 3. Integrate with Active Directory for user synchronization and password management. 4. Configure endpoint MFA for Windows/Mac login to protect the device authentication point. 5. Implement self-service password reset to reduce helpdesk load while maintaining security. 6. Use CyberArk Identity App Gateway for VPN-less access to on-premises web applications. 7. Monitor CyberArk Identity events in the unified audit log for both SSO and PAM activity.",
+      "common_misconfigurations": [
+        {"issue": "Separate authentication for Identity SSO and PAM; no integration", "impact": "Users authenticate twice; no unified audit trail across standard and privileged access", "severity": "medium"},
+        {"issue": "Adaptive MFA not enabled; static MFA for all authentication events", "impact": "No risk-based adjustment; same friction for low-risk and high-risk authentication", "severity": "medium"},
+        {"issue": "Endpoint MFA not deployed on workstations", "impact": "Device login relies on password alone; stolen device provides access without MFA", "severity": "high"},
+        {"issue": "Self-service password reset without adequate identity verification", "impact": "Social engineering of password reset flow enables account takeover", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-2(1)", "NIST-800-53-AC-7", "NIST-800-63B-AAL2", "ISO-27001-A.8.5", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Microsoft Entra ID (SSO + MFA + Conditional Access)", "aws-iam": "IAM Identity Center", "okta": "Okta SSO + Adaptive MFA", "gcp-iam": "Cloud Identity + BeyondCorp"}
+    },
+    {
+      "id": "cyberark-secure-web-sessions",
+      "vendor": "cyberark",
+      "feature": "Secure Web Sessions",
+      "category": "privileged-access",
+      "description": "CyberArk Secure Web Sessions extends privileged session security to web-based management consoles and SaaS administration interfaces. Traditional PSM handles RDP/SSH protocols, but modern infrastructure administration increasingly occurs through web portals (AWS Console, Azure Portal, Okta Admin, ServiceNow Admin). Secure Web Sessions provides: session recording of all web-based administrative activity (clicks, page navigation, form submissions), step-by-step audit trail of configuration changes, real-time monitoring of web admin sessions, and session termination capability for suspicious activity. It operates as a browser extension or proxy that captures web session activity without requiring changes to the target web application.",
+      "best_practices": "1. Enable Secure Web Sessions for all cloud console access (AWS, Azure, GCP admin consoles). 2. Record SaaS admin sessions (Okta Admin, ServiceNow Admin, Salesforce Admin). 3. Configure real-time alerts for high-risk web admin actions (user deletion, policy changes, configuration exports). 4. Retain web session recordings for the same duration as PSM session recordings for consistency. 5. Use Secure Web Sessions with CyberArk Identity SSO for seamless access and recording. 6. Monitor web session recording storage and implement retention policies. 7. Include web session recordings in incident investigation playbooks.",
+      "common_misconfigurations": [
+        {"issue": "Web admin sessions not recorded; only RDP/SSH sessions captured by PSM", "impact": "Cloud console and SaaS administrative actions not auditable; major visibility gap for modern IT environments", "severity": "high"},
+        {"issue": "Not all cloud consoles covered by Secure Web Sessions", "impact": "Administrative actions on uncovered cloud platforms not recorded or monitored", "severity": "medium"},
+        {"issue": "Real-time alerting not configured for high-risk web admin actions", "impact": "Malicious configuration changes in cloud consoles completed before detection", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-6(9)", "ISO-27001-A.8.15", "ISO-27001-A.8.2", "SOC2-CC7.2"],
+      "equivalent_in": {"azure-entra": "Microsoft Defender for Cloud Apps (session proxy)", "aws-iam": "CloudTrail + Console sign-in events", "okta": "Okta System Log (admin events only, no session recording)"}
+    },
+    {
+      "id": "cyberark-application-access-manager",
+      "vendor": "cyberark",
+      "feature": "Application Access Manager (AAM)",
+      "category": "privileged-access",
+      "description": "CyberArk Application Access Manager provides secure application-to-application credential management, specifically designed for eliminating hardcoded credentials in application code, configuration files, and scripts. AAM deploys a local agent on the application server that authenticates to the CyberArk vault using application identity attributes (process name, path, hash, OS user, IP address) and retrieves credentials on behalf of the application. The agent caches credentials locally with configurable TTL for resilience during vault unavailability. AAM supports credential retrieval for databases (connection strings), web services (API keys), mainframes (RACF/ACF2/TopSecret), and cloud services. Unlike the Central Credential Provider (CCP) which uses web service calls, AAM uses a local agent model optimized for high-frequency, low-latency credential retrieval by applications.",
+      "best_practices": "1. Deploy AAM agents on all application servers with hardcoded or configuration-file credentials. 2. Use multiple application identity attributes for strong authentication (hash + path + OS user). 3. Configure credential caching TTL to balance freshness with availability (5-15 minutes typical). 4. Implement graceful degradation when vault is unreachable (use cached credential, not fail hard). 5. Coordinate AAM credential retrieval with CyberArk CPM rotation schedules to avoid timing conflicts. 6. Monitor AAM agent health and credential retrieval failures. 7. Use AAM for database connection string management to enable transparent password rotation.",
+      "common_misconfigurations": [
+        {"issue": "AAM agent authenticates with only one identity attribute (e.g., path alone)", "impact": "Any process in the same path can impersonate the application and retrieve credentials", "severity": "high"},
+        {"issue": "Credential caching disabled; every retrieval requires vault connection", "impact": "Vault unavailability causes immediate application failure; no resilience to vault outages", "severity": "medium"},
+        {"issue": "AAM not used for database connections; connection strings still in config files", "impact": "Database passwords exposed in configuration files readable by anyone with server access", "severity": "high"},
+        {"issue": "Credential rotation and AAM retrieval not coordinated", "impact": "Application retrieves old cached credential after rotation, causing authentication failures", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-IA-5(1)", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "SOC2-CC6.1", "SOC2-CC6.7"],
+      "equivalent_in": {"azure-entra": "Managed Identities + Key Vault References", "aws-iam": "IAM Roles + Secrets Manager SDK", "gcp-iam": "Workload Identity + Secret Manager Client Library"}
+    },
+    {
+      "id": "sailpoint-identitynow",
+      "vendor": "sailpoint",
+      "feature": "IdentityNow / Identity Security Cloud (ISC)",
+      "category": "governance",
+      "description": "SailPoint IdentityNow (now Identity Security Cloud) is a SaaS-delivered identity governance and administration (IGA) platform that provides comprehensive identity lifecycle management, access governance, and compliance reporting. The platform aggregates identity data from all connected systems (HR, Active Directory, cloud services, SaaS applications, databases) into a unified identity model. It provides: access visibility (who has access to what across all systems), access certification (periodic reviews of access appropriateness), role management (defining and maintaining roles based on common access patterns), policy enforcement (separation of duties, least privilege), and automated provisioning/deprovisioning across hundreds of connected applications. ISC uses AI/ML for access recommendations, anomaly detection, and role mining.",
+      "best_practices": "1. Connect all critical applications as sources for comprehensive identity governance visibility. 2. Configure the HR system as the authoritative identity source for joiner/mover/leaver lifecycle events. 3. Implement access certifications for all sensitive applications on a quarterly cycle. 4. Use role mining to discover common access patterns and create organizational roles. 5. Define separation of duties (SoD) policies for conflicting access combinations. 6. Enable AI-driven access recommendations to assist certifiers in making informed decisions. 7. Monitor governance dashboard metrics: certification completion rate, SoD violations, orphan accounts. 8. Integrate with PAM solution (CyberArk) for privileged access governance.",
+      "common_misconfigurations": [
+        {"issue": "Not all critical applications connected; partial identity governance visibility", "impact": "Access to unconnected applications not governed, creating blind spots in access reviews and compliance", "severity": "high"},
+        {"issue": "HR system not configured as authoritative identity source", "impact": "Identity lifecycle events (hire, transfer, termination) not automatically reflected in access governance", "severity": "critical"},
+        {"issue": "Access certifications configured annually instead of quarterly", "impact": "Up to 12 months of access drift before review and remediation", "severity": "medium"},
+        {"issue": "No SoD policies defined", "impact": "Users accumulate conflicting access combinations (e.g., create vendor + approve payment) without detection", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-1", "NIST-800-53-AC-2", "NIST-800-53-AC-5", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "ISO-27001-A.5.3", "SOC2-CC6.1", "SOC2-CC6.2", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra ID Governance (Access Reviews + Entitlement Management + Lifecycle Workflows)", "okta": "Okta Identity Governance", "aws-iam": "IAM Access Analyzer + Custom IGA workflows"}
+    },
+    {
+      "id": "sailpoint-access-reviews",
+      "vendor": "sailpoint",
+      "feature": "Access Certifications (Reviews)",
+      "category": "governance",
+      "description": "SailPoint Access Certifications automate the periodic review and recertification of user access across all connected applications. Certification campaigns can be scoped by: manager (review all direct reports' access), application owner (review all users of a specific application), entitlement owner (review all holders of a specific permission), or role (review all members of a specific role). Certifiers receive a prioritized list of access items with AI-driven recommendations (approve, revoke, flag for review) based on peer group analysis, access usage patterns, and risk scoring. Certification decisions (approve/revoke) can be automatically executed via provisioning connectors, removing access in real-time when revoked. Multi-round certifications escalate undecided items to higher-level reviewers. Campaign completion is tracked with dashboards showing progress, SLA compliance, and remediation status.",
+      "best_practices": "1. Run manager certifications quarterly for all employees' application access. 2. Run application owner certifications semi-annually for sensitive applications. 3. Enable AI recommendations to assist certifiers with data-driven approve/revoke suggestions. 4. Configure automatic revocation for items revoked during certification (not just flagging). 5. Set escalation rules for uncompleted certifications (escalate to manager's manager after 7 days). 6. Track certification completion rate as a KPI and hold managers accountable. 7. Use targeted micro-certifications for high-risk access changes between regular campaign cycles. 8. Include privileged access (CyberArk safe membership) in certification scope.",
+      "common_misconfigurations": [
+        {"issue": "Certification campaigns configured but auto-revocation not enabled", "impact": "Reviewers revoke access in the campaign, but revocation not executed in the application; access persists", "severity": "high"},
+        {"issue": "No escalation for uncompleted certifications", "impact": "Reviewers who ignore certifications face no consequences; access items remain in uncertified state", "severity": "medium"},
+        {"issue": "AI recommendations not enabled; certifiers review without data assistance", "impact": "Certifiers rubber-stamp approvals due to volume; AI could identify anomalous access for focused review", "severity": "medium"},
+        {"issue": "Privileged access excluded from certification scope", "impact": "Most sensitive access (admin roles, PAM safes) not periodically reviewed or recertified", "severity": "high"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(3)", "NIST-800-53-AC-6(7)", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.2", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra ID Access Reviews", "okta": "Okta Identity Governance Access Certifications", "aws-iam": "IAM Access Analyzer + Custom review workflows"}
+    },
+    {
+      "id": "sailpoint-role-mining",
+      "vendor": "sailpoint",
+      "feature": "Role Mining & Management",
+      "category": "governance",
+      "description": "SailPoint Role Mining uses machine learning to analyze existing access patterns across all connected applications and discover common access combinations that can be formalized into organizational roles. Top-down role modeling defines roles based on organizational structure and job functions, while bottom-up role mining discovers roles from actual access data. The platform identifies access that is common to a peer group (suggesting it should be a role entitlement) and access that is unique to individuals (suggesting it should be removed or explicitly justified). Role management includes: role composition (nesting roles for hierarchical access models), role assignment policies (automatic assignment based on identity attributes), and role analytics (tracking role membership, usage, and overlap). Well-designed roles simplify access governance by reducing the number of individual access items to certify and manage.",
+      "best_practices": "1. Start role mining with a well-defined organizational hierarchy and job classification. 2. Focus initial role mining on departments with the most consistent access patterns. 3. Validate machine-discovered roles with business stakeholders before formalization. 4. Combine top-down (organizational structure) and bottom-up (access pattern analysis) approaches. 5. Monitor role membership counts and flag roles that grow beyond expected size. 6. Review and refine roles quarterly as organizational access needs evolve. 7. Use role analytics to identify redundant or overlapping roles for consolidation.",
+      "common_misconfigurations": [
+        {"issue": "Roles created from access patterns without business validation", "impact": "Roles formalize existing over-privileged access patterns instead of defining appropriate access", "severity": "high"},
+        {"issue": "Too many granular roles created (role explosion)", "impact": "Role management overhead exceeds benefit; certification campaigns overwhelmed with role entries", "severity": "medium"},
+        {"issue": "Roles not updated when organizational structure or access needs change", "impact": "Stale roles grant access to systems no longer needed by the role's intended population", "severity": "medium"},
+        {"issue": "Automatic role assignment policies not configured", "impact": "Roles must be manually assigned; new hires wait for IT to assign roles instead of automatic provisioning", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-3", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.1", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra ID Roles + Entitlement Management Access Packages", "okta": "Group Rules + Application Assignments", "aws-iam": "IAM Identity Center Permission Sets + Groups"}
+    },
+    {
+      "id": "sailpoint-sod-policies",
+      "vendor": "sailpoint",
+      "feature": "Separation of Duties (SoD) Policy Management",
+      "category": "governance",
+      "description": "SailPoint SoD Policy Management detects and prevents toxic access combinations where a single user holds conflicting entitlements that could enable fraud or abuse. SoD policies define pairs or sets of entitlements that should not coexist for the same identity (e.g., 'create purchase order' + 'approve purchase order', 'manage user accounts' + 'approve access requests'). The platform provides: preventive SoD (blocks provisioning that would create a violation), detective SoD (identifies existing violations for remediation), and compensating control documentation (records approved exceptions with mitigating controls). SoD violations are surfaced during access requests, certifications, and role assignments. Violation reports support audit evidence for SOX, SOC 2, and other compliance frameworks that require duty segregation.",
+      "best_practices": "1. Define SoD policies for financial processes first (highest regulatory impact: SOX, SOC 2). 2. Implement preventive SoD to block access requests that would create violations before provisioning. 3. Run detective SoD scans monthly to identify existing violations from before policy implementation. 4. Document compensating controls for approved SoD exceptions (dual approval, enhanced monitoring). 5. Include SoD violation status in access certification campaigns for reviewer awareness. 6. Review and update SoD policies when business processes or application entitlements change. 7. Track SoD violation trends over time as a governance maturity metric.",
+      "common_misconfigurations": [
+        {"issue": "Only detective SoD implemented; no preventive controls", "impact": "New SoD violations created through access requests and provisioning; violations only found after the fact", "severity": "high"},
+        {"issue": "SoD policies defined only for financial systems; IT access SoD not addressed", "impact": "IT access conflicts (user admin + audit log admin) not detected, enabling insider threats", "severity": "medium"},
+        {"issue": "SoD exceptions approved without compensating controls documentation", "impact": "Audit finding: violations exist with no documented mitigation; regulatory non-compliance", "severity": "high"},
+        {"issue": "SoD policies not updated when application entitlements change", "impact": "New entitlements that create toxic combinations not covered by existing SoD policies", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-5", "NIST-800-53-AC-6(7)", "ISO-27001-A.5.3", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.3", "SOC2-CC5.2"],
+      "equivalent_in": {"azure-entra": "Entitlement Management Incompatible Access Packages", "okta": "N/A (limited SoD; use downstream IGA)", "aws-iam": "N/A (no built-in SoD; custom policies required)"}
+    },
+    {
+      "id": "sailpoint-provisioning",
+      "vendor": "sailpoint",
+      "feature": "Provisioning Connectors & Integrations",
+      "category": "governance",
+      "description": "SailPoint Provisioning Connectors enable automated user account creation, modification, and removal across connected applications. SailPoint maintains 200+ pre-built connectors for common platforms: Active Directory, Azure AD, AWS IAM, Salesforce, ServiceNow, SAP, Oracle, Workday, and many more. Connectors support: account creation (with attribute mapping from identity profile), entitlement provisioning (group membership, role assignment, permission grants), account modification (attribute updates when identity attributes change), and account deprovisioning (disable, delete, or transfer on user departure). Custom connectors can be built using the SailPoint SaaS Connector Framework for applications without pre-built connectors. Provisioning operations are logged and auditable, providing evidence of automated access management.",
+      "best_practices": "1. Prioritize connector deployment for the highest-risk applications (those containing sensitive data or privileged access). 2. Use provisioning plans with approval workflows for sensitive application account creation. 3. Implement deprovisioning for all connected applications to ensure complete access removal on termination. 4. Configure attribute mapping to populate downstream application profiles from the authoritative identity source. 5. Monitor provisioning failures daily and create remediation workflows for failed operations. 6. Test provisioning and deprovisioning in a non-production instance before production deployment. 7. Use connector-level logging for troubleshooting provisioning issues. 8. Build custom connectors for critical applications without pre-built support.",
+      "common_misconfigurations": [
+        {"issue": "Deprovisioning not configured for all connectors; some apps only provision", "impact": "Terminated users retain accounts in applications without deprovisioning, creating orphan accounts", "severity": "critical"},
+        {"issue": "Provisioning failures not monitored or alerted", "impact": "Users do not receive required access (failed provisioning) or retain access they should not have (failed deprovisioning)", "severity": "high"},
+        {"issue": "Connector uses a shared service account with excessive permissions", "impact": "Compromise of the connector service account grants full administrative access to the target application", "severity": "high"},
+        {"issue": "Critical applications not connected; manual provisioning remains", "impact": "Identity governance does not cover all applications; manual provisioning introduces delays and errors", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(1)", "NIST-800-53-AC-2(2)", "ISO-27001-A.5.16", "ISO-27001-A.5.18", "ISO-27001-A.6.5", "SOC2-CC6.2"],
+      "equivalent_in": {"azure-entra": "Entra ID Provisioning (SCIM) + Custom Connectors", "okta": "Okta Lifecycle Management (SCIM + Custom)", "aws-iam": "IAM Identity Center SCIM + Custom Provisioning"}
+    },
+    {
+      "id": "sailpoint-ai-recommendations",
+      "vendor": "sailpoint",
+      "feature": "AI-Driven Access Recommendations",
+      "category": "governance",
+      "description": "SailPoint AI-Driven Access Recommendations uses machine learning models to provide intelligent recommendations throughout the identity governance lifecycle. During access certifications, AI analyzes peer group access patterns, historical certification decisions, access usage data, and outlier detection to recommend approve or revoke actions for each access item. During access requests, AI evaluates the request against the identity's peer group to determine whether the requested access is typical or anomalous. Role mining AI discovers common access patterns that should be formalized as roles. Access outlier detection identifies users whose access significantly deviates from their peers, flagging potential over-provisioning or inappropriate access. The AI models improve over time as they learn from reviewer decisions and access usage patterns, increasing recommendation accuracy.",
+      "best_practices": "1. Enable AI recommendations for all access certifications to assist reviewers. 2. Track AI recommendation acceptance rate to measure model accuracy and reviewer trust. 3. Use access outlier scores to prioritize certification items requiring the most scrutiny. 4. Feed AI recommendation feedback (accepted/rejected) back to the model for continuous improvement. 5. Combine AI recommendations with risk scores for prioritized access governance. 6. Use AI-driven role mining to continuously refine organizational roles based on evolving access patterns. 7. Report on AI governance metrics: recommendation accuracy, outlier detection rate, certification efficiency improvement.",
+      "common_misconfigurations": [
+        {"issue": "AI recommendations disabled; certifiers review without data assistance", "impact": "Large certification campaigns overwhelm reviewers, leading to rubber-stamp approvals", "severity": "medium"},
+        {"issue": "AI model not trained with sufficient historical data", "impact": "Recommendations inaccurate; reviewers lose trust and ignore AI suggestions", "severity": "medium"},
+        {"issue": "Access outlier detection not enabled or not acted upon", "impact": "Users with anomalous access patterns not investigated; potential over-provisioning persists", "severity": "medium"},
+        {"issue": "AI feedback loop not configured; model does not learn from reviewer decisions", "impact": "Recommendation accuracy does not improve over time; static model becomes increasingly stale", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-2(4)", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra Permissions Management (CIEM) + Access Review recommendations", "gcp-iam": "IAM Recommender", "aws-iam": "IAM Access Advisor + Access Analyzer policy generation", "okta": "Okta Identity Governance recommendations"}
+    },
+    {
+      "id": "sailpoint-password-management",
+      "vendor": "sailpoint",
+      "feature": "Password Management",
+      "category": "authentication",
+      "description": "SailPoint Password Management provides centralized password lifecycle management across all connected applications. It synchronizes password changes across multiple applications so users maintain a single password, reduces helpdesk volume through self-service password reset with multi-factor verification, and enforces consistent password policies across all managed applications regardless of their native password policy capabilities. Password interception detects Windows password changes and synchronizes them to connected applications in real-time. Password policies can be customized per application or globally enforced. The self-service portal supports authentication via security questions, email verification, SMS OTP, or integration with external MFA providers. Password management reduces one of the largest helpdesk cost drivers (30-50% of helpdesk tickets are password-related).",
+      "best_practices": "1. Enable self-service password reset with multi-factor verification (MFA, not just security questions). 2. Synchronize passwords across critical applications to provide single-password experience. 3. Enforce password policies aligned with NIST 800-63B (length-based, banned word lists, no forced rotation). 4. Use password interception for real-time synchronization when users change Windows passwords. 5. Monitor password reset events for social engineering patterns (bulk resets, unusual timing). 6. Integrate with external MFA provider for strong identity verification during password reset. 7. Track helpdesk ticket volume for password issues to measure self-service adoption impact.",
+      "common_misconfigurations": [
+        {"issue": "Self-service password reset uses only security questions without MFA", "impact": "Security question answers guessable via social media; account takeover through password reset", "severity": "high"},
+        {"issue": "Password synchronization not configured for all critical applications", "impact": "Users maintain different passwords per application; password fatigue leads to weak passwords", "severity": "medium"},
+        {"issue": "Password policy not aligned with NIST 800-63B (still requiring complexity and rotation)", "impact": "Users create predictable passwords meeting complexity rules; forced rotation decreases password quality", "severity": "medium"},
+        {"issue": "Password reset events not monitored for abuse patterns", "impact": "Credential theft via social engineering of password reset not detected", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-63B-AUTH-MEMORIZED", "NIST-800-63B-VERIFIER-SECRETS", "NIST-800-63B-RECOVERY", "NIST-800-53-IA-5(1)", "ISO-27001-A.5.17", "SOC2-CC6.1"],
+      "equivalent_in": {"azure-entra": "Self-Service Password Reset (SSPR) + Password Protection", "okta": "Okta Password Management + SSPR", "aws-iam": "IAM Password Policy (limited, no cross-app sync)"}
+    },
+    {
+      "id": "sailpoint-lifecycle-events",
+      "vendor": "sailpoint",
+      "feature": "Lifecycle Events & Triggers",
+      "category": "governance",
+      "description": "SailPoint Lifecycle Events automate identity governance actions based on identity lifecycle transitions. Event triggers include: identity created (new hire), identity attribute changed (department transfer, role change, location change), identity disabled (termination or leave), identity deleted (post-retention removal), and access request events (submitted, approved, denied, completed). Each trigger can invoke automation workflows that execute governance actions: provision or deprovision application access, reassign access reviews, update group memberships, notify managers, create service desk tickets, and invoke external APIs. SailPoint's event-driven architecture ensures that identity changes are immediately reflected in access governance without manual intervention or scheduled batch processing. This is critical for security-sensitive transitions like terminations and transfers.",
+      "best_practices": "1. Configure identity disabled events to trigger immediate access revocation across all applications. 2. Use attribute change events for department transfers to trigger access review of previous role's access. 3. Implement identity created events to auto-provision baseline access based on department and job function. 4. Configure manager change events to reassign pending certifications to the new manager. 5. Use external API triggers for integration with ITSM (ServiceNow, Jira) for workflow coordination. 6. Test lifecycle event automations thoroughly in a sandbox environment before production. 7. Monitor event processing queues for failures and delays. 8. Document all lifecycle event automations for audit and operational reference.",
+      "common_misconfigurations": [
+        {"issue": "Identity disabled event does not trigger immediate deprovisioning", "impact": "Terminated users retain application access for hours or days until the next scheduled provisioning run", "severity": "critical"},
+        {"issue": "Department transfer events do not trigger previous access review", "impact": "Users accumulate access from multiple departments as they transfer, violating least privilege", "severity": "high"},
+        {"issue": "Event processing failures not monitored", "impact": "Failed deprovisioning or provisioning events not detected; security-critical access changes not executed", "severity": "high"},
+        {"issue": "Manager change events not configured to reassign certifications", "impact": "Certification campaigns sent to former manager who cannot review current reports' access", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-2(1)", "NIST-800-53-AC-2(2)", "ISO-27001-A.5.16", "ISO-27001-A.5.18", "ISO-27001-A.6.5", "SOC2-CC6.2"],
+      "equivalent_in": {"azure-entra": "Entra ID Lifecycle Workflows + Logic Apps", "okta": "Okta Workflows + Lifecycle Management event hooks", "aws-iam": "EventBridge + Lambda lifecycle automation"}
+    },
+    {
+      "id": "sailpoint-workflows",
+      "vendor": "sailpoint",
+      "feature": "SailPoint Workflows (Automation Engine)",
+      "category": "governance",
+      "description": "SailPoint Workflows is a low-code automation engine that enables building custom identity governance workflows triggered by identity events, scheduled timers, or external API calls. Workflows consist of triggers, operators (conditional logic, loops, data transformations), and actions (HTTP calls, identity operations, notifications). Common governance workflow patterns include: automated access request fulfillment with multi-level approvals, custom deprovisioning sequences that coordinate across multiple systems, compliance violation auto-remediation (automatically revoke access when SoD violation detected), periodic identity data quality checks, and integration with ITSM tools (ServiceNow, Jira) for governance-driven ticket creation. Workflows extend ISC's built-in capabilities with custom logic without requiring external automation platforms.",
+      "best_practices": "1. Use Workflows for custom governance logic that goes beyond ISC's built-in capabilities. 2. Implement error handling and retry logic in all workflows to handle transient failures. 3. Test workflows in a sandbox environment before production deployment. 4. Monitor workflow execution logs for failures and performance degradation. 5. Use workflow templates for common patterns (onboarding sequence, offboarding sequence). 6. Integrate workflows with notification channels (email, Slack, Teams) for human-in-the-loop steps. 7. Version control workflow configurations for change management and rollback capability.",
+      "common_misconfigurations": [
+        {"issue": "Workflows without error handling; failures cause silent data inconsistencies", "impact": "Failed provisioning or deprovisioning steps not retried or escalated, leaving access in inconsistent state", "severity": "high"},
+        {"issue": "Workflows not tested in sandbox before production deployment", "impact": "Logic errors in production workflows affect live identity governance operations", "severity": "medium"},
+        {"issue": "No monitoring of workflow execution success rates", "impact": "Failed workflows not detected; governance automation assumed to be functioning when it is not", "severity": "medium"},
+        {"issue": "Complex multi-step workflows without documentation", "impact": "Workflow logic opaque to operations team; troubleshooting failures requires reverse-engineering", "severity": "low"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(1)", "NIST-800-53-AC-5", "ISO-27001-A.5.18", "SOC2-CC6.2", "SOC2-CC8.1"],
+      "equivalent_in": {"azure-entra": "Logic Apps + Lifecycle Workflows", "okta": "Okta Workflows", "aws-iam": "Step Functions + EventBridge + Lambda"}
+    },
+    {
+      "id": "sailpoint-certification-campaigns",
+      "vendor": "sailpoint",
+      "feature": "Certification Campaigns (Advanced)",
+      "category": "governance",
+      "description": "SailPoint Certification Campaigns provide advanced access review orchestration beyond basic certification. Campaigns can be configured with multiple dimensions: scope (identity-based, application-based, entitlement-based, role-based), schedule (quarterly, semi-annual, event-triggered), reviewer assignment (manager, application owner, entitlement owner, custom), phases (multi-round with escalation), and actions (approve, revoke, reassign, flag for review). Advanced campaign features include: targeted micro-certifications (triggered by access changes between full campaigns), continuous certification (real-time review of new access grants), event-based certifications (triggered by identity attribute changes like department transfer), and delegated certifications (reviewers can delegate reviews to subject matter experts). Campaign analytics provide completion tracking, decision distribution, remediation progress, and historical comparison.",
+      "best_practices": "1. Combine periodic full campaigns with targeted micro-certifications for continuous governance. 2. Configure event-based certifications for sensitive access changes (new admin role assignments). 3. Use multi-phase campaigns: first phase manager review, second phase application owner review for sensitive access. 4. Enable campaign delegation so reviewers can assign specialized reviews to SMEs. 5. Track campaign metrics: completion rate, average decision time, revocation rate, and escalation rate. 6. Use campaign analytics to identify rubber-stamp reviewers (100% approval rate) for training. 7. Configure campaign completion reminders and escalation for overdue reviews. 8. Archive campaign results for compliance audit evidence.",
+      "common_misconfigurations": [
+        {"issue": "Only periodic campaigns; no event-based or micro-certifications", "impact": "Access changes between campaign cycles not reviewed until the next scheduled campaign", "severity": "medium"},
+        {"issue": "Single-phase campaigns without escalation for non-response", "impact": "Reviewers who do not respond effectively approve all access by default", "severity": "high"},
+        {"issue": "Campaign analytics not used to identify rubber-stamp reviewers", "impact": "Reviewers who approve everything without review not detected or addressed", "severity": "medium"},
+        {"issue": "Campaign results not archived for compliance evidence", "impact": "Historical certification data unavailable for audit; cannot demonstrate compliance history", "severity": "medium"}
+      ],
+      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(3)", "NIST-800-53-AC-6(7)", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.2", "SOC2-CC6.3"],
+      "equivalent_in": {"azure-entra": "Entra ID Access Reviews (Multi-Stage)", "okta": "Okta Identity Governance Access Certifications", "aws-iam": "Custom certification workflows with Access Analyzer data"}
+    }
+  ]
+}
