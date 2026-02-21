@@ -30,7 +30,8 @@ function resolveDbPath(): string {
   if (process.env[DB_ENV_VAR]) {
     return process.env[DB_ENV_VAR];
   }
-  return join(__dirname, '..', 'data', 'database.db');
+  // __dirname resolves to dist/src/ after tsc, so go up two levels to project root
+  return join(__dirname, '..', '..', 'data', 'database.db');
 }
 
 let db: InstanceType<typeof Database> | null = null;
