@@ -1,0 +1,485 @@
+# sources.yml
+schema_version: "1.0"
+mcp_name: "IAM Expert MCP"
+domain: "identity-access-management"
+
+sources:
+  # --- NIST Special Publications ---
+  - name: "NIST SP 800-63 (Digital Identity Guidelines)"
+    authority: "National Institute of Standards and Technology (NIST)"
+    official_portal: "https://pages.nist.gov/800-63-4/"
+    canonical_identifier: "SP 800-63-4"
+    retrieval_method: "HTML_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Public Domain (US Government Work)"
+      url: "https://www.nist.gov/open/license"
+      summary: "US Government publications are not subject to copyright; free to use"
+    coverage:
+      scope: "Digital identity assurance levels (IAL, AAL, FAL), enrollment, identity proofing, authentication, federation"
+      limitations: "US-centric assurance framework; may not map directly to non-US regulatory requirements"
+    languages:
+      - "en"
+
+  - name: "NIST SP 800-53 rev5 (Security and Privacy Controls — AC Family)"
+    authority: "National Institute of Standards and Technology (NIST)"
+    official_portal: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    canonical_identifier: "SP 800-53r5"
+    retrieval_method: "OSCAL_JSON"
+    api_documentation: "https://pages.nist.gov/OSCAL/"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Public Domain (US Government Work)"
+      url: "https://www.nist.gov/open/license"
+      summary: "US Government publications are not subject to copyright; free to use"
+    coverage:
+      scope: "Access Control (AC) family: AC-1 through AC-25, including account management, access enforcement, separation of duties, least privilege, session management"
+      limitations: "Only AC family extracted; other families (IA, AU, etc.) available in security-controls-mcp"
+    languages:
+      - "en"
+
+  - name: "NIST SP 800-207 (Zero Trust Architecture)"
+    authority: "National Institute of Standards and Technology (NIST)"
+    official_portal: "https://csrc.nist.gov/publications/detail/sp/800-207/final"
+    canonical_identifier: "SP 800-207"
+    retrieval_method: "HTML_PDF_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Public Domain (US Government Work)"
+      url: "https://www.nist.gov/open/license"
+      summary: "US Government publications are not subject to copyright; free to use"
+    coverage:
+      scope: "Zero Trust Architecture principles, deployment models, migration approaches"
+      limitations: "High-level architectural guidance; implementation specifics vary by vendor"
+    languages:
+      - "en"
+
+  # --- MITRE Frameworks ---
+  - name: "MITRE ATT&CK (Identity-related Techniques)"
+    authority: "The MITRE Corporation"
+    official_portal: "https://attack.mitre.org"
+    canonical_identifier: "ATT&CK"
+    retrieval_method: "STIX_TAXII_API"
+    api_documentation: "https://attack.mitre.org/resources/working-with-attack/"
+    update_frequency: "weekly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Apache-2.0"
+      url: "https://attack.mitre.org/resources/terms-of-use/"
+      summary: "Free to use with attribution; Apache 2.0 licensed"
+    coverage:
+      scope: "Credential Access, Privilege Escalation, Lateral Movement, Initial Access, Persistence, Defense Evasion tactics — IAM-related techniques and sub-techniques"
+      limitations: "Filtered to IAM-relevant techniques only; full ATT&CK matrix available in STRIDE MCP"
+    languages:
+      - "en"
+
+  - name: "CWE (Common Weakness Enumeration — Identity/Access Families)"
+    authority: "The MITRE Corporation"
+    official_portal: "https://cwe.mitre.org"
+    canonical_identifier: "CWE"
+    retrieval_method: "XML_DOWNLOAD"
+    api_documentation: "https://cwe.mitre.org/data/downloads.html"
+    update_frequency: "weekly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "CWE Terms of Use"
+      url: "https://cwe.mitre.org/about/termsofuse.html"
+      summary: "Free to use; must include CWE attribution and disclaimer"
+    coverage:
+      scope: "CWE-284 (Improper Access Control), CWE-287 (Improper Authentication), CWE-269 (Improper Privilege Management), CWE-306 (Missing Authentication), CWE-798 (Use of Hard-coded Credentials), and related weakness families"
+      limitations: "Filtered to identity and access control CWE families only"
+    languages:
+      - "en"
+
+  - name: "CAPEC (Common Attack Pattern Enumeration — Identity Patterns)"
+    authority: "The MITRE Corporation"
+    official_portal: "https://capec.mitre.org"
+    canonical_identifier: "CAPEC"
+    retrieval_method: "XML_DOWNLOAD"
+    api_documentation: "https://capec.mitre.org/data/downloads.html"
+    update_frequency: "weekly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "CAPEC Terms of Use"
+      url: "https://capec.mitre.org/about/termsofuse.html"
+      summary: "Free to use; must include CAPEC attribution and disclaimer"
+    coverage:
+      scope: "Identity-related attack patterns: credential stuffing, session hijacking, privilege escalation, authentication bypass, token manipulation"
+      limitations: "Filtered to identity and access control CAPEC patterns only"
+    languages:
+      - "en"
+
+  # --- Industry Standards ---
+  - name: "OWASP ASVS (Application Security Verification Standard)"
+    authority: "OWASP Foundation"
+    official_portal: "https://owasp.org/www-project-application-security-verification-standard/"
+    canonical_identifier: "ASVS 4.0.3"
+    retrieval_method: "GITHUB_MARKDOWN"
+    api_documentation: "https://github.com/OWASP/ASVS"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)"
+      url: "https://github.com/OWASP/ASVS/blob/master/LICENSE.md"
+      summary: "Free to use with attribution and share-alike"
+    coverage:
+      scope: "V2 (Authentication), V3 (Session Management), V4 (Access Control) verification requirements"
+      limitations: "Only authentication, session, and access control chapters extracted"
+    languages:
+      - "en"
+
+  - name: "CIS Controls v8 (Identity Controls)"
+    authority: "Center for Internet Security (CIS)"
+    official_portal: "https://www.cisecurity.org/controls"
+    canonical_identifier: "CIS Controls v8"
+    retrieval_method: "CSV_JSON_DOWNLOAD"
+    api_documentation: "N/A"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "CIS Terms of Use"
+      url: "https://www.cisecurity.org/terms-of-use"
+      summary: "Free for non-commercial use; commercial use requires license"
+    coverage:
+      scope: "Control 5 (Account Management), Control 6 (Access Control Management)"
+      limitations: "Only identity-related controls extracted; full CIS Controls in security-controls-mcp"
+    languages:
+      - "en"
+
+  - name: "CISA Zero Trust Maturity Model"
+    authority: "Cybersecurity and Infrastructure Security Agency (CISA)"
+    official_portal: "https://www.cisa.gov/zero-trust-maturity-model"
+    canonical_identifier: "CISA ZTMM v2.0"
+    retrieval_method: "PDF_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Public Domain (US Government Work)"
+      url: "https://www.cisa.gov/terms"
+      summary: "US Government publications are not subject to copyright; free to use"
+    coverage:
+      scope: "Zero Trust maturity pillars (Identity, Device, Network, Application, Data) with maturity levels (Traditional, Initial, Advanced, Optimal)"
+      limitations: "Focus on US federal agency context; adaptable to private sector"
+    languages:
+      - "en"
+
+  # --- Protocol Specifications ---
+  - name: "OAuth 2.0 / 2.1 RFCs"
+    authority: "Internet Engineering Task Force (IETF)"
+    official_portal: "https://datatracker.ietf.org"
+    canonical_identifier: "RFC 6749, RFC 6750, RFC 7636, RFC 9126"
+    retrieval_method: "IETF_DATATRACKER"
+    api_documentation: "https://datatracker.ietf.org/api/"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "IETF Trust License"
+      url: "https://trustee.ietf.org/documents/trust-legal-provisions/"
+      summary: "Free to use with attribution; subject to IETF Trust legal provisions"
+    coverage:
+      scope: "OAuth 2.0 framework, bearer tokens, PKCE, pushed authorization requests, OAuth 2.1 draft"
+      limitations: "Core RFCs only; extension RFCs may be added incrementally"
+    languages:
+      - "en"
+
+  - name: "OpenID Connect (OIDC)"
+    authority: "OpenID Foundation"
+    official_portal: "https://openid.net/developers/specs/"
+    canonical_identifier: "OpenID Connect Core 1.0"
+    retrieval_method: "HTML_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Apache-2.0"
+      url: "https://openid.net/intellectual-property/"
+      summary: "Free to use; Apache 2.0 licensed specifications"
+    coverage:
+      scope: "OIDC Core, Discovery, Dynamic Client Registration, Session Management"
+      limitations: "Core specifications only; FAPI and CIBA profiles may be added later"
+    languages:
+      - "en"
+
+  - name: "SAML 2.0"
+    authority: "OASIS Open"
+    official_portal: "https://www.oasis-open.org/standard/saml/"
+    canonical_identifier: "SAML 2.0"
+    retrieval_method: "OASIS_DOCS"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "OASIS IPR Policy"
+      url: "https://www.oasis-open.org/policies-guidelines/ipr/"
+      summary: "Royalty-free mode; free to implement and use"
+    coverage:
+      scope: "SAML 2.0 Core, Profiles (Web Browser SSO, SP-initiated, IdP-initiated), Bindings (HTTP POST, HTTP Redirect, Artifact)"
+      limitations: "SAML 2.0 specification only; SAML 1.x not included"
+    languages:
+      - "en"
+
+  - name: "FIDO2 / WebAuthn"
+    authority: "W3C / FIDO Alliance"
+    official_portal: "https://www.w3.org/TR/webauthn-3/"
+    canonical_identifier: "Web Authentication Level 3"
+    retrieval_method: "W3C_SPEC_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "W3C Software and Document License"
+      url: "https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document"
+      summary: "Free to use; W3C permissive license"
+    coverage:
+      scope: "WebAuthn API, CTAP2, passkeys, platform authenticators, roaming authenticators, attestation"
+      limitations: "W3C spec extraction; FIDO Alliance implementation guides may be summarized"
+    languages:
+      - "en"
+
+  - name: "SCIM (System for Cross-domain Identity Management)"
+    authority: "Internet Engineering Task Force (IETF)"
+    official_portal: "https://datatracker.ietf.org"
+    canonical_identifier: "RFC 7642, RFC 7643, RFC 7644"
+    retrieval_method: "IETF_DATATRACKER"
+    api_documentation: "https://datatracker.ietf.org/api/"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "IETF Trust License"
+      url: "https://trustee.ietf.org/documents/trust-legal-provisions/"
+      summary: "Free to use with attribution; subject to IETF Trust legal provisions"
+    coverage:
+      scope: "SCIM overview, schema, protocol for identity provisioning and management"
+      limitations: "Core RFCs only; vendor-specific SCIM extensions not included"
+    languages:
+      - "en"
+
+  # --- Vendor Documentation ---
+  - name: "Azure Entra ID (Microsoft)"
+    authority: "Microsoft Corporation"
+    official_portal: "https://learn.microsoft.com/en-us/entra/"
+    canonical_identifier: "Azure Entra ID"
+    retrieval_method: "MICROSOFT_LEARN"
+    api_documentation: "https://learn.microsoft.com/en-us/graph/api/overview"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Microsoft Documentation License"
+      url: "https://learn.microsoft.com/en-us/legal/termsofuse"
+      summary: "Free to reference; summarized for advisory use under fair use"
+    coverage:
+      scope: "Conditional Access, Privileged Identity Management (PIM), App Registrations, Managed Identities, B2C/B2B, Workload Identity Federation"
+      limitations: "Advisory summaries only; vendor docs may change without notice"
+    languages:
+      - "en"
+
+  - name: "AWS IAM"
+    authority: "Amazon Web Services"
+    official_portal: "https://docs.aws.amazon.com/IAM/"
+    canonical_identifier: "AWS IAM"
+    retrieval_method: "AWS_DOCS"
+    api_documentation: "https://docs.aws.amazon.com/IAM/latest/APIReference/"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "AWS Documentation License"
+      url: "https://aws.amazon.com/terms/"
+      summary: "Free to reference; summarized for advisory use under fair use"
+    coverage:
+      scope: "IAM Policies, Roles, Service Control Policies, AWS Organizations, IAM Identity Center (SSO), STS"
+      limitations: "Advisory summaries only; vendor docs may change without notice"
+    languages:
+      - "en"
+
+  - name: "GCP IAM (Google Cloud)"
+    authority: "Google Cloud"
+    official_portal: "https://cloud.google.com/iam/docs"
+    canonical_identifier: "GCP IAM"
+    retrieval_method: "GOOGLE_CLOUD_DOCS"
+    api_documentation: "https://cloud.google.com/iam/docs/reference/rest"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Google Cloud Documentation License"
+      url: "https://cloud.google.com/terms"
+      summary: "Free to reference; summarized for advisory use under fair use"
+    coverage:
+      scope: "IAM Roles, Service Accounts, Organization Policies, Workload Identity Federation, BeyondCorp"
+      limitations: "Advisory summaries only; vendor docs may change without notice"
+    languages:
+      - "en"
+
+  - name: "Okta / Auth0"
+    authority: "Okta, Inc."
+    official_portal: "https://developer.okta.com/docs/"
+    canonical_identifier: "Okta / Auth0"
+    retrieval_method: "VENDOR_DOCS"
+    api_documentation: "https://developer.okta.com/docs/reference/"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Okta Developer Terms"
+      url: "https://developer.okta.com/terms/"
+      summary: "Free to reference; summarized for advisory use under fair use"
+    coverage:
+      scope: "MFA policies, Universal Login, Adaptive Authentication, Okta Workflows, Auth0 Actions, Organizations"
+      limitations: "Advisory summaries only; vendor docs may change without notice"
+    languages:
+      - "en"
+
+  - name: "Ping Identity / ForgeRock"
+    authority: "Ping Identity (formerly ForgeRock)"
+    official_portal: "https://docs.pingidentity.com/"
+    canonical_identifier: "Ping Identity / ForgeRock"
+    retrieval_method: "VENDOR_DOCS"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "Ping Identity Terms of Use"
+      url: "https://www.pingidentity.com/en/legal.html"
+      summary: "Free to reference; summarized for advisory use under fair use"
+    coverage:
+      scope: "PingFederate, PingAccess, ForgeRock AM/IG, identity orchestration, progressive profiling"
+      limitations: "Advisory summaries only; vendor docs may change without notice"
+    languages:
+      - "en"
+
+  - name: "CyberArk"
+    authority: "CyberArk Software"
+    official_portal: "https://docs.cyberark.com/"
+    canonical_identifier: "CyberArk"
+    retrieval_method: "VENDOR_DOCS"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "CyberArk Terms of Use"
+      url: "https://www.cyberark.com/legal/"
+      summary: "Free to reference; summarized for advisory use under fair use"
+    coverage:
+      scope: "Privileged Access Management (PAM), Secrets Manager, Endpoint Privilege Manager, Conjur"
+      limitations: "Advisory summaries only; vendor docs may change without notice"
+    languages:
+      - "en"
+
+  - name: "SailPoint"
+    authority: "SailPoint Technologies"
+    official_portal: "https://documentation.sailpoint.com/"
+    canonical_identifier: "SailPoint"
+    retrieval_method: "VENDOR_DOCS"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "SailPoint Terms of Use"
+      url: "https://www.sailpoint.com/legal/"
+      summary: "Free to reference; summarized for advisory use under fair use"
+    coverage:
+      scope: "Identity Governance and Administration (IGA), IdentityNow, IdentityIQ, access certifications, role mining"
+      limitations: "Advisory summaries only; vendor docs may change without notice"
+    languages:
+      - "en"
+
+  # --- Compliance Frameworks ---
+  - name: "ISO 27001:2022 / ISO 27002:2022 (Identity Controls)"
+    authority: "International Organization for Standardization (ISO)"
+    official_portal: "https://www.iso.org/standard/27001"
+    canonical_identifier: "ISO/IEC 27001:2022, ISO/IEC 27002:2022"
+    retrieval_method: "MANUAL_CURATION"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "ISO Copyright"
+      url: "https://www.iso.org/iso-copyright.html"
+      summary: "Control titles and IDs are public; full normative text requires license. Only publicly available control identifiers and summaries are used."
+    coverage:
+      scope: "A.5.15 (Access Control), A.5.16 (Identity Management), A.5.17 (Authentication), A.5.18 (Access Rights), A.8.2-8.5 (Technology Controls)"
+      limitations: "Only identity-related controls; full framework in security-controls-mcp"
+    languages:
+      - "en"
+
+  - name: "SOC 2 Trust Services Criteria (CC6)"
+    authority: "AICPA"
+    official_portal: "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2"
+    canonical_identifier: "SOC 2 TSC"
+    retrieval_method: "MANUAL_CURATION"
+    api_documentation: "N/A"
+    update_frequency: "annually"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "AICPA Copyright"
+      url: "https://www.aicpa-cima.com/terms-conditions"
+      summary: "Criteria identifiers and descriptions used under fair use for compliance cross-mapping"
+    coverage:
+      scope: "CC6 (Logical and Physical Access Controls) — CC6.1 through CC6.8"
+      limitations: "Only CC6 criteria; full SOC 2 coverage in security-controls-mcp"
+    languages:
+      - "en"
+
+  # --- Emerging Technology Specifications ---
+  - name: "W3C Decentralized Identifiers (DIDs)"
+    authority: "World Wide Web Consortium (W3C)"
+    official_portal: "https://www.w3.org/TR/did-core/"
+    canonical_identifier: "DID Core 1.0"
+    retrieval_method: "W3C_SPEC_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "W3C Software and Document License"
+      url: "https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document"
+      summary: "Free to use; W3C permissive license"
+    coverage:
+      scope: "Decentralized Identifiers specification, DID methods, resolution"
+      limitations: "Core specification only; DID method specifications vary by implementation"
+    languages:
+      - "en"
+
+  - name: "W3C Verifiable Credentials"
+    authority: "World Wide Web Consortium (W3C)"
+    official_portal: "https://www.w3.org/TR/vc-data-model-2.0/"
+    canonical_identifier: "VC Data Model 2.0"
+    retrieval_method: "W3C_SPEC_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "quarterly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "W3C Software and Document License"
+      url: "https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document"
+      summary: "Free to use; W3C permissive license"
+    coverage:
+      scope: "Verifiable Credentials data model, presentation, issuance"
+      limitations: "Core data model only; specific proof formats (JWT, JSON-LD) vary"
+    languages:
+      - "en"
+
+  - name: "FIDO Alliance (Passkey Guidance)"
+    authority: "FIDO Alliance"
+    official_portal: "https://fidoalliance.org/passkeys/"
+    canonical_identifier: "FIDO Passkeys"
+    retrieval_method: "HTML_EXTRACTION"
+    api_documentation: "N/A"
+    update_frequency: "monthly"
+    last_ingested: "PENDING_FIRST_INGEST"
+    license_or_terms:
+      type: "FIDO Alliance Terms"
+      url: "https://fidoalliance.org/legal/"
+      summary: "Free to reference; implementation guidance for passkey adoption"
+    coverage:
+      scope: "Passkey deployment guidance, platform support matrix, UX recommendations, migration strategies"
+      limitations: "Guidance documents only; technical specification in FIDO2/WebAuthn source"
+    languages:
+      - "en"
+
+data_freshness:
+  automated_checks: true
+  check_frequency: "weekly"
+  last_verified: "PENDING_FIRST_INGEST"
