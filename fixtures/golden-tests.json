@@ -1,0 +1,670 @@
+{
+  "version": "1.0",
+  "mcp_name": "IAM Expert MCP",
+  "description": "Golden contract tests for the IAM Expert MCP — 55 tests covering all 22 domain tools across standards, threats, protocols, architecture, vendor, emerging, compliance, and assessment categories",
+  "tests": [
+    {
+      "id": "std-001",
+      "category": "standards",
+      "description": "Retrieve NIST 800-53 AC-2 Account Management standard by exact ID",
+      "tool": "get_iam_standard",
+      "input": { "id": "NIST-800-53-AC-2" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "framework", "title", "description", "category", "cross_references"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "std-002",
+      "category": "standards",
+      "description": "Search for multi-factor authentication requirements across all frameworks",
+      "tool": "search_iam_requirements",
+      "input": { "query": "multi-factor authentication" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "framework", "title", "description", "category"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "std-003",
+      "category": "standards",
+      "description": "Search for authentication standards filtered by nist-800-53 framework",
+      "tool": "search_iam_requirements",
+      "input": { "framework": "nist-800-53" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "framework", "title"],
+        "min_results": 3
+      }
+    },
+    {
+      "id": "std-004",
+      "category": "standards",
+      "description": "Search requirements filtered by authentication category",
+      "tool": "search_iam_requirements",
+      "input": { "category": "authentication" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "framework", "title", "category"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "comp-001",
+      "category": "compliance",
+      "description": "Check IAM compliance with a few implemented controls against nist-800-53",
+      "tool": "check_iam_compliance",
+      "input": {
+        "implemented": ["NIST-800-53-AC-2", "NIST-800-53-AC-3"],
+        "framework": "nist-800-53"
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["compliant", "gaps", "coverage_percent"]
+      }
+    },
+    {
+      "id": "comp-002",
+      "category": "compliance",
+      "description": "Map AC-2 from nist-800-53 to iso-27001 equivalents",
+      "tool": "map_frameworks",
+      "input": {
+        "control": "AC-2",
+        "from": "nist-800-53",
+        "to": "iso-27001"
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["source_framework", "source_control", "target_framework", "target_control"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "comp-003",
+      "category": "compliance",
+      "description": "Map AC-2 from nist-800-53 to all target frameworks",
+      "tool": "map_frameworks",
+      "input": {
+        "control": "AC-2",
+        "from": "nist-800-53"
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 1
+      }
+    },
+    {
+      "id": "assur-001",
+      "category": "standards",
+      "description": "Get all AAL assurance levels from NIST 800-63",
+      "tool": "get_assurance_levels",
+      "input": { "type": "AAL" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["level", "standards"],
+        "min_results": 3
+      }
+    },
+    {
+      "id": "assur-002",
+      "category": "standards",
+      "description": "Get AAL2 assurance level specifically",
+      "tool": "get_assurance_levels",
+      "input": { "type": "AAL", "level": 2 },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 1
+      }
+    },
+    {
+      "id": "assur-003",
+      "category": "standards",
+      "description": "Get IAL identity assurance levels",
+      "tool": "get_assurance_levels",
+      "input": { "type": "IAL" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["level", "standards"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "threat-001",
+      "category": "threats",
+      "description": "Get T1110 Brute Force attack pattern with sub-techniques",
+      "tool": "get_iam_attack",
+      "input": { "id": "T1110" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "name", "tactic", "description", "sub_techniques", "mitigation_controls", "stride_category", "severity"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "threat-002",
+      "category": "threats",
+      "description": "Get T1078 Valid Accounts attack across multiple tactics",
+      "tool": "get_iam_attack",
+      "input": { "id": "T1078" },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 2
+      }
+    },
+    {
+      "id": "threat-003",
+      "category": "threats",
+      "description": "Search threats by credential-access tactic",
+      "tool": "search_iam_threats",
+      "input": { "tactic": "credential-access" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "name", "tactic", "stride_category"],
+        "min_results": 3
+      }
+    },
+    {
+      "id": "threat-004",
+      "category": "threats",
+      "description": "Search threats by spoofing STRIDE category",
+      "tool": "search_iam_threats",
+      "input": { "stride": "spoofing" },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 1
+      }
+    },
+    {
+      "id": "threat-005",
+      "category": "threats",
+      "description": "FTS search for password spray attack patterns",
+      "tool": "search_iam_threats",
+      "input": { "query": "password spray" },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 1
+      }
+    },
+    {
+      "id": "threat-006",
+      "category": "threats",
+      "description": "Get CWE-287 Improper Authentication weakness with CAPEC cross-references",
+      "tool": "get_iam_weakness",
+      "input": { "cwe_id": "CWE-287" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["cwe_id", "title", "description", "capec_ids", "affected_protocols", "stride_category", "severity"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "threat-007",
+      "category": "threats",
+      "description": "Get CWE-798 Hard-coded Credentials weakness",
+      "tool": "get_iam_weakness",
+      "input": { "cwe_id": "CWE-798" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["cwe_id", "title", "severity"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "assess-001",
+      "category": "assessment",
+      "description": "Assess IAM posture with weak authentication components",
+      "tool": "assess_iam_posture",
+      "input": {
+        "components": ["password-auth", "no-mfa", "shared-accounts"]
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["threats", "weaknesses"]
+      }
+    },
+    {
+      "id": "assess-002",
+      "category": "assessment",
+      "description": "Assess IAM posture filtered by spoofing STRIDE category",
+      "tool": "assess_iam_posture",
+      "input": {
+        "components": ["password"],
+        "stride_filter": "spoofing"
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["threats", "weaknesses"]
+      }
+    },
+    {
+      "id": "stride-001",
+      "category": "threats",
+      "description": "Get STRIDE patterns for SSO gateway component",
+      "tool": "get_iam_stride_patterns",
+      "input": { "component": "SSO gateway" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["category", "patterns"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "stride-002",
+      "category": "threats",
+      "description": "Get spoofing-only STRIDE patterns for SSO",
+      "tool": "get_iam_stride_patterns",
+      "input": {
+        "component": "SSO",
+        "stride_category": "spoofing"
+      },
+      "assertions": {
+        "result_not_empty": false
+      }
+    },
+    {
+      "id": "proto-001",
+      "category": "protocols",
+      "description": "Get OAuth2 Authorization Code with PKCE protocol details",
+      "tool": "get_protocol",
+      "input": { "id": "oauth2-authorization-code-pkce" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "protocol", "flow_type", "description", "security_considerations", "recommended_for", "deprecated", "rfc", "sequence_diagram"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "proto-002",
+      "category": "protocols",
+      "description": "Get SAML2 SP-Initiated SSO protocol details",
+      "tool": "get_protocol",
+      "input": { "id": "saml2-sp-initiated" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "protocol", "flow_type", "description"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "proto-003",
+      "category": "protocols",
+      "description": "Get FIDO2 WebAuthn authentication protocol",
+      "tool": "get_protocol",
+      "input": { "id": "fido2-authentication" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "protocol", "description"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "arch-001",
+      "category": "architecture",
+      "description": "Get RBAC access model with components and compliance mappings",
+      "tool": "get_access_model",
+      "input": { "id": "rbac" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "name", "category", "description", "when_to_use", "components", "compliance_mappings", "related_patterns"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "arch-002",
+      "category": "architecture",
+      "description": "Get ABAC access model",
+      "tool": "get_access_model",
+      "input": { "id": "abac" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "name", "category", "description"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "arch-003",
+      "category": "architecture",
+      "description": "Recommend architecture for enterprise scale with NIST compliance on Azure",
+      "tool": "recommend_architecture",
+      "input": {
+        "scale": "10000-users",
+        "compliance": ["nist-800-53", "soc2"],
+        "existing": "azure-entra"
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "name", "category", "score"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "arch-004",
+      "category": "architecture",
+      "description": "Get JML lifecycle pattern by exact ID",
+      "tool": "get_lifecycle_pattern",
+      "input": { "id": "jml-lifecycle" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "name", "category", "description", "when_to_use", "components", "compliance_mappings", "related_patterns"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "arch-005",
+      "category": "architecture",
+      "description": "Get all lifecycle category architecture patterns",
+      "tool": "get_lifecycle_pattern",
+      "input": { "category": "lifecycle" },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 2
+      }
+    },
+    {
+      "id": "zt-001",
+      "category": "architecture",
+      "description": "Get Zero Trust guidance for the identity pillar",
+      "tool": "get_zero_trust_pattern",
+      "input": { "pillar": "identity" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["standards", "patterns"]
+      }
+    },
+    {
+      "id": "zt-002",
+      "category": "architecture",
+      "description": "Get Zero Trust guidance for identity at advanced maturity",
+      "tool": "get_zero_trust_pattern",
+      "input": { "pillar": "identity", "maturity": "advanced" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["standards", "patterns"]
+      }
+    },
+    {
+      "id": "vendor-001",
+      "category": "vendor",
+      "description": "Get Azure Entra vendor config for Conditional Access",
+      "tool": "get_vendor_config",
+      "input": { "vendor": "azure-entra", "feature": "Conditional Access" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["vendor", "feature", "description", "best_practices", "common_misconfigurations", "compliance_controls", "equivalent_in"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "vendor-002",
+      "category": "vendor",
+      "description": "Get all Azure Entra vendor configurations (default limit)",
+      "tool": "get_vendor_config",
+      "input": { "vendor": "azure-entra" },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 10
+      }
+    },
+    {
+      "id": "vendor-003",
+      "category": "vendor",
+      "description": "Compare MFA feature across azure-entra and okta vendors",
+      "tool": "compare_vendors",
+      "input": {
+        "feature": "MFA",
+        "vendors": ["azure-entra", "okta"]
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["vendor", "feature", "description"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "vendor-004",
+      "category": "vendor",
+      "description": "Compare MFA across all vendors without filter",
+      "tool": "compare_vendors",
+      "input": { "feature": "MFA" },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 1
+      }
+    },
+    {
+      "id": "vendor-005",
+      "category": "vendor",
+      "description": "Get misconfigurations for azure-entra with severity filtering",
+      "tool": "get_misconfigurations",
+      "input": { "vendor": "azure-entra", "severity": "critical" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["vendor", "feature", "issue", "impact", "severity"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "vendor-006",
+      "category": "vendor",
+      "description": "Get all misconfigurations across all vendors",
+      "tool": "get_misconfigurations",
+      "input": {},
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 5
+      }
+    },
+    {
+      "id": "vendor-007",
+      "category": "vendor",
+      "description": "Get migration path from okta to azure-entra",
+      "tool": "get_migration_path",
+      "input": { "from": "okta", "to": "azure-entra" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["mappings", "gaps", "from_vendor", "to_vendor"]
+      }
+    },
+    {
+      "id": "emerg-001",
+      "category": "emerging",
+      "description": "Get passkeys-fido2 emerging technology details",
+      "tool": "get_emerging_technology",
+      "input": { "id": "passkeys-fido2" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["id", "name", "category", "description", "maturity", "standards", "use_cases", "vendor_support"],
+        "min_results": 1
+      }
+    },
+    {
+      "id": "emerg-002",
+      "category": "emerging",
+      "description": "Get all passwordless category emerging technologies",
+      "tool": "get_emerging_technology",
+      "input": { "category": "passwordless" },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 3
+      }
+    },
+    {
+      "id": "emerg-003",
+      "category": "emerging",
+      "description": "Get machine identity guidance for Azure platform",
+      "tool": "get_machine_identity",
+      "input": { "platform": "azure" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["technologies", "vendor_configs"]
+      }
+    },
+    {
+      "id": "emerg-004",
+      "category": "emerging",
+      "description": "Get all machine identity technologies without platform filter",
+      "tool": "get_machine_identity",
+      "input": {},
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["technologies", "vendor_configs"]
+      }
+    },
+    {
+      "id": "maturity-001",
+      "category": "assessment",
+      "description": "Assess IAM maturity with weak authentication and basic authorization",
+      "tool": "assess_iam_maturity",
+      "input": {
+        "current": {
+          "authentication": "passwords-only",
+          "authorization": "rbac-basic"
+        }
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["areas", "overall_maturity", "gaps", "recommendations", "reference_standards"]
+      }
+    },
+    {
+      "id": "maturity-002",
+      "category": "assessment",
+      "description": "Assess IAM maturity with MFA and PAM capabilities",
+      "tool": "assess_iam_maturity",
+      "input": {
+        "current": {
+          "authentication": "MFA with TOTP",
+          "privileged_access": "shared admin accounts"
+        }
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["areas", "overall_maturity", "gaps", "recommendations"]
+      }
+    },
+    {
+      "id": "comp-004",
+      "category": "compliance",
+      "description": "Check compliance returns 0% for nonexistent framework",
+      "tool": "check_iam_compliance",
+      "input": {
+        "implemented": ["AC-2"],
+        "framework": "nonexistent-framework"
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["compliant", "gaps", "coverage_percent"]
+      }
+    },
+    {
+      "id": "arch-006",
+      "category": "architecture",
+      "description": "Recommend architecture with ISO 27001 compliance requirement",
+      "tool": "recommend_architecture",
+      "input": {
+        "compliance": ["iso-27001"],
+        "existing": "okta"
+      },
+      "assertions": {
+        "result_not_empty": true,
+        "min_results": 1
+      }
+    },
+    {
+      "id": "vendor-008",
+      "category": "vendor",
+      "description": "Get migration path from aws-iam to azure-entra",
+      "tool": "get_migration_path",
+      "input": { "from": "aws-iam", "to": "azure-entra" },
+      "assertions": {
+        "result_not_empty": true,
+        "fields_present": ["mappings", "gaps", "from_vendor", "to_vendor"]
+      }
+    },
+    {
+      "id": "neg-001",
+      "category": "negative",
+      "description": "Nonexistent standard ID returns empty results",
+      "tool": "get_iam_standard",
+      "input": { "id": "NONEXISTENT-STANDARD-99" },
+      "assertions": {
+        "result_empty": true
+      }
+    },
+    {
+      "id": "neg-002",
+      "category": "negative",
+      "description": "Nonexistent attack pattern ID returns empty results",
+      "tool": "get_iam_attack",
+      "input": { "id": "T9999" },
+      "assertions": {
+        "result_empty": true
+      }
+    },
+    {
+      "id": "neg-003",
+      "category": "negative",
+      "description": "Nonexistent CWE weakness returns empty results",
+      "tool": "get_iam_weakness",
+      "input": { "cwe_id": "CWE-99999" },
+      "assertions": {
+        "result_empty": true
+      }
+    },
+    {
+      "id": "neg-004",
+      "category": "negative",
+      "description": "Nonexistent vendor returns empty results",
+      "tool": "get_vendor_config",
+      "input": { "vendor": "NONEXISTENT-VENDOR" },
+      "assertions": {
+        "result_empty": true
+      }
+    },
+    {
+      "id": "neg-005",
+      "category": "negative",
+      "description": "Nonexistent protocol ID returns empty results",
+      "tool": "get_protocol",
+      "input": { "id": "NONEXISTENT-PROTOCOL" },
+      "assertions": {
+        "result_empty": true
+      }
+    },
+    {
+      "id": "neg-006",
+      "category": "negative",
+      "description": "Nonexistent access model ID returns empty results",
+      "tool": "get_access_model",
+      "input": { "id": "NONEXISTENT-MODEL" },
+      "assertions": {
+        "result_empty": true
+      }
+    },
+    {
+      "id": "neg-007",
+      "category": "negative",
+      "description": "Nonexistent emerging technology ID returns empty results",
+      "tool": "get_emerging_technology",
+      "input": { "id": "NONEXISTENT-TECH" },
+      "assertions": {
+        "result_empty": true
+      }
+    },
+    {
+      "id": "neg-008",
+      "category": "negative",
+      "description": "Unmapped framework control returns empty mapping results",
+      "tool": "map_frameworks",
+      "input": {
+        "control": "NONEXISTENT-99",
+        "from": "nist-800-53"
+      },
+      "assertions": {
+        "result_empty": true
+      }
+    }
+  ]
+}
