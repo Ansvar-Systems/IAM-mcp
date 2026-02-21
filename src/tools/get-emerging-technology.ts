@@ -59,7 +59,7 @@ export async function handler(
     const row = db.prepare('SELECT * FROM emerging_technologies WHERE id = ?').get(params.id.trim()) as RawEmergingTechnologyRow | undefined;
     rows = row ? [row] : [];
   } else if (params.category && params.category.trim().length > 0) {
-    rows = db.prepare('SELECT * FROM emerging_technologies WHERE category = ?').all(params.category.trim()) as RawEmergingTechnologyRow[];
+    rows = db.prepare('SELECT * FROM emerging_technologies WHERE category = ? LIMIT ?').all(params.category.trim(), effectiveLimit) as RawEmergingTechnologyRow[];
   } else {
     rows = db.prepare('SELECT * FROM emerging_technologies LIMIT ?').all(effectiveLimit) as RawEmergingTechnologyRow[];
   }
