@@ -1,0 +1,148 @@
+{
+  "emerging_technologies": [
+    {
+      "id": "did-web",
+      "name": "DID Method did:web (Domain-Linked Decentralized Identifiers)",
+      "category": "decentralized-identity",
+      "description": "The did:web method creates decentralized identifiers (DIDs) that resolve through standard HTTPS infrastructure using domain names. A did:web identifier like did:web:example.com resolves by fetching a DID document from https://example.com/.well-known/did.json. This approach leverages existing web infrastructure and DNS trust, making it the most practical DID method for enterprises today. Organizations can host their own DID documents without blockchain infrastructure, reducing complexity and cost. The trade-off is that did:web inherits the centralized trust model of DNS and TLS certificate authorities, making it less decentralized than blockchain-anchored methods. However, for enterprise-to-enterprise identity federation, this is often acceptable because organizations already trust the DNS and PKI infrastructure.",
+      "maturity": "emerging",
+      "standards": ["W3C DID Core 1.0", "W3C did:web Method Specification", "DIF Well Known DID Configuration"],
+      "adoption_status": "Growing adoption in enterprise and government sectors. The EU Digital Identity Architecture Reference Framework references did:web for organizational identifiers. The GLEIF vLEI (verifiable Legal Entity Identifier) ecosystem uses did:web for organizational DIDs. Microsoft Entra Verified ID supports did:web for organizational credential issuance. Did:web is the most widely implemented DID method in enterprise scenarios because it requires no blockchain infrastructure and works with existing web hosting.",
+      "use_cases": ["Enterprise organizational identity for B2B credential issuance and verification", "Supply chain identity verification for trade partner authentication", "Academic credential issuance by universities with institutional DIDs", "Government agency identifiers for issuing verifiable credentials to citizens", "Employee credential verification across organizational boundaries"],
+      "migration_from": "SAML federation with bilateral trust agreements, manual letter-of-authorization verification, organizational PKI cross-certification",
+      "vendor_support": {
+        "microsoft": "Entra Verified ID uses did:web for organizational DIDs in credential issuance",
+        "spruce": "SpruceID open-source did:web implementation with DIDKit library",
+        "transmute": "Enterprise did:web support with supply chain credential solutions",
+        "mattr": "MATTR VII platform supports did:web for organizational credential management",
+        "dock": "Dock.io supports did:web alongside other DID methods for credential ecosystems"
+      }
+    },
+    {
+      "id": "did-ion",
+      "name": "DID Method did:ion (Bitcoin-Anchored Decentralized Identifiers)",
+      "category": "decentralized-identity",
+      "description": "ION (Identity Overlay Network) is a permissionless, open Layer 2 DID network anchored to the Bitcoin blockchain using the Sidetree protocol. Unlike did:web, did:ion provides truly decentralized identifiers that do not depend on any single organization's infrastructure for resolution. DID operations (create, update, deactivate) are batched and anchored to Bitcoin transactions using content-addressable storage (IPFS). Resolution is performed by ION nodes that process the Sidetree operation log. Did:ion provides censorship resistance and temporal ordering guarantees from the Bitcoin blockchain without requiring individual transactions per DID operation, making it cost-efficient. The trade-off is operational complexity of running ION nodes and dependency on IPFS availability.",
+      "maturity": "emerging",
+      "standards": ["W3C DID Core 1.0", "DIF Sidetree Protocol v1.0", "DIF ION Specification"],
+      "adoption_status": "Microsoft invested significantly in ION development and operates ION nodes. The network has been operational since 2021 on Bitcoin mainnet. Adoption is primarily in scenarios requiring censorship-resistant decentralized identity such as humanitarian aid, refugee identity, and cross-border credential verification. Enterprise adoption is limited compared to did:web because most enterprises do not require blockchain-level decentralization for their identity needs. The complexity of operating infrastructure and Bitcoin dependency concerns some organizations.",
+      "use_cases": ["Humanitarian identity for displaced persons without government documentation", "Cross-border credential verification where no single jurisdiction is trusted", "Censorship-resistant identity for journalists and human rights workers", "Long-lived identifiers that survive organizational changes", "Academic and professional credential anchoring with immutable issuance records"],
+      "migration_from": "Centralized identity providers, government-issued digital identity that may not be available across borders",
+      "vendor_support": {
+        "microsoft": "Original developer of ION; Entra Verified ID previously used did:ion (transitioning to did:web for enterprise)",
+        "dif": "Decentralized Identity Foundation maintains the Sidetree and ION specifications",
+        "block": "Block (Square/TBD) Web5 platform uses did:ion for decentralized web applications",
+        "civic": "Civic identity verification integrates with ION for decentralized identity attestation",
+        "godiddy": "Universal DID resolver and registrar with did:ion support"
+      }
+    },
+    {
+      "id": "did-key",
+      "name": "DID Method did:key (Self-Contained Key-Based Identifiers)",
+      "category": "decentralized-identity",
+      "description": "The did:key method encodes a public key directly in the DID itself, creating a self-contained identifier that requires no external resolution infrastructure. A did:key identifier like did:key:z6MkhaXg... contains all the information needed to verify signatures from the corresponding private key. Did:key identifiers are ephemeral by design — they cannot be updated or deactivated because there is no separate DID document to modify. This simplicity makes did:key ideal for short-lived interactions, testing, peer-to-peer communication, and situations where the overhead of maintaining a DID document is unnecessary. Did:key supports multiple key types including Ed25519, P-256, P-384, secp256k1, and X25519 for key agreement. The method is trivial to implement, making it the most widely supported DID method across libraries and frameworks.",
+      "maturity": "mainstream",
+      "standards": ["W3C DID Core 1.0", "W3C did:key Method Specification", "Multicodec (for key type encoding)"],
+      "adoption_status": "Widely implemented in DID libraries and frameworks as the default or simplest DID method. Used extensively in development, testing, and prototyping of verifiable credential systems. Production use is common for peer-to-peer DIDComm messaging, ephemeral identifiers in anonymous credential presentations, and as holder DIDs in verifiable credential flows where the holder does not need a persistent identifier. The simplicity of did:key has made it a universal baseline that virtually all DID implementations support.",
+      "use_cases": ["Development and testing of verifiable credential systems", "Peer-to-peer DIDComm messaging between individuals", "Ephemeral holder identifiers for privacy-preserving credential presentation", "IoT device identifiers for constrained environments without network connectivity", "Quick proof-of-concept implementations for DID and VC ecosystems"],
+      "migration_from": "Ad-hoc public key distribution, PGP key servers, manual key fingerprint verification",
+      "vendor_support": {
+        "spruce": "DIDKit library with comprehensive did:key support across multiple key types",
+        "mattr": "MATTR VII platform supports did:key for holder-side credential management",
+        "veramo": "Open-source TypeScript framework with did:key as default method for development",
+        "walt-id": "Walt.id SSI Kit supports did:key for credential issuance and verification",
+        "aries-framework": "Hyperledger Aries framework uses did:key extensively for agent communication"
+      }
+    },
+    {
+      "id": "verifiable-credentials",
+      "name": "W3C Verifiable Credentials",
+      "category": "decentralized-identity",
+      "description": "W3C Verifiable Credentials (VCs) are a standard data model for expressing cryptographically verifiable claims about a subject. A VC is issued by an issuer (e.g., a university, employer, government) to a holder (the subject), who can then present it to a verifier. The verifier can cryptographically verify the credential's authenticity and integrity without contacting the issuer, enabling privacy-preserving identity verification. VCs can represent any type of claim: educational qualifications, professional certifications, age verification, employment status, or organizational membership. The VC data model supports selective disclosure (revealing only specific claims within a credential) and zero-knowledge proofs (proving properties about claims without revealing the claims themselves). VCs are encoded in JSON-LD or JWT format with digital signatures from the issuer's DID.",
+      "maturity": "emerging",
+      "standards": ["W3C Verifiable Credentials Data Model 2.0", "W3C VC JSON Schema", "W3C VC Status List 2021", "W3C Data Integrity Proofs"],
+      "adoption_status": "Moving from pilot to production in several sectors. The EU Digital Identity Wallet (EUDI) will use VCs for Pan-European identity documents. The GLEIF vLEI uses VCs for organizational identity in financial services. Academic credentials are being issued as VCs by universities in the US (Velocity Network, Digital Credentials Consortium) and Europe (EBSI). US states (Utah, Louisiana) are piloting mobile driver's licenses using VCs. Enterprise adoption is growing for employee credentials, professional certifications, and supply chain attestation.",
+      "use_cases": ["Digital diplomas and academic transcripts that can be verified instantly", "Professional certifications (medical licenses, security clearances) as portable credentials", "Employee identity verification for background checks and onboarding", "KYC (Know Your Customer) credentials for financial services reducing repeated verification", "Supply chain attestation for product origin, safety, and compliance certificates", "Age verification without revealing full date of birth (selective disclosure)"],
+      "migration_from": "Paper certificates, PDF credentials, centralized credential databases, SAML assertions for federated attributes",
+      "vendor_support": {
+        "microsoft": "Entra Verified ID for issuing and verifying VCs with Azure integration and Face Check",
+        "mattr": "MATTR VII platform for VC issuance, verification, and credential management at scale",
+        "spruce": "SpruceID open-source tools for VC issuance and mobile wallet integration",
+        "dock": "Dock.io VC platform with blockchain-anchored revocation and credential schema registry",
+        "walt-id": "Walt.id open-source SSI stack for VC issuance, verification, and wallet infrastructure"
+      }
+    },
+    {
+      "id": "verifiable-presentations",
+      "name": "W3C Verifiable Presentations",
+      "category": "decentralized-identity",
+      "description": "Verifiable Presentations (VPs) are a mechanism for combining and presenting one or more verifiable credentials to a verifier in a privacy-preserving manner. A VP allows a holder to selectively disclose specific attributes from their credentials without revealing unnecessary information. For example, a holder can prove they are over 21 without revealing their exact date of birth, or prove they hold a valid professional license without revealing their home address. VPs are cryptographically bound to the holder's DID, preventing credential relay attacks where someone presents another person's credentials. The presentation protocol includes challenge-response mechanisms to ensure freshness and prevent replay attacks. Advanced VP formats support zero-knowledge proofs (ZKPs) using BBS+ signatures, enabling unlinkable presentations where the verifier cannot correlate different presentations from the same holder.",
+      "maturity": "emerging",
+      "standards": ["W3C Verifiable Credentials Data Model 2.0 (VP section)", "DIF Presentation Exchange 2.0", "OpenID4VP (OpenID for Verifiable Presentations)", "BBS+ Signatures (IETF draft)", "W3C Data Integrity BBS Cryptosuites"],
+      "adoption_status": "Closely coupled with VC adoption. OpenID4VP is becoming the dominant presentation protocol, standardized as part of the OpenID Connect family. The EU Digital Identity Wallet will use OpenID4VP for credential presentation. The ISO 18013-5 mDL (mobile driver's license) standard defines a presentation protocol that aligns with VP concepts. DIF Presentation Exchange is used to define what credentials and attributes a verifier requires. BBS+ signatures for ZKP-based selective disclosure are progressing through IETF standardization.",
+      "use_cases": ["Age verification at point of sale revealing only over-18 status, not birth date", "Professional credential verification during hiring without exposing salary history", "Know Your Customer verification sharing only required attributes per regulation", "Government service access using mobile identity wallet with selective disclosure", "Cross-border credential presentation where different countries accept the same VP format"],
+      "migration_from": "Sharing full identity documents (passport scans), SAML attribute statements, OAuth scopes for API-level attribute release",
+      "vendor_support": {
+        "microsoft": "Entra Verified ID supports VP verification through OpenID4VP and Presentation Exchange",
+        "mattr": "MATTR VII supports OpenID4VP and DIF Presentation Exchange for VP workflows",
+        "spruce": "SpruceID Credible Wallet supports VP creation and presentation via OpenID4VP",
+        "animo": "Paradym platform supports VP with BBS+ selective disclosure for privacy-preserving presentations",
+        "idemia": "ID Wallet supporting ISO 18013-5 mDL and W3C VP for government identity"
+      }
+    },
+    {
+      "id": "identity-wallets",
+      "name": "Mobile Identity Wallets",
+      "category": "decentralized-identity",
+      "description": "Mobile identity wallets are applications on smartphones that store, manage, and present verifiable credentials and digital identity documents. They function similarly to physical wallets but for digital identity, allowing users to carry government-issued IDs, professional certifications, and organizational credentials in a secure, user-controlled mobile application. Identity wallets interact with issuers to receive credentials and with verifiers to present them, using standardized protocols (OpenID4VCI for issuance, OpenID4VP for presentation). Wallets store private keys in the device's secure enclave or hardware security module, and credentials are stored locally on the device rather than in a central server. User authentication to the wallet uses device biometrics. The wallet holder has full control over what information is shared with each verifier, implementing the principle of minimum disclosure.",
+      "maturity": "emerging",
+      "standards": ["EUDI Wallet Architecture Reference Framework (ARF)", "OpenID4VCI (OpenID for Verifiable Credential Issuance)", "OpenID4VP", "ISO 18013-5 (mobile Driver's License)", "W3C VC Data Model 2.0"],
+      "adoption_status": "Accelerating rapidly due to EU regulation. The eIDAS 2.0 regulation requires all EU member states to offer an EU Digital Identity Wallet to citizens by 2026. Large-scale pilots (EU Digital Identity Wallet Consortium with 250+ organizations) are testing cross-border scenarios. Apple and Google are integrating government IDs into their platform wallets (Apple Wallet, Google Wallet). US states are issuing mobile driver's licenses through ISO 18013-5 compatible apps. Enterprise identity wallets are emerging for employee and contractor credentials.",
+      "use_cases": ["EU citizens carrying digital identity for cross-border authentication and service access", "Mobile driver's license presentation to law enforcement and age-restricted venues", "Employee credential presentation for building access and system authentication", "Student ID and academic transcript presentation to employers and institutions", "Healthcare credential storage for vaccination records and insurance cards", "Travel document presentation at airports with automated border control"],
+      "migration_from": "Physical identity documents, federated SSO for each service, centralized identity databases per government agency",
+      "vendor_support": {
+        "apple": "Apple Wallet supports ISO 18013-5 mDL in US states; expanding to more identity types",
+        "google": "Google Wallet supports mDL and expanding VC support; Android Identity Credential API",
+        "thales": "Enterprise and government identity wallet solutions with PKI integration",
+        "idemia": "ID Wallet for government-issued digital identity and mobile driver's license",
+        "lissi": "Lissi Wallet for enterprise and consumer verifiable credential management"
+      }
+    },
+    {
+      "id": "ssi-enterprise",
+      "name": "Self-Sovereign Identity for Enterprise",
+      "category": "decentralized-identity",
+      "description": "Self-Sovereign Identity (SSI) for enterprise extends decentralized identity principles to organizational contexts, enabling organizations to issue, hold, and verify digital credentials without centralized identity intermediaries. In enterprise SSI, employees receive verifiable credentials representing their employment status, role, certifications, and access authorizations. These credentials travel with the employee across organizational boundaries, reducing the need for bilateral federation agreements. During onboarding, a new employee's credentials from previous employers and educational institutions can be instantly verified. Within the organization, SSI-based access management allows fine-grained, portable authorization that adapts as employees move between departments or projects. Enterprise SSI requires integration with existing HR systems, identity providers, and access management infrastructure, making adoption incremental rather than revolutionary.",
+      "maturity": "experimental",
+      "standards": ["W3C DID Core 1.0", "W3C VC Data Model 2.0", "DIF Trust Over IP (ToIP) Stack", "Hyperledger Aries RFC Set", "GLEIF vLEI Governance Framework"],
+      "adoption_status": "Early-stage enterprise adoption focused on specific use cases. The GLEIF vLEI ecosystem is the most mature enterprise SSI deployment, providing verifiable legal entity identifiers for financial services. Velocity Network Foundation is deploying SSI for workforce credentials (employment history, certifications). Enterprise pilots exist in supply chain (provenance attestation), healthcare (provider credentialing), and financial services (KYC portability). Full enterprise SSI adoption is hampered by the cold-start problem: credentials are only useful if verifiers accept them, and verifiers only accept them if enough issuers produce them.",
+      "use_cases": ["Workforce credential portability across employers (employment verification, certifications)", "Supply chain partner authentication without centralized trust broker", "Cross-border business identity for trade and regulatory compliance", "Portable KYC credentials for financial services reducing repeated verification", "Contractor and gig worker identity verification across multiple platforms"],
+      "migration_from": "Centralized background check services, bilateral SAML federation, paper-based credential verification, employer reference calls",
+      "vendor_support": {
+        "gleif": "vLEI ecosystem providing verifiable organizational identity for financial services globally",
+        "velocity": "Velocity Network Foundation for portable workforce credentials across employers",
+        "microsoft": "Entra Verified ID for enterprise VC issuance integrated with Azure AD",
+        "ibm": "IBM Digital Credentials for supply chain and organizational identity verification",
+        "indicio": "Enterprise SSI platform with Hyperledger Indy/Aries for credential ecosystems"
+      }
+    },
+    {
+      "id": "eidas2-wallet",
+      "name": "EU Digital Identity Wallet (eIDAS 2.0)",
+      "category": "decentralized-identity",
+      "description": "The European Digital Identity Wallet is a mobile application mandated by the eIDAS 2.0 regulation that will allow all EU citizens, residents, and businesses to securely store and present identity documents, electronic attestations, and digital credentials across borders. The wallet provides government-backed identity at Level of Assurance High (comparable to IAL3/AAL3), enabling authentication to online services, electronic signatures, and selective disclosure of identity attributes. The regulation requires that very large online platforms (VLOPs) must accept the EU Digital Identity Wallet for user authentication by 2026. The wallet architecture uses Person Identification Data (PID) as the foundational credential, with Electronic Attestations of Attributes (EAA) for additional credentials like diplomas, professional licenses, and health insurance. The technical architecture builds on W3C VCs, OpenID4VP, and ISO 18013-5 standards.",
+      "maturity": "emerging",
+      "standards": ["eIDAS 2.0 Regulation (EU 2024/1183)", "EUDI Wallet Architecture Reference Framework (ARF) v1.4", "OpenID4VP", "OpenID4VCI", "ISO 18013-5", "W3C VC Data Model 2.0"],
+      "adoption_status": "EU member states are required to issue EUDI Wallets by late 2026. Four large-scale pilots (EWC, POTENTIAL, NOBID, DC4EU) involving 250+ organizations across all EU member states are testing use cases including eID, mDL, diplomas, payments, and healthcare. The European Commission's Implementing Acts are being finalized, defining technical specifications for interoperability. Very Large Online Platforms (Google, Apple, Meta, Amazon) must integrate EUDI Wallet acceptance. This is the largest government-mandated deployment of decentralized identity in history, affecting 450 million EU citizens.",
+      "use_cases": ["Cross-border authentication to government services across EU member states", "Age verification for online services without revealing full identity", "Electronic signatures with legal equivalence to handwritten signatures", "Academic credential recognition across EU countries", "KYC for financial services with reusable verified identity", "Healthcare credential presentation across borders (EHIC, prescriptions)"],
+      "migration_from": "National eID schemes (BankID, eHerkenning, SPID), physical identity documents, per-service registration and identity verification",
+      "vendor_support": {
+        "thales": "EUDI Wallet reference implementation and large-scale pilot participation",
+        "idemia": "Digital identity wallet technology and government-grade identity verification",
+        "atos": "EU Digital Identity Wallet infrastructure and integration services",
+        "scytales": "Open-source EUDI Wallet reference implementation for Android/iOS",
+        "lissi": "EUDI Wallet compatible credential management for enterprise and government"
+      }
+    }
+  ]
+}

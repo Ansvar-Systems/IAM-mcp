@@ -1,0 +1,708 @@
+{
+  "compliance_mappings": [
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "equivalent",
+      "notes": "Both establish access control policy governance requirements including purpose, scope, roles, and periodic review"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.1",
+      "relationship": "partial",
+      "notes": "ISO A.5.1 is broader covering all information security policies; NIST AC-1 is specific to access control policy"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "equivalent",
+      "notes": "Both address full identity lifecycle management including creation, modification, and removal of accounts"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 covers access rights provisioning/review which is a subset of NIST AC-2 account management scope"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.9",
+      "relationship": "partial",
+      "notes": "ISO A.5.9 inventory of assets relates to the account inventory requirements within NIST AC-2"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 includes automated provisioning concepts but NIST AC-2(1) is more explicit about automated account management mechanisms"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(2)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 addresses timely removal of access but NIST AC-2(2) specifically mandates automatic removal of temporary and emergency accounts"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(3)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 requires regular review of access rights; NIST AC-2(3) specifically requires automatic disabling after a defined inactivity period"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(4)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.15",
+      "relationship": "equivalent",
+      "notes": "Both require audit logging of account lifecycle events including creation, modification, enabling, disabling, and removal"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(5)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication broadly; NIST AC-2(5) specifically addresses per-session inactivity logout requirements"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(7)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "equivalent",
+      "notes": "Both address privileged account management including separation from regular accounts, role-based assignment, and periodic review"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(9)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "partial",
+      "notes": "ISO A.5.16 covers shared identity scenarios; NIST AC-2(9) adds specific restrictions and supplementary accountability controls for shared accounts"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(11)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control rules generally; NIST AC-2(11) specifically addresses context-based usage conditions like time, location, and device"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(12)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.16",
+      "relationship": "equivalent",
+      "notes": "Both require monitoring for anomalous behaviour patterns with baseline establishment and deviation alerting"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(13)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 covers prompt removal of access; NIST AC-2(13) specifically addresses rapid disabling for individuals determined to pose significant risk"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-2(13)",
+      "target_framework": "iso-27001",
+      "target_control": "A.6.5",
+      "relationship": "partial",
+      "notes": "ISO A.6.5 covers termination responsibilities; NIST AC-2(13) extends to high-risk users under investigation, not just terminated employees"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-3",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 defines access control policy; NIST AC-3 focuses on the technical enforcement of approved authorizations through ACLs, RBAC, ABAC mechanisms"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-3",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "equivalent",
+      "notes": "Both require technical enforcement of access restrictions at all access points including applications, APIs, and databases"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-3(2)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.3",
+      "relationship": "partial",
+      "notes": "ISO A.5.3 addresses segregation of duties; NIST AC-3(2) specifically addresses dual authorization (two-person integrity) for critical operations"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-3(4)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "partial",
+      "notes": "ISO A.8.3 covers information access restriction broadly; NIST AC-3(4) specifically addresses discretionary access control (DAC) model"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-3(7)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 mentions access control models; NIST AC-3(7) specifically mandates role-based access control with detailed role management requirements"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-3(8)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 covers access modification; NIST AC-3(8) specifically addresses real-time revocation when security attributes change"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-3(13)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control broadly; NIST AC-3(13) specifically mandates attribute-based access control (ABAC) with subject, object, action, and environment attributes"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-4",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "partial",
+      "notes": "ISO A.8.3 covers information access restriction; NIST AC-4 addresses information flow control between systems and across boundaries, a distinct concept"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-4",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.14",
+      "relationship": "partial",
+      "notes": "ISO A.5.14 covers information transfer rules; NIST AC-4 addresses technical enforcement of information flow policies"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-4(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "partial",
+      "notes": "ISO A.8.3 covers access restriction; NIST AC-4(1) specifically requires security attribute binding to information objects for data-centric flow control"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-5",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.3",
+      "relationship": "equivalent",
+      "notes": "Both require segregation of conflicting duties to reduce fraud, error, and insider threat risk through role separation"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 mentions least privilege as part of access control policy; NIST AC-6 is a dedicated control with detailed enforcement requirements"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access restriction; NIST AC-6 is broader covering least privilege for all users and processes"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access; NIST AC-6(1) specifically requires explicit authorization for access to security functions and information"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6(2)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "equivalent",
+      "notes": "Both require separation of privileged and non-privileged accounts, mandating dedicated admin accounts for administrative tasks"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6(3)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access generally; NIST AC-6(3) specifically restricts network access to privileged commands through jump servers and PAWs"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6(5)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "equivalent",
+      "notes": "Both require restricting privileged accounts to a defined set of personnel with regular review and justification documentation"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6(7)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "equivalent",
+      "notes": "Both require periodic review of user privileges to validate continued need and remove excess permissions (privilege creep prevention)"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6(9)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.15",
+      "relationship": "equivalent",
+      "notes": "Both require audit logging of privileged function execution with user identification, function executed, and outcome"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-6(10)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access restriction; NIST AC-6(10) specifically prevents non-privileged users from executing privileged functions through technical controls"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-7",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication broadly; NIST AC-7 specifically addresses unsuccessful logon attempt limits, lockout, and delay mechanisms"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-8",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.10",
+      "relationship": "equivalent",
+      "notes": "Both require displaying acceptable use and monitoring notification before granting access to systems"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-10",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication; NIST AC-10 specifically limits concurrent sessions per account to detect credential sharing and theft"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-11",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.1",
+      "relationship": "partial",
+      "notes": "ISO A.8.1 covers endpoint device protection including screen lock; NIST AC-11 specifically addresses session lock after inactivity with re-authentication requirement"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-12",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication procedures; NIST AC-12 specifically addresses automatic session termination conditions and resource release"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-14",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 defines access control policy; NIST AC-14 specifically identifies and documents permitted actions without authentication"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-16",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "partial",
+      "notes": "ISO A.8.3 covers information access restriction; NIST AC-16 specifically addresses security and privacy attributes (classification labels, sensitivity tags) for ABAC"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-17",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.1",
+      "relationship": "partial",
+      "notes": "ISO A.8.1 covers endpoint device protection; NIST AC-17 specifically addresses remote access usage restrictions, authorization, and encryption requirements"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-17",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.20",
+      "relationship": "partial",
+      "notes": "ISO A.8.20 covers network security; NIST AC-17 specifically addresses remote access methods including VPN, SSH, and web portal security"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-17(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.16",
+      "relationship": "partial",
+      "notes": "ISO A.8.16 covers general monitoring; NIST AC-17(1) specifically addresses monitoring and control of remote access sessions and anomalous patterns"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-17(2)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.24",
+      "relationship": "partial",
+      "notes": "ISO A.8.24 covers cryptography use; NIST AC-17(2) specifically mandates encryption for remote access session confidentiality and integrity"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-17(4)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access; NIST AC-17(4) specifically addresses remote execution of privileged commands with session recording"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-18",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.20",
+      "relationship": "partial",
+      "notes": "ISO A.8.20 covers network security broadly; NIST AC-18 specifically addresses wireless access restrictions and WPA3 Enterprise authentication"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-19",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.1",
+      "relationship": "equivalent",
+      "notes": "Both address mobile device access control including enrollment, configuration enforcement, containerization, and remote wipe capability"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-20",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.19",
+      "relationship": "partial",
+      "notes": "ISO A.5.19 covers supplier relationship security; NIST AC-20 specifically addresses access from external systems including partner networks and personal devices"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-20",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.20",
+      "relationship": "partial",
+      "notes": "ISO A.5.20 covers supplier agreement security requirements; NIST AC-20 establishes terms for access from external systems with compensating controls"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-21",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control policy; NIST AC-21 specifically addresses user-driven information sharing decisions based on partner authorization matching"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-22",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "partial",
+      "notes": "ISO A.8.3 covers information access restriction; NIST AC-22 specifically addresses publicly accessible content review to prevent nonpublic information disclosure"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-24",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control rules; NIST AC-24 specifically addresses centralized vs local access decision architecture (PDP/PEP model)"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "AC-25",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "partial",
+      "notes": "ISO A.8.3 covers access restriction enforcement; NIST AC-25 specifically mandates a tamperproof reference monitor that mediates all access"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control policy broadly; NIST IA-1 specifically addresses identification and authentication policy with authenticator types and identity proofing"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-1",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication procedures; NIST IA-1 establishes the governance framework including acceptable authenticator types per system"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-2",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "equivalent",
+      "notes": "Both require secure authentication of organizational users with mechanisms appropriate to system sensitivity"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "partial",
+      "notes": "ISO A.5.16 covers identity management; NIST IA-2 covers both unique identification and authentication as a combined control"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-2(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 mentions MFA for critical systems; NIST IA-2(1) specifically mandates MFA for all network access to privileged accounts with phishing-resistant preference"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-2(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access management; NIST IA-2(1) adds the specific MFA requirement for all privileged account authentication"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-2(6)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication; NIST IA-2(6) specifically requires one MFA factor from a separate device for single-point-of-compromise prevention"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-5",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.17",
+      "relationship": "equivalent",
+      "notes": "Both address authenticator management including initial distribution, strength requirements, lost/compromised handling, and lifecycle procedures"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-5(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.17",
+      "relationship": "partial",
+      "notes": "ISO A.5.17 covers authentication information management generally; NIST IA-5(1) specifically addresses password complexity, breach-checking, and storage requirements"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-5(1)",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.24",
+      "relationship": "partial",
+      "notes": "ISO A.8.24 covers cryptography use; NIST IA-5(1) specifically requires approved key derivation functions for password storage"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-8",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.19",
+      "relationship": "partial",
+      "notes": "ISO A.5.19 covers supplier relationship security; NIST IA-8 specifically addresses authentication of non-organizational users including contractors and federated users"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-11",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication; NIST IA-11 specifically addresses re-authentication triggers including time elapsed, sensitive resource access, and context changes"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-12",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "partial",
+      "notes": "ISO A.5.16 covers identity management; NIST IA-12 specifically addresses identity proofing with graduated assurance levels (IAL1-3) before credential issuance"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-12",
+      "target_framework": "iso-27001",
+      "target_control": "A.6.1",
+      "relationship": "partial",
+      "notes": "ISO A.6.1 covers personnel screening; NIST IA-12 extends identity proofing beyond screening to include government-issued ID verification for higher assurance"
+    },
+    {
+      "source_framework": "nist-800-53",
+      "source_control": "IA-12(2)",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "partial",
+      "notes": "ISO A.5.16 covers identity verification; NIST IA-12(2) specifically addresses validation and verification of identity evidence including biometric comparison"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.15",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-1",
+      "relationship": "superset",
+      "notes": "ISO A.5.15 covers access control policy broadly including logical and physical access; NIST AC-1 is narrower focusing on logical access control policy"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.16",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "equivalent",
+      "notes": "Both address full identity lifecycle from creation through removal with unique identification and formal processes"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.17",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5",
+      "relationship": "equivalent",
+      "notes": "Both address authenticator/credential management including allocation, protection, and lifecycle control"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.18",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "partial",
+      "notes": "NIST AC-2 is broader covering all account management; ISO A.5.18 focuses specifically on access rights provisioning, review, and removal"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.18",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6(7)",
+      "relationship": "partial",
+      "notes": "NIST AC-6(7) specifically covers periodic review of user privileges; ISO A.5.18 covers broader access rights review including provisioning and removal"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.8.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6(5)",
+      "relationship": "equivalent",
+      "notes": "Both restrict privileged access to designated personnel with separate accounts, competence verification, and frequent review"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.8.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "equivalent",
+      "notes": "Both require technical enforcement of access restrictions through ACLs, RBAC, ABAC at all access points"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.8.5",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2",
+      "relationship": "equivalent",
+      "notes": "Both require secure authentication with MFA for critical systems and credential protection during transmission and storage"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-5",
+      "relationship": "equivalent",
+      "notes": "Both address segregation of conflicting duties through role separation and technical workflow enforcement"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.8.15",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(4)",
+      "relationship": "superset",
+      "notes": "ISO A.8.15 covers all logging requirements broadly; NIST AC-2(4) is specifically focused on account lifecycle event auditing"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.8.16",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(12)",
+      "relationship": "superset",
+      "notes": "ISO A.8.16 covers all monitoring activities; NIST AC-2(12) specifically addresses atypical account usage monitoring"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.8.24",
+      "target_framework": "nist-800-53",
+      "target_control": "SC-12",
+      "relationship": "equivalent",
+      "notes": "Both address cryptographic key management including generation, distribution, storage, rotation, and destruction for identity infrastructure"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.19",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-20",
+      "relationship": "partial",
+      "notes": "NIST AC-20 covers external system access; ISO A.5.19 is broader covering all supplier relationship security including IAM assessments"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.6.1",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-12",
+      "relationship": "partial",
+      "notes": "NIST IA-12 covers full identity proofing; ISO A.6.1 covers personnel screening which supports but does not fully replace identity proofing"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.6.5",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(13)",
+      "relationship": "partial",
+      "notes": "NIST AC-2(13) covers high-risk user account disabling; ISO A.6.5 covers broader termination and change-of-role responsibilities"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.8.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-19",
+      "relationship": "superset",
+      "notes": "ISO A.8.1 covers all endpoint devices broadly; NIST AC-19 specifically covers mobile device access control"
+    },
+    {
+      "source_framework": "iso-27001",
+      "source_control": "A.5.10",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-8",
+      "relationship": "equivalent",
+      "notes": "Both require acceptable use rules and system use notification before granting access"
+    }
+  ]
+}

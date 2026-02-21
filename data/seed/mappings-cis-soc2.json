@@ -1,0 +1,980 @@
+{
+  "compliance_mappings": [
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "equivalent",
+      "notes": "Both require maintaining a comprehensive inventory of all accounts with regular review and removal of unauthorized accounts"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "equivalent",
+      "notes": "Both require formal identity management including registration and deregistration of user identities"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.2",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5(1)",
+      "relationship": "partial",
+      "notes": "NIST IA-5(1) is more detailed on password storage and breach-checking; CIS 5.2 focuses on unique passwords across enterprise assets"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.17",
+      "relationship": "partial",
+      "notes": "ISO A.5.17 covers authentication information management broadly; CIS 5.2 specifically requires unique passwords per system"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(3)",
+      "relationship": "equivalent",
+      "notes": "Both require automatic disabling of dormant accounts after a defined inactivity period (CIS specifies 45 days)"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.3",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 covers access rights review broadly; CIS 5.3 specifically targets dormant account identification and disabling"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.4",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6(2)",
+      "relationship": "equivalent",
+      "notes": "Both require dedicated administrator accounts separate from day-to-day user accounts for privileged access"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.4",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6(5)",
+      "relationship": "partial",
+      "notes": "NIST AC-6(5) covers restricting and registering privileged accounts; CIS 5.4 focuses on the separation aspect"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.4",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "equivalent",
+      "notes": "Both require privileged access through dedicated accounts with separation from routine activities"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.5",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "partial",
+      "notes": "NIST AC-2 covers all account types; CIS 5.5 specifically addresses service account inventory with owner, purpose, and authorization"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.5",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "partial",
+      "notes": "ISO A.5.16 covers all identity management; CIS 5.5 specifically targets service account identification and ownership documentation"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.6",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(1)",
+      "relationship": "partial",
+      "notes": "NIST AC-2(1) covers automated account management broadly; CIS 5.6 specifically requires centralized account management through directory services"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "5.6",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "partial",
+      "notes": "ISO A.5.16 covers identity management; CIS 5.6 adds the centralization requirement through a single directory or identity provider"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-1",
+      "relationship": "partial",
+      "notes": "NIST AC-1 covers access control policy governance; CIS 6.1 specifically mandates a formal process for granting access with documented requests and approvals"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "partial",
+      "notes": "NIST AC-2 covers account management; CIS 6.1 specifically addresses the access granting workflow with request, approval, and notification"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 defines access control policy; CIS 6.1 operationalizes this with a specific access granting process"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "equivalent",
+      "notes": "Both require formal access provisioning processes with authorization from asset owners and least privilege application"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "partial",
+      "notes": "NIST AC-2 covers full account management; CIS 6.2 specifically addresses the access revoking process triggered by HR events"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "partial",
+      "notes": "ISO A.5.18 covers access rights modification and removal; CIS 6.2 adds specific timing requirements (24 hours) for revocation"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.6.5",
+      "relationship": "equivalent",
+      "notes": "Both address prompt access revocation upon termination or role change with verification of completeness"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.3",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2(1)",
+      "relationship": "partial",
+      "notes": "NIST IA-2(1) mandates MFA for privileged accounts; CIS 6.3 specifically requires MFA for all externally-exposed applications"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.3",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication broadly; CIS 6.3 specifically mandates MFA for all externally-exposed applications"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.4",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-17",
+      "relationship": "partial",
+      "notes": "NIST AC-17 covers remote access broadly; CIS 6.4 specifically mandates MFA for remote network access with phishing-resistant preference"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.4",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication; CIS 6.4 specifically requires MFA for remote network access including VPN and RDP"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.5",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6(5)",
+      "relationship": "partial",
+      "notes": "NIST AC-6(5) covers privileged account restriction; CIS 6.5 adds the specific MFA requirement for all administrative access"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.5",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access management; CIS 6.5 adds the requirement for phishing-resistant MFA for all admin access"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.6",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "partial",
+      "notes": "NIST AC-2 covers account management; CIS 6.6 specifically addresses maintaining an inventory of authentication and authorization systems themselves"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.6",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.9",
+      "relationship": "partial",
+      "notes": "ISO A.5.9 covers asset inventory broadly; CIS 6.6 specifically targets the inventory of identity infrastructure (IdPs, directories, auth systems)"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.7",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(1)",
+      "relationship": "partial",
+      "notes": "NIST AC-2(1) covers automated account management; CIS 6.7 specifically mandates centralizing access control through SSO or directory services"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.7",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control policy; CIS 6.7 operationalizes centralized enforcement through a single identity provider"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.8",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3(7)",
+      "relationship": "equivalent",
+      "notes": "Both require defining and maintaining role-based access control with documented role definitions and least privilege enforcement"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.8",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6",
+      "relationship": "partial",
+      "notes": "NIST AC-6 covers least privilege broadly; CIS 6.8 implements it through RBAC role definitions and annual reviews"
+    },
+    {
+      "source_framework": "cis-controls-v8",
+      "source_control": "6.8",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 mentions access control models; CIS 6.8 specifically mandates documented RBAC with annual role reviews"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "equivalent",
+      "notes": "Both require logical access security mechanisms that enforce approved authorizations using ACLs, RBAC, ABAC"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6",
+      "relationship": "partial",
+      "notes": "NIST AC-6 is specifically least privilege; SOC 2 CC6.1 covers broader logical access security software and architectures"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "equivalent",
+      "notes": "Both establish access control policy based on business and security requirements with least privilege and need-to-know"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "equivalent",
+      "notes": "Both require technical enforcement of information access restrictions at all access points"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2",
+      "relationship": "equivalent",
+      "notes": "Both cover user registration, authorization, provisioning, periodic review, and timely deprovisioning"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.16",
+      "relationship": "equivalent",
+      "notes": "Both address identity lifecycle management including registration, verification, and removal"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "equivalent",
+      "notes": "Both require formal access provisioning with periodic review and prompt revocation upon role change or termination"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-5",
+      "relationship": "partial",
+      "notes": "NIST AC-5 covers segregation of duties; SOC 2 CC6.3 covers both SoD and role-based least privilege in one control"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6",
+      "relationship": "partial",
+      "notes": "NIST AC-6 covers least privilege; SOC 2 CC6.3 combines this with role-based access and segregation of duties"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3(7)",
+      "relationship": "partial",
+      "notes": "NIST AC-3(7) covers RBAC specifically; SOC 2 CC6.3 combines RBAC with least privilege and SoD"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.3",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control policy broadly; SOC 2 CC6.3 specifically operationalizes RBAC and least privilege"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.3",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.2",
+      "relationship": "partial",
+      "notes": "ISO A.8.2 covers privileged access; SOC 2 CC6.3 covers privileged access restriction as part of broader role-based access"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.4",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "partial",
+      "notes": "NIST AC-3 covers logical access enforcement; SOC 2 CC6.4 covers physical access restriction with identity integration"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.4",
+      "target_framework": "iso-27001",
+      "target_control": "A.7.2",
+      "relationship": "equivalent",
+      "notes": "Both address physical entry controls with badge-based systems integrated with identity management infrastructure"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.6",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-17",
+      "relationship": "partial",
+      "notes": "NIST AC-17 covers remote access; SOC 2 CC6.6 covers broader external threat protection including MFA and boundary protection"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.6",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-17(2)",
+      "relationship": "partial",
+      "notes": "NIST AC-17(2) covers remote access encryption; SOC 2 CC6.6 includes TLS 1.2+ requirement as part of external threat protection"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.6",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.20",
+      "relationship": "partial",
+      "notes": "ISO A.8.20 covers network security; SOC 2 CC6.6 includes network boundary protection with identity-aware controls"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.7",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-4",
+      "relationship": "equivalent",
+      "notes": "Both address controlling information flow including identity data transmission with encryption and authorization requirements"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.7",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.14",
+      "relationship": "equivalent",
+      "notes": "Both require secure transfer rules including encryption for identity data, SCIM provisioning traffic, and federation assertions"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.8",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-19",
+      "relationship": "partial",
+      "notes": "NIST AC-19 covers mobile device access control; SOC 2 CC6.8 covers broader malicious software prevention including credential-theft malware"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC6.8",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.1",
+      "relationship": "partial",
+      "notes": "ISO A.8.1 covers endpoint device protection; SOC 2 CC6.8 specifically addresses malware prevention for credential stores and identity infrastructure"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC7.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(12)",
+      "relationship": "equivalent",
+      "notes": "Both require monitoring of identity and access systems for anomalous patterns including impossible travel and privilege escalation"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC7.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(4)",
+      "relationship": "partial",
+      "notes": "NIST AC-2(4) covers account lifecycle auditing; SOC 2 CC7.2 covers broader real-time security monitoring including identity systems"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC7.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.15",
+      "relationship": "partial",
+      "notes": "ISO A.8.15 covers logging; SOC 2 CC7.2 emphasizes real-time monitoring and analysis of security events including identity attacks"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC7.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.16",
+      "relationship": "equivalent",
+      "notes": "Both require monitoring for anomalous behaviour with appropriate actions including identity-related incident detection"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC9.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-20",
+      "relationship": "partial",
+      "notes": "NIST AC-20 covers external system access; SOC 2 CC9.2 covers broader third-party identity risk assessment including IAM practices evaluation"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC9.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.19",
+      "relationship": "equivalent",
+      "notes": "Both address supplier identity and access management risk assessment including authentication standards and access governance"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC9.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.20",
+      "relationship": "equivalent",
+      "notes": "Both require contractual security requirements with suppliers including MFA, credential management, and breach notification"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.1",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5(1)",
+      "relationship": "equivalent",
+      "notes": "Both define password security requirements including minimum length, breach-checking, no forced rotation, and no composition rules"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-7",
+      "relationship": "partial",
+      "notes": "NIST AC-7 covers failed logon limits; OWASP V2.2 covers broader authenticator security including anti-automation and rate limiting"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.2",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5",
+      "relationship": "partial",
+      "notes": "NIST IA-5 covers authenticator management; OWASP V2.2 covers general authenticator security requirements for all auth mechanisms"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.4",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5(1)",
+      "relationship": "partial",
+      "notes": "NIST IA-5(1) covers password-based auth broadly; OWASP V2.4 specifically mandates credential storage algorithms (bcrypt, Argon2, scrypt) with parameters"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.5",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5(1)",
+      "relationship": "partial",
+      "notes": "NIST IA-5(1) addresses password management; OWASP V2.5 specifically covers credential recovery with anti-enumeration and secure token requirements"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.7",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2(6)",
+      "relationship": "partial",
+      "notes": "NIST IA-2(6) covers separate device MFA; OWASP V2.7 covers out-of-band verifier requirements including SMS, push, and voice"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.8",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5",
+      "relationship": "partial",
+      "notes": "NIST IA-5 covers authenticator management broadly; OWASP V2.8 specifically covers TOTP/HOTP OTP requirements with entropy and drift"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.9",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2(1)",
+      "relationship": "partial",
+      "notes": "NIST IA-2(1) mandates MFA; OWASP V2.9 specifically covers FIDO2/WebAuthn cryptographic verifier implementation requirements"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.10",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-5",
+      "relationship": "partial",
+      "notes": "NIST IA-5 covers authenticator management; OWASP V2.10 specifically covers service-to-service authentication using mTLS and OAuth client credentials"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.1",
+      "target_framework": "nist-800-53",
+      "target_control": "SC-23",
+      "relationship": "equivalent",
+      "notes": "Both require session authenticity with cryptographic tokens, new session on auth, and secure transmission channels"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.2",
+      "target_framework": "nist-800-53",
+      "target_control": "SC-23",
+      "relationship": "partial",
+      "notes": "NIST SC-23 covers session authenticity; OWASP V3.2 adds specific session binding requirements including server-side validation and JWT claims"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.2",
+      "target_framework": "nist-800-53",
+      "target_control": "SC-23(3)",
+      "relationship": "partial",
+      "notes": "NIST SC-23(3) covers unique session identifiers; OWASP V3.2 extends to binding sessions to user, auth method, and TLS connection"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-12",
+      "relationship": "equivalent",
+      "notes": "Both require session termination with idle timeout, absolute timeout, server-side invalidation, and accessible logout"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(5)",
+      "relationship": "partial",
+      "notes": "NIST AC-2(5) covers inactivity logout broadly; OWASP V3.3 provides specific idle and absolute timeout maximums"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.5",
+      "target_framework": "nist-800-53",
+      "target_control": "SC-23",
+      "relationship": "partial",
+      "notes": "NIST SC-23 covers session authenticity; OWASP V3.5 specifically covers JWT/OAuth token security with algorithm restrictions and rotation"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.7",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-10",
+      "relationship": "partial",
+      "notes": "NIST AC-10 covers concurrent sessions; OWASP V3.7 covers broader session exploit defenses including fixation prevention and session visibility"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "equivalent",
+      "notes": "Both require centralized, server-side access control enforcement with deny-by-default and least privilege"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-25",
+      "relationship": "partial",
+      "notes": "NIST AC-25 is the theoretical reference monitor; OWASP V4.1 provides practical implementation guidance for centralized access control"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "equivalent",
+      "notes": "Both require technical enforcement of access restrictions at all access points including APIs and databases"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "partial",
+      "notes": "NIST AC-3 covers access enforcement broadly; OWASP V4.2 specifically addresses operation-level access control including IDOR prevention"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6",
+      "relationship": "partial",
+      "notes": "NIST AC-6 covers least privilege; OWASP V4.2 covers preventing both vertical and horizontal privilege escalation at the API level"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "partial",
+      "notes": "NIST AC-3 covers access enforcement; OWASP V4.3 covers additional access control considerations including CSRF and bulk operation authorization"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.3",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6(5)",
+      "relationship": "partial",
+      "notes": "NIST AC-6(5) restricts privileged accounts; OWASP V4.3 requires MFA and network restrictions for administrative interfaces"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Traditional",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "partial",
+      "notes": "Traditional ZT maturity maps to basic NIST AC-3 enforcement with static password-based authentication at the perimeter"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Initial",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2(1)",
+      "relationship": "partial",
+      "notes": "Initial ZT maturity requires MFA for privileged and external users, mapping to NIST IA-2(1) MFA for privileged accounts"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Initial",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(1)",
+      "relationship": "partial",
+      "notes": "Initial ZT maturity requires centralized IdP, mapping to NIST AC-2(1) automated account management through centralized directory"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Advanced",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(12)",
+      "relationship": "partial",
+      "notes": "Advanced ZT maturity requires continuous risk evaluation, mapping to NIST AC-2(12) account monitoring for atypical usage"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Advanced",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3(13)",
+      "relationship": "partial",
+      "notes": "Advanced ZT maturity continuous authorization maps to NIST AC-3(13) attribute-based access control with dynamic context evaluation"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Optimal",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-25",
+      "relationship": "partial",
+      "notes": "Optimal ZT maturity with universal enforcement maps to NIST AC-25 reference monitor concepts for complete access mediation"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - MFA Evolution",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2(1)",
+      "relationship": "partial",
+      "notes": "CISA MFA progression from basic to phishing-resistant directly maps to NIST IA-2(1) MFA requirement with increasing assurance"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Lifecycle Automation",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(1)",
+      "relationship": "equivalent",
+      "notes": "Both require automated identity lifecycle management integrated with HR systems for provisioning and deprovisioning"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Lifecycle Automation",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(2)",
+      "relationship": "partial",
+      "notes": "NIST AC-2(2) covers temporary account removal; CISA lifecycle automation covers broader automated lifecycle including JML processes"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Privileged Access",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-6(5)",
+      "relationship": "partial",
+      "notes": "NIST AC-6(5) restricts privileged accounts; CISA PAM maturity extends to JIT access, session recording, and zero standing privilege"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Privileged Access",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-17(4)",
+      "relationship": "partial",
+      "notes": "NIST AC-17(4) covers remote privileged access; CISA PAM maturity includes PAWs, session recording, and AI-driven anomaly detection"
+    },
+    {
+      "source_framework": "nist-800-63",
+      "source_control": "800-63B AAL1",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2",
+      "relationship": "partial",
+      "notes": "AAL1 single-factor authentication satisfies the basic requirement of NIST IA-2 unique identification and authentication"
+    },
+    {
+      "source_framework": "nist-800-63",
+      "source_control": "800-63B AAL2",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2(1)",
+      "relationship": "equivalent",
+      "notes": "Both require multi-factor authentication; AAL2 defines the specific assurance level that maps to NIST IA-2(1) MFA requirements"
+    },
+    {
+      "source_framework": "nist-800-63",
+      "source_control": "800-63B AAL3",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-2(6)",
+      "relationship": "equivalent",
+      "notes": "Both require hardware cryptographic authentication with verifier impersonation resistance on a separate device"
+    },
+    {
+      "source_framework": "nist-800-63",
+      "source_control": "800-63A IAL2",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-12",
+      "relationship": "equivalent",
+      "notes": "Both require government-issued photo ID verification for identity proofing at the moderate assurance level"
+    },
+    {
+      "source_framework": "nist-800-63",
+      "source_control": "800-63A IAL3",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-12(2)",
+      "relationship": "equivalent",
+      "notes": "Both require in-person identity evidence validation and verification at the highest assurance level"
+    },
+    {
+      "source_framework": "nist-800-63",
+      "source_control": "800-63C FAL1",
+      "target_framework": "nist-800-53",
+      "target_control": "IA-8",
+      "relationship": "partial",
+      "notes": "NIST IA-8 covers non-organizational user authentication; FAL1 defines the basic federation assurance level for identity assertions"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC5.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-1",
+      "relationship": "partial",
+      "notes": "NIST AC-1 covers access control policy; SOC 2 CC5.2 specifically covers risk assessment of identity and access controls"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC5.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.15",
+      "relationship": "partial",
+      "notes": "ISO A.5.15 covers access control policy; SOC 2 CC5.2 specifically addresses risk assessment informing control selection"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC8.1",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-3",
+      "relationship": "partial",
+      "notes": "NIST AC-3 covers access enforcement; SOC 2 CC8.1 covers change management for identity system configurations"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC8.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.9",
+      "relationship": "equivalent",
+      "notes": "Both require configuration management for identity systems with security review, testing, and rollback capability"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC1.4",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-1",
+      "relationship": "partial",
+      "notes": "NIST AC-1 covers management commitment; SOC 2 CC1.4 specifically requires board-level oversight with IAM metrics reporting"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC1.4",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.1",
+      "relationship": "partial",
+      "notes": "ISO A.5.1 covers management-approved security policies; SOC 2 CC1.4 requires board-level oversight and IAM KPI reporting"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC3.2",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-5",
+      "relationship": "partial",
+      "notes": "NIST AC-5 covers segregation of duties; SOC 2 CC3.2 addresses identity fraud risk assessment including collusion and social engineering"
+    },
+    {
+      "source_framework": "soc2",
+      "source_control": "CC3.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.3",
+      "relationship": "partial",
+      "notes": "ISO A.5.3 covers segregation of duties; SOC 2 CC3.2 specifically addresses fraud risk in identity governance processes"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.1",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.17",
+      "relationship": "partial",
+      "notes": "ISO A.5.17 covers authentication information management broadly; OWASP V2.1 provides specific password length, composition, and breach-checking requirements"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication; OWASP V2.2 adds specific anti-automation, rate limiting, and error response requirements"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.4",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.24",
+      "relationship": "partial",
+      "notes": "ISO A.8.24 covers cryptography use; OWASP V2.4 specifies exact credential storage algorithms (Argon2id, bcrypt, scrypt) with minimum parameters"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V2.9",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 mentions MFA; OWASP V2.9 provides specific FIDO2/WebAuthn implementation requirements for cryptographic verifiers"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V3.3",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication broadly; OWASP V3.3 provides specific session timeout maximums (30 min idle, 12 hr absolute)"
+    },
+    {
+      "source_framework": "owasp-asvs-v4",
+      "source_control": "V4.2",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.3",
+      "relationship": "equivalent",
+      "notes": "Both require operation-level access restriction enforcement at all access points including API endpoints"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Initial",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.5",
+      "relationship": "partial",
+      "notes": "ISO A.8.5 covers secure authentication; CISA initial maturity specifically requires centralized IdP and phishing-resistant MFA deployment"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Identity Pillar - Advanced",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.18",
+      "relationship": "superset",
+      "notes": "CISA advanced maturity requires full lifecycle automation with SCIM; ISO A.5.18 covers access rights review but allows manual processes"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Cross-Cutting - Visibility and Analytics",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(4)",
+      "relationship": "superset",
+      "notes": "CISA visibility covers all identity event logging and UEBA analytics; NIST AC-2(4) is limited to account lifecycle auditing"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Cross-Cutting - Visibility and Analytics",
+      "target_framework": "iso-27001",
+      "target_control": "A.8.15",
+      "relationship": "superset",
+      "notes": "CISA visibility requires AI/ML-driven analytics at higher maturity levels; ISO A.8.15 covers standard logging requirements"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Cross-Cutting - Automation and Orchestration",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-2(1)",
+      "relationship": "superset",
+      "notes": "CISA automation covers self-healing identity infrastructure at optimal; NIST AC-2(1) covers basic automated account management"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Cross-Cutting - Governance",
+      "target_framework": "nist-800-53",
+      "target_control": "AC-1",
+      "relationship": "partial",
+      "notes": "NIST AC-1 covers access control policy; CISA governance covers zero trust steering committees, KPIs, and identity-specific roadmaps"
+    },
+    {
+      "source_framework": "cisa-zero-trust",
+      "source_control": "Cross-Cutting - Governance",
+      "target_framework": "iso-27001",
+      "target_control": "A.5.1",
+      "relationship": "partial",
+      "notes": "ISO A.5.1 covers management-approved policies; CISA governance adds zero trust-specific identity maturity metrics and executive sponsorship"
+    }
+  ]
+}
