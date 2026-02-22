@@ -114,12 +114,12 @@ async function main() {
             sessionIdGenerator: () => randomUUID(),
           });
           const server = createMCPServer();
+          await server.connect(transport);
           transport.onclose = () => {
             if (transport.sessionId) sessions.delete(transport.sessionId);
           };
-          await server.connect(transport);
-          if (transport.sessionId) sessions.set(transport.sessionId, transport);
           await transport.handleRequest(req, res);
+          if (transport.sessionId) sessions.set(transport.sessionId, transport);
           return;
         }
 
