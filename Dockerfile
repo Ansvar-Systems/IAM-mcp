@@ -3,8 +3,11 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY src/ ./src/
+COPY scripts/ ./scripts/
+COPY data/seed/ ./data/seed/
 COPY tsconfig.json ./
 RUN npm run build
+RUN npm run build:db
 
 FROM node:24-alpine AS production
 WORKDIR /app
@@ -12,7 +15,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 COPY --from=builder /app/dist ./dist
-COPY data/ ./data/
+COPY --from=builder /app/data ./data
 RUN chown -R nodejs:nodejs /app
 USER nodejs
 ENV NODE_ENV=production
