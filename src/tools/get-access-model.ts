@@ -7,6 +7,7 @@
  */
 
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { buildCitation } from '../citation-universal.js';
 
 export interface GetAccessModelInput {
   id: string;
@@ -69,8 +70,18 @@ export async function handler(
 
   const results = row ? [parsePattern(row)] : [];
 
+  const _citations = results.map((r) =>
+    buildCitation(
+      r.id,
+      `${r.name} (${r.category})`,
+      'get_access_model',
+      { id: r.id },
+    ),
+  );
+
   return {
     results,
+    _citations,
     _metadata: generateResponseMetadata(),
   };
 }

@@ -5,6 +5,7 @@
  */
 
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { buildCitation } from '../citation-universal.js';
 
 export interface GetEmergingTechnologyInput {
   id?: string;
@@ -64,8 +65,20 @@ export async function handler(
     rows = db.prepare('SELECT * FROM emerging_technologies LIMIT ?').all(effectiveLimit) as RawEmergingTechnologyRow[];
   }
 
+  const parsed = rows.map(parseEmergingTechnology);
+
+  const _citations = parsed.map((r) =>
+    buildCitation(
+      r.id,
+      `${r.name} (${r.category})`,
+      'get_emerging_technology',
+      { id: r.id },
+    ),
+  );
+
   return {
-    results: rows.map(parseEmergingTechnology),
+    results: parsed,
+    _citations,
     _metadata: generateResponseMetadata(),
   };
 }

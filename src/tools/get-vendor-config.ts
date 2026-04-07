@@ -5,6 +5,7 @@
  */
 
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { buildCitation } from '../citation-universal.js';
 
 export interface GetVendorConfigInput {
   vendor: string;
@@ -70,8 +71,20 @@ export async function handler(
     rows = db.prepare(sql).all(params.vendor, effectiveLimit) as RawVendorConfigRow[];
   }
 
+  const parsed = rows.map(parseVendorConfig);
+
+  const _citations = parsed.map((r) =>
+    buildCitation(
+      `${r.vendor} ${r.id}`,
+      `${r.vendor} — ${r.feature}`,
+      'get_vendor_config',
+      { vendor: r.vendor, feature: r.feature },
+    ),
+  );
+
   return {
-    results: rows.map(parseVendorConfig),
+    results: parsed,
+    _citations,
     _metadata: generateResponseMetadata(),
   };
 }

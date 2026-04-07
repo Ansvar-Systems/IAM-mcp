@@ -3,6 +3,7 @@
  */
 
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { buildCitation } from '../citation-universal.js';
 
 export interface GetIamWeaknessInput {
   cwe_id: string;
@@ -50,8 +51,19 @@ export async function handler(
 
   const results = row ? [parseWeakness(row)] : [];
 
+  const _citations = results.map((r) =>
+    buildCitation(
+      r.cwe_id,
+      `${r.title} (${r.cwe_id})`,
+      'get_iam_weakness',
+      { cwe_id: r.cwe_id },
+      `https://cwe.mitre.org/data/definitions/${r.cwe_id.replace('CWE-', '')}.html`,
+    ),
+  );
+
   return {
     results,
+    _citations,
     _metadata: generateResponseMetadata(),
   };
 }
