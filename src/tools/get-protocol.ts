@@ -5,6 +5,7 @@
  * recommended use-cases, RFC references, and sequence diagrams.
  */
 
+import { buildCitation } from '../citation-universal.js';
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
 
 export interface GetProtocolInput {
@@ -51,8 +52,19 @@ export async function handler(
 
   const results = row ? [parseProtocol(row)] : [];
 
+  const _citations = results.map((r) =>
+    buildCitation(
+      r.id,
+      `${r.protocol}${r.flow_type ? ` (${r.flow_type})` : ''}`,
+      'get_protocol',
+      { id: r.id },
+      r.rfc ? `https://datatracker.ietf.org/doc/html/${r.rfc.toLowerCase()}` : null,
+    ),
+  );
+
   return {
     results,
+    _citations,
     _metadata: generateResponseMetadata(),
   };
 }

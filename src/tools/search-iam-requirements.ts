@@ -2,6 +2,7 @@
  * search-iam-requirements — Full-text and filtered search across IAM standards.
  */
 
+import { buildCitation } from '../citation-universal.js';
 import { sanitizeFtsInput, buildFtsQueryVariants } from '../utils/fts-query.js';
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
 
@@ -75,8 +76,10 @@ export async function handler(
         const sql = `SELECT s.* FROM standards s JOIN standards_fts f ON s.rowid = f.rowid WHERE standards_fts MATCH ?${filterClause} LIMIT ?`;
         const rows = db.prepare(sql).all(variant, ...filterParams, effectiveLimit) as RawStandardRow[];
         if (rows.length > 0) {
+          const parsed = rows.map(parseStandard);
           return {
-            results: rows.map(parseStandard),
+            results: parsed,
+            _citations: parsed.map((r) => buildCitation(r.id, `${r.framework} — ${r.title}`, 'get_iam_standard', { id: r.id })),
             _metadata: generateResponseMetadata(),
           };
         }
@@ -105,9 +108,11 @@ export async function handler(
   const whereClause = conditions.length > 0 ? ' WHERE ' + conditions.join(' AND ') : '';
   const sql = `SELECT * FROM standards${whereClause} LIMIT ?`;
   const rows = db.prepare(sql).all(...conditionParams, effectiveLimit) as RawStandardRow[];
+  const parsed = rows.map(parseStandard);
 
   return {
-    results: rows.map(parseStandard),
+    results: parsed,
+    _citations: parsed.map((r) => buildCitation(r.id, `${r.framework} — ${r.title}`, 'get_iam_standard', { id: r.id })),
     _metadata: generateResponseMetadata(),
   };
 }

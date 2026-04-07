@@ -4,6 +4,7 @@
  * Supports FTS5 search on attack_patterns_fts + optional tactic/stride/severity filters.
  */
 
+import { buildCitation } from '../citation-universal.js';
 import { sanitizeFtsInput, buildFtsQueryVariants } from '../utils/fts-query.js';
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
 
@@ -83,8 +84,10 @@ export async function handler(
         const sql = `SELECT a.* FROM attack_patterns a JOIN attack_patterns_fts f ON a.rowid = f.rowid WHERE attack_patterns_fts MATCH ?${filterClause} LIMIT ?`;
         const rows = db.prepare(sql).all(variant, ...filterParams, effectiveLimit) as RawAttackPatternRow[];
         if (rows.length > 0) {
+          const parsed = rows.map(parseAttackPattern);
           return {
-            results: rows.map(parseAttackPattern),
+            results: parsed,
+            _citations: parsed.map((r) => buildCitation(r.id, `${r.id} — ${r.name}`, 'get_iam_attack', { id: r.id })),
             _metadata: generateResponseMetadata(),
           };
         }
@@ -117,9 +120,11 @@ export async function handler(
   const whereClause = conditions.length > 0 ? ' WHERE ' + conditions.join(' AND ') : '';
   const sql = `SELECT * FROM attack_patterns${whereClause} LIMIT ?`;
   const rows = db.prepare(sql).all(...conditionParams, effectiveLimit) as RawAttackPatternRow[];
+  const parsed = rows.map(parseAttackPattern);
 
   return {
-    results: rows.map(parseAttackPattern),
+    results: parsed,
+    _citations: parsed.map((r) => buildCitation(r.id, `${r.id} — ${r.name}`, 'get_iam_attack', { id: r.id })),
     _metadata: generateResponseMetadata(),
   };
 }
