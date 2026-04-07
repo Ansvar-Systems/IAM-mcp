@@ -2,6 +2,7 @@
  * get-iam-standard — Lookup a single IAM standard/control by exact ID.
  */
 
+import { buildCitation } from '../citation-universal.js';
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
 
 export interface GetIamStandardInput {
@@ -49,8 +50,18 @@ export async function handler(
 
   const results = row ? [parseStandard(row)] : [];
 
+  const _citations = results.map((r) =>
+    buildCitation(
+      r.id,
+      `${r.framework} — ${r.title}`,
+      'get_iam_standard',
+      { id: r.id },
+    ),
+  );
+
   return {
     results,
+    _citations,
     _metadata: generateResponseMetadata(),
   };
 }

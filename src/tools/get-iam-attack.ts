@@ -5,6 +5,7 @@
  * all tactic variants of a technique (e.g., T1078-IA, T1078-PERS).
  */
 
+import { buildCitation } from '../citation-universal.js';
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
 
 export interface GetIamAttackInput {
@@ -59,8 +60,13 @@ export async function handler(
       .all(params.id + '%', params.id) as RawAttackPatternRow[];
 
     const allRows = [exactRow, ...variantRows];
+    const exactResults = allRows.map(parseAttackPattern);
+    const _citations = exactResults.map((r) =>
+      buildCitation(r.id, `${r.id} — ${r.name}`, 'get_iam_attack', { id: r.id }),
+    );
     return {
-      results: allRows.map(parseAttackPattern),
+      results: exactResults,
+      _citations,
       _metadata: generateResponseMetadata(),
     };
   }
@@ -70,8 +76,14 @@ export async function handler(
     .prepare('SELECT * FROM attack_patterns WHERE id LIKE ?')
     .all(params.id + '%') as RawAttackPatternRow[];
 
+  const prefixResults = prefixRows.map(parseAttackPattern);
+  const _citations = prefixResults.map((r) =>
+    buildCitation(r.id, `${r.id} — ${r.name}`, 'get_iam_attack', { id: r.id }),
+  );
+
   return {
-    results: prefixRows.map(parseAttackPattern),
+    results: prefixResults,
+    _citations,
     _metadata: generateResponseMetadata(),
   };
 }
