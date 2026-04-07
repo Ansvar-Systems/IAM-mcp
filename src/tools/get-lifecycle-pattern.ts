@@ -7,6 +7,7 @@
  */
 
 import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { buildCitation } from '../citation-universal.js';
 
 export interface GetLifecyclePatternInput {
   id?: string;
@@ -56,6 +57,11 @@ export async function handler(
   db: { prepare(sql: string): { get(...params: unknown[]): unknown; all(...params: unknown[]): unknown[] } },
   params: GetLifecyclePatternInput,
 ): Promise<ToolResponse<LifecyclePatternEntry[]>> {
+  const makeCitations = (items: LifecyclePatternEntry[]) =>
+    items.map((r) =>
+      buildCitation(r.id, `${r.name} (${r.category})`, 'get_lifecycle_pattern', { id: r.id }),
+    );
+
   // ID lookup takes precedence
   if (params.id) {
     const row = db
@@ -66,6 +72,7 @@ export async function handler(
 
     return {
       results,
+      _citations: makeCitations(results),
       _metadata: generateResponseMetadata(),
     };
   }
@@ -76,8 +83,11 @@ export async function handler(
       .prepare('SELECT * FROM architecture_patterns WHERE category = ?')
       .all(params.category) as RawPatternRow[];
 
+    const parsed = rows.map(parsePattern);
+
     return {
-      results: rows.map(parsePattern),
+      results: parsed,
+      _citations: makeCitations(parsed),
       _metadata: generateResponseMetadata(),
     };
   }
