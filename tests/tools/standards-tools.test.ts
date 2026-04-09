@@ -43,13 +43,13 @@ describe('get-iam-standard', () => {
     expect(std.title).toContain('Account Management');
     expect(Array.isArray(std.cross_references)).toBe(true);
     expect(std.cross_references.length).toBeGreaterThan(0);
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns empty array for NONEXISTENT', async () => {
     const res = await getIamStandard(db, { id: 'NONEXISTENT' });
     expect(res.results).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
+    expect(res._meta).toBeDefined();
   });
 });
 

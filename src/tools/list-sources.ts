@@ -142,6 +142,6 @@ export async function listSources(
         },
       },
     },
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

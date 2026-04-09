@@ -126,6 +126,6 @@ export async function handler(
       weaknesses: Array.from(weaknessMap.values()),
       components_analyzed: params.components,
     },
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

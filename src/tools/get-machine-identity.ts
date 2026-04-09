@@ -127,6 +127,6 @@ export async function handler(
       technologies: techRows.map(parseEmergingTechnology),
       vendor_configs: vendorConfigRows.map(parseVendorConfig),
     },
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

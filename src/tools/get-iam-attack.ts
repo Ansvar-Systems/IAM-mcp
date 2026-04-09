@@ -5,7 +5,7 @@
  * all tactic variants of a technique (e.g., T1078-IA, T1078-PERS).
  */
 
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface GetIamAttackInput {
   id: string;
@@ -22,6 +22,7 @@ export interface AttackPatternEntry {
   stride_category: string;
   severity: string;
   real_world_examples: string | null;
+  _citation: CitationEntry;
 }
 
 interface RawAttackPatternRow {
@@ -42,6 +43,11 @@ function parseAttackPattern(row: RawAttackPatternRow): AttackPatternEntry {
     ...row,
     sub_techniques: JSON.parse(row.sub_techniques || '[]'),
     mitigation_controls: JSON.parse(row.mitigation_controls || '[]'),
+    _citation: {
+      canonical_ref: row.id,
+      display_text: `MITRE ATT&CK ${row.id}`,
+      lookup: 'get_iam_attack',
+    },
   };
 }
 
@@ -61,7 +67,7 @@ export async function handler(
     const allRows = [exactRow, ...variantRows];
     return {
       results: allRows.map(parseAttackPattern),
-      _metadata: generateResponseMetadata(),
+      _meta: generateResponseMetadata(),
     };
   }
 
@@ -72,6 +78,6 @@ export async function handler(
 
   return {
     results: prefixRows.map(parseAttackPattern),
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

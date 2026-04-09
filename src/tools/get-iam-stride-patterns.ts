@@ -42,7 +42,7 @@ export async function handler(
   if (!sanitized || sanitized.trim().length === 0) {
     return {
       results: [],
-      _metadata: generateResponseMetadata(),
+      _meta: generateResponseMetadata(),
     };
   }
 
@@ -99,6 +99,6 @@ export async function handler(
 
   return {
     results,
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

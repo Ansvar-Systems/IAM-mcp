@@ -6,7 +6,7 @@
  * since the caller may not know the exact category.
  */
 
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface GetAccessModelInput {
   id: string;
@@ -25,6 +25,7 @@ export interface AccessModelEntry {
   weaknesses: string | null;
   compliance_mappings: string[];
   related_patterns: string[];
+  _citation: CitationEntry;
 }
 
 interface RawPatternRow {
@@ -48,6 +49,11 @@ function parsePattern(row: RawPatternRow): AccessModelEntry {
     components: JSON.parse(row.components || '[]'),
     compliance_mappings: JSON.parse(row.compliance_mappings || '[]'),
     related_patterns: JSON.parse(row.related_patterns || '[]'),
+    _citation: {
+      canonical_ref: row.id,
+      display_text: row.name,
+      lookup: 'get_access_model',
+    },
   };
 }
 
@@ -71,6 +77,6 @@ export async function handler(
 
   return {
     results,
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

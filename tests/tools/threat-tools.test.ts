@@ -53,7 +53,7 @@ describe('get-iam-attack', () => {
     expect(attack.mitigation_controls.length).toBeGreaterThan(0);
     expect(attack.stride_category).toBe('spoofing');
     expect(attack.severity).toBe('high');
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
 
     // All results should have IDs starting with T1110
     for (const r of res.results) {
@@ -75,7 +75,7 @@ describe('get-iam-attack', () => {
   it('returns empty array for nonexistent technique', async () => {
     const res = await getIamAttack(db, { id: 'T9999' });
     expect(res.results).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
+    expect(res._meta).toBeDefined();
   });
 });
 
@@ -161,13 +161,13 @@ describe('get-iam-weakness', () => {
     expect(weakness.affected_protocols.length).toBeGreaterThan(0);
     expect(weakness.stride_category).toBeTruthy();
     expect(weakness.severity).toBeTruthy();
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns empty array for nonexistent CWE', async () => {
     const res = await getIamWeakness(db, { cwe_id: 'CWE-99999' });
     expect(res.results).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
+    expect(res._meta).toBeDefined();
   });
 });
 
@@ -191,7 +191,7 @@ describe('assess-iam-posture', () => {
     const weaknessIds = res.results.weaknesses.map((w: { cwe_id: string }) => w.cwe_id);
     expect(new Set(weaknessIds).size).toBe(weaknessIds.length);
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns results filtered by stride category', async () => {

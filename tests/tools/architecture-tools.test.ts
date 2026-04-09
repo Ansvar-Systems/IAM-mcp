@@ -48,13 +48,13 @@ describe('get-protocol', () => {
     expect(protocol.deprecated).toBe(false);
     expect(protocol.rfc).toBeTruthy();
     expect(protocol.sequence_diagram).toBeTruthy();
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns empty results for NONEXISTENT', async () => {
     const res = await getProtocol(db, { id: 'NONEXISTENT' });
     expect(res.results).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
+    expect(res._meta).toBeDefined();
   });
 });
 
@@ -78,13 +78,13 @@ describe('get-access-model', () => {
     expect(model.compliance_mappings.length).toBeGreaterThan(0);
     expect(Array.isArray(model.related_patterns)).toBe(true);
     expect(model.related_patterns.length).toBeGreaterThan(0);
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns empty results for NONEXISTENT', async () => {
     const res = await getAccessModel(db, { id: 'NONEXISTENT' });
     expect(res.results).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
+    expect(res._meta).toBeDefined();
   });
 });
 
@@ -108,7 +108,7 @@ describe('recommend-architecture', () => {
       expect(typeof rec.score).toBe('number');
       expect(rec.score).toBeGreaterThan(0);
     }
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 });
 
@@ -132,7 +132,7 @@ describe('get-lifecycle-pattern', () => {
     expect(pattern.compliance_mappings.length).toBeGreaterThan(0);
     expect(Array.isArray(pattern.related_patterns)).toBe(true);
     expect(pattern.related_patterns.length).toBeGreaterThan(0);
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns all lifecycle patterns when category is "lifecycle"', async () => {
@@ -163,7 +163,7 @@ describe('get-zero-trust-pattern', () => {
     }
     // Should also include ZT architecture patterns
     expect(Array.isArray(res.results.patterns)).toBe(true);
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns all maturity levels for identity pillar when no maturity specified', async () => {

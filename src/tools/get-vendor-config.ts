@@ -4,7 +4,7 @@
  * Supports lookup by vendor + optional feature filter, with JSON field parsing.
  */
 
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface GetVendorConfigInput {
   vendor: string;
@@ -28,6 +28,7 @@ export interface VendorConfigEntry {
   common_misconfigurations: MisconfigurationEntry[];
   compliance_controls: string[];
   equivalent_in: Record<string, string>;
+  _citation: CitationEntry;
 }
 
 interface RawVendorConfigRow {
@@ -48,6 +49,11 @@ function parseVendorConfig(row: RawVendorConfigRow): VendorConfigEntry {
     common_misconfigurations: JSON.parse(row.common_misconfigurations || '[]'),
     compliance_controls: JSON.parse(row.compliance_controls || '[]'),
     equivalent_in: JSON.parse(row.equivalent_in || '{}'),
+    _citation: {
+      canonical_ref: row.id,
+      display_text: `${row.vendor} — ${row.feature}`,
+      lookup: 'get_vendor_config',
+    },
   };
 }
 
@@ -72,6 +78,6 @@ export async function handler(
 
   return {
     results: rows.map(parseVendorConfig),
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

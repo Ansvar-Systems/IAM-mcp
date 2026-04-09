@@ -1,0 +1,77 @@
+name: Scheduled Database Rebuild
+
+on:
+  schedule:
+    # Rebuild monthly on the 1st at 02:00 UTC
+    - cron: '0 2 1 * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force rebuild even if no drift detected'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  ingest:
+    name: Rebuild IAM database
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ingest pipeline
+        run: npx tsx scripts/ingest.ts
+
+      - name: Build database
+        run: npx tsx scripts/build-db.ts
+
+      - name: Verify database
+        run: |
+          if [ ! -f data/database.db ]; then
+            echo "ERROR: data/database.db was not created"
+            exit 1
+          fi
+          SIZE=$(stat -c%s data/database.db)
+          echo "Database size: ${SIZE} bytes"
+          if [ "$SIZE" -lt 1000 ]; then
+            echo "ERROR: Database is suspiciously small (${SIZE} bytes)"
+            exit 1
+          fi
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/db-rebuild-${{ github.run_id }}
+          base: dev
+          title: 'chore: scheduled database rebuild'
+          body: |
+            ## Scheduled database rebuild
+
+            This PR was automatically created by the monthly ingest pipeline.
+
+            - Triggered by: ${{ github.event_name }}
+            - Run ID: ${{ github.run_id }}
+            - Built at: ${{ github.event.repository.updated_at }}
+
+            Review the database diff before merging.
+          commit-message: 'chore: rebuild IAM database from upstream sources'
+          add-paths: |
+            data/database.db
+            data/seed

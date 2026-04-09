@@ -58,6 +58,6 @@ export async function handler(
 
   return {
     results,
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

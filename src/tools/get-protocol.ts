@@ -5,7 +5,7 @@
  * recommended use-cases, RFC references, and sequence diagrams.
  */
 
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface GetProtocolInput {
   id: string;
@@ -21,6 +21,7 @@ export interface ProtocolEntry {
   deprecated: boolean;
   rfc: string | null;
   sequence_diagram: string | null;
+  _citation: CitationEntry;
 }
 
 interface RawProtocolRow {
@@ -40,6 +41,11 @@ function parseProtocol(row: RawProtocolRow): ProtocolEntry {
     ...row,
     recommended_for: JSON.parse(row.recommended_for || '[]'),
     deprecated: row.deprecated === 1,
+    _citation: {
+      canonical_ref: row.id,
+      display_text: row.protocol,
+      lookup: 'get_protocol',
+    },
   };
 }
 
@@ -53,6 +59,6 @@ export async function handler(
 
   return {
     results,
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

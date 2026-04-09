@@ -5,7 +5,7 @@
  */
 
 import { sanitizeFtsInput, buildFtsQueryVariants } from '../utils/fts-query.js';
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface SearchIamThreatsInput {
   query?: string;
@@ -26,6 +26,7 @@ export interface AttackPatternEntry {
   stride_category: string;
   severity: string;
   real_world_examples: string | null;
+  _citation: CitationEntry;
 }
 
 interface RawAttackPatternRow {
@@ -46,6 +47,11 @@ function parseAttackPattern(row: RawAttackPatternRow): AttackPatternEntry {
     ...row,
     sub_techniques: JSON.parse(row.sub_techniques || '[]'),
     mitigation_controls: JSON.parse(row.mitigation_controls || '[]'),
+    _citation: {
+      canonical_ref: row.id,
+      display_text: `MITRE ATT&CK ${row.id}`,
+      lookup: 'get_iam_attack',
+    },
   };
 }
 
@@ -85,7 +91,7 @@ export async function handler(
         if (rows.length > 0) {
           return {
             results: rows.map(parseAttackPattern),
-            _metadata: generateResponseMetadata(),
+            _meta: generateResponseMetadata(),
           };
         }
       } catch {
@@ -120,6 +126,6 @@ export async function handler(
 
   return {
     results: rows.map(parseAttackPattern),
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

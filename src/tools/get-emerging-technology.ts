@@ -4,7 +4,7 @@
  * Supports lookup by exact ID, by category, or returns all technologies.
  */
 
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface GetEmergingTechnologyInput {
   id?: string;
@@ -23,6 +23,7 @@ export interface EmergingTechnologyEntry {
   use_cases: string[];
   migration_from: string | null;
   vendor_support: Record<string, string>;
+  _citation: CitationEntry;
 }
 
 interface RawEmergingTechnologyRow {
@@ -44,6 +45,11 @@ function parseEmergingTechnology(row: RawEmergingTechnologyRow): EmergingTechnol
     standards: JSON.parse(row.standards || '[]'),
     use_cases: JSON.parse(row.use_cases || '[]'),
     vendor_support: JSON.parse(row.vendor_support || '{}'),
+    _citation: {
+      canonical_ref: row.id,
+      display_text: row.name,
+      lookup: 'get_emerging_technology',
+    },
   };
 }
 
@@ -66,6 +72,6 @@ export async function handler(
 
   return {
     results: rows.map(parseEmergingTechnology),
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

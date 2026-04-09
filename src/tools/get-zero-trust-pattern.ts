@@ -118,6 +118,6 @@ export async function handler(
       standards: standardRows.map(parseStandard),
       patterns: patternRows.map(parsePattern),
     },
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

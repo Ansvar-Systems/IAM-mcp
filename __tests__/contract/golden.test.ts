@@ -74,7 +74,7 @@ interface GoldenFixture {
 // Tool dispatch map
 // ────────────────────────────────────────────────────────
 
-type ToolHandler = (db: InstanceType<typeof Database>, input: never) => Promise<{ results: unknown; _metadata: unknown }>;
+type ToolHandler = (db: InstanceType<typeof Database>, input: never) => Promise<{ results: unknown; _meta: unknown }>;
 
 const toolHandlers: Record<string, ToolHandler> = {
   get_iam_standard: getIamStandard as ToolHandler,
@@ -133,8 +133,8 @@ afterAll(() => {
  * Extract the results data from the handler response.
  *
  * Handlers return either:
- * - { results: SomeObject[], _metadata } — array of results
- * - { results: { threats, weaknesses, ... }, _metadata } — complex object
+ * - { results: SomeObject[], _meta } — array of results
+ * - { results: { threats, weaknesses, ... }, _meta } — complex object
  *
  * For assertions that check array length (result_not_empty, min_results),
  * we need to determine what the "results" looks like.
@@ -238,7 +238,7 @@ describe('Golden contract tests', () => {
 
           const response = await handler(db, test.input as never);
           expect(response).toBeDefined();
-          expect(response._metadata).toBeDefined();
+          expect(response._meta).toBeDefined();
 
           const { results } = response;
 

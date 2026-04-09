@@ -62,7 +62,7 @@ describe('get-emerging-technology', () => {
     expect(tech.vendor_support).toHaveProperty('google');
     expect(tech.vendor_support).toHaveProperty('microsoft');
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns all passwordless technologies for category "passwordless"', async () => {
@@ -82,15 +82,15 @@ describe('get-emerging-technology', () => {
     const ids = res.results.map((t: { id: string }) => t.id);
     expect(ids).toContain('passkeys-fido2');
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns empty results for NONEXISTENT id', async () => {
     const res = await getEmergingTechnology(db, { id: 'NONEXISTENT' });
 
     expect(res.results).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta).toBeDefined();
+    expect(res._meta.domain).toBe('iam');
   });
 });
 
@@ -124,7 +124,7 @@ describe('get-machine-identity', () => {
     );
     expect(hasMachineRelated).toBe(true);
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns all machine identity technologies when no platform specified', async () => {
@@ -142,7 +142,7 @@ describe('get-machine-identity', () => {
     // Should NOT have vendor_configs when no platform is specified
     expect(res.results.vendor_configs).toHaveLength(0);
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 });
 
@@ -182,6 +182,6 @@ describe('assess-iam-maturity', () => {
     expect(Array.isArray(res.results.reference_standards)).toBe(true);
     expect(res.results.reference_standards.length).toBeGreaterThan(0);
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 });

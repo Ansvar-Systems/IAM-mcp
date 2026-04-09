@@ -59,7 +59,7 @@ describe('get-vendor-config', () => {
     expect(config.equivalent_in).not.toBeNull();
     expect(Array.isArray(config.equivalent_in)).toBe(false);
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns all configs for a vendor when only vendor is provided', async () => {
@@ -78,8 +78,8 @@ describe('get-vendor-config', () => {
     const res = await getVendorConfig(db, { vendor: 'NONEXISTENT' });
 
     expect(res.results).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta).toBeDefined();
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('respects limit parameter', async () => {
@@ -127,7 +127,7 @@ describe('compare-vendors', () => {
       expect(typeof config.equivalent_in).toBe('object');
     }
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('compares across all vendors when no vendor filter is provided', async () => {
@@ -139,7 +139,7 @@ describe('compare-vendors', () => {
     const vendors = new Set(res.results.map((r: { vendor: string }) => r.vendor));
     expect(vendors.size).toBeGreaterThan(1);
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 });
 
@@ -161,7 +161,7 @@ describe('get-misconfigurations', () => {
       expect(['critical', 'high', 'medium', 'low']).toContain(misconfig.severity);
     }
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns misconfigurations across all vendors when no vendor specified', async () => {
@@ -178,7 +178,7 @@ describe('get-misconfigurations', () => {
       expect(misconfig.severity).toBeTruthy();
     }
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('filters misconfigurations by severity', async () => {
@@ -224,7 +224,7 @@ describe('get-migration-path', () => {
     expect(res.results.from_vendor).toBe('okta');
     expect(res.results.to_vendor).toBe('azure-entra');
 
-    expect(res._metadata.domain).toBe('iam');
+    expect(res._meta.domain).toBe('iam');
   });
 
   it('returns empty mappings when source vendor has no configs', async () => {
@@ -232,6 +232,6 @@ describe('get-migration-path', () => {
 
     expect(res.results.mappings).toHaveLength(0);
     expect(res.results.gaps).toHaveLength(0);
-    expect(res._metadata).toBeDefined();
+    expect(res._meta).toBeDefined();
   });
 });
