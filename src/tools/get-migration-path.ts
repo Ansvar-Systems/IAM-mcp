@@ -70,6 +70,6 @@ export async function handler(
       mappings,
       gaps,
     },
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

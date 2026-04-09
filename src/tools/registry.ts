@@ -51,6 +51,7 @@ import { handler as assessIamMaturity, type AssessIamMaturityInput } from './ass
 // --- Meta tools ---
 import { listSources } from './list-sources.js';
 import { getAbout, type AboutContext } from './about.js';
+import { checkDataFreshness } from './check-data-freshness.js';
 export type { AboutContext } from './about.js';
 
 // ────────────────────────────────────────────────────────
@@ -75,6 +76,16 @@ const LIST_SOURCES_TOOL: Tool = {
     'Each source includes authority, URL, licence, coverage scope, update frequency, and limitations. ' +
     'Also returns dataset statistics (row counts per table) and database build timestamp. ' +
     'Call this FIRST when you need to understand what IAM data this server covers.',
+  inputSchema: { type: 'object', properties: {} },
+};
+
+const CHECK_DATA_FRESHNESS_TOOL: Tool = {
+  name: 'check_data_freshness',
+  description:
+    'Returns the database build timestamp, age in days, and freshness status (fresh/stale/unknown). ' +
+    'Use this to determine if the IAM dataset is current before relying on time-sensitive guidance ' +
+    'such as threat intelligence, vendor configurations, or emerging technology recommendations. ' +
+    'Staleness threshold is 90 days.',
   inputSchema: { type: 'object', properties: {} },
 };
 
@@ -748,6 +759,7 @@ export function buildTools(
 
   // --- Meta tools (always available) ---
   tools.push(LIST_SOURCES_TOOL);
+  tools.push(CHECK_DATA_FRESHNESS_TOOL);
   if (context) {
     tools.push(ABOUT_TOOL);
   }
@@ -857,6 +869,9 @@ export function registerTools(
         case 'list_sources':
           result = await listSources(db);
           break;
+        case 'check_data_freshness':
+          result = await checkDataFreshness(db);
+          break;
         case 'about':
           if (context) {
             result = getAbout(db, context);
@@ -880,8 +895,17 @@ export function registerTools(
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      const errorResponse = {
+        error: message,
+        _error_type: 'tool_execution_error',
+        _meta: {
+          data_source: 'IAM Expert MCP Server',
+          domain: 'iam',
+          disclaimer: 'An error occurred while processing the tool request.',
+        },
+      };
       return {
-        content: [{ type: 'text' as const, text: `Error: ${message}` }],
+        content: [{ type: 'text' as const, text: JSON.stringify(errorResponse, null, 2) }],
         isError: true,
       };
     }

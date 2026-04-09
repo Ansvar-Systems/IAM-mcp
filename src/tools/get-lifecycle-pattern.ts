@@ -66,7 +66,7 @@ export async function handler(
 
     return {
       results,
-      _metadata: generateResponseMetadata(),
+      _meta: generateResponseMetadata(),
     };
   }
 
@@ -78,13 +78,13 @@ export async function handler(
 
     return {
       results: rows.map(parsePattern),
-      _metadata: generateResponseMetadata(),
+      _meta: generateResponseMetadata(),
     };
   }
 
   // No params — return empty
   return {
     results: [],
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

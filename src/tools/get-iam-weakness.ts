@@ -2,7 +2,7 @@
  * get-iam-weakness — Lookup a CWE IAM weakness by CWE ID.
  */
 
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface GetIamWeaknessInput {
   cwe_id: string;
@@ -19,6 +19,7 @@ export interface WeaknessEntry {
   severity: string;
   detection_guidance: string | null;
   remediation: string | null;
+  _citation: CitationEntry;
 }
 
 interface RawWeaknessRow {
@@ -39,6 +40,11 @@ function parseWeakness(row: RawWeaknessRow): WeaknessEntry {
     ...row,
     capec_ids: JSON.parse(row.capec_ids || '[]'),
     affected_protocols: JSON.parse(row.affected_protocols || '[]'),
+    _citation: {
+      canonical_ref: row.cwe_id,
+      display_text: `CWE-${row.cwe_id}`,
+      lookup: 'get_iam_weakness',
+    },
   };
 }
 
@@ -52,6 +58,6 @@ export async function handler(
 
   return {
     results,
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

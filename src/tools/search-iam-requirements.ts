@@ -3,7 +3,7 @@
  */
 
 import { sanitizeFtsInput, buildFtsQueryVariants } from '../utils/fts-query.js';
-import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
+import { generateResponseMetadata, type ToolResponse, type CitationEntry } from '../utils/metadata.js';
 
 export interface SearchIamRequirementsInput {
   query?: string;
@@ -23,6 +23,7 @@ export interface StandardEntry {
   zero_trust_pillar: string | null;
   maturity_level: string | null;
   cross_references: string[];
+  _citation: CitationEntry;
 }
 
 interface RawStandardRow {
@@ -39,9 +40,17 @@ interface RawStandardRow {
 }
 
 function parseStandard(row: RawStandardRow): StandardEntry {
+  const displayText = row.section
+    ? `${row.framework} ${row.section}`
+    : `${row.framework} ${row.id}`;
   return {
     ...row,
     cross_references: JSON.parse(row.cross_references || '[]'),
+    _citation: {
+      canonical_ref: row.id,
+      display_text: displayText,
+      lookup: 'get_iam_standard',
+    },
   };
 }
 
@@ -77,7 +86,7 @@ export async function handler(
         if (rows.length > 0) {
           return {
             results: rows.map(parseStandard),
-            _metadata: generateResponseMetadata(),
+            _meta: generateResponseMetadata(),
           };
         }
       } catch {
@@ -108,6 +117,6 @@ export async function handler(
 
   return {
     results: rows.map(parseStandard),
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

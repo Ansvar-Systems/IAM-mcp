@@ -75,6 +75,6 @@ export async function handler(
 
   return {
     results: { compliant, gaps, coverage_percent },
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

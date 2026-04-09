@@ -65,7 +65,7 @@ export async function handler(
   if (variants.length === 0) {
     return {
       results: [],
-      _metadata: generateResponseMetadata(),
+      _meta: generateResponseMetadata(),
     };
   }
 
@@ -90,7 +90,7 @@ export async function handler(
       if (rows.length > 0) {
         return {
           results: rows.map(parseVendorConfig),
-          _metadata: generateResponseMetadata(),
+          _meta: generateResponseMetadata(),
         };
       }
     } catch {
@@ -102,6 +102,6 @@ export async function handler(
   // All FTS variants returned nothing
   return {
     results: [],
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

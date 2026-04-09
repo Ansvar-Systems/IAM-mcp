@@ -15,12 +15,12 @@ describe('generateResponseMetadata', () => {
     const meta = generateResponseMetadata();
     expect(meta.disclaimer).toContain('not legal advice');
   });
-  it('includes freshness when provided', () => {
+  it('includes data_age when provided', () => {
     const meta = generateResponseMetadata('2026-02-21T00:00:00Z');
-    expect(meta.freshness).toBe('2026-02-21T00:00:00Z');
+    expect(meta.data_age).toBe('2026-02-21T00:00:00Z');
   });
-  it('freshness is undefined when not provided', () => {
+  it('data_age is undefined when not provided', () => {
     const meta = generateResponseMetadata();
-    expect(meta.freshness).toBeUndefined();
+    expect(meta.data_age).toBeUndefined();
   });
 });

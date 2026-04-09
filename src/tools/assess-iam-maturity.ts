@@ -302,6 +302,6 @@ export async function handler(
       recommendations,
       reference_standards,
     },
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }

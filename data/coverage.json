@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-04-09",
+  "domain": "iam",
+  "tables": {
+    "standards": {
+      "description": "IAM standards and controls from NIST, OWASP, CIS, CISA",
+      "sources": ["NIST SP 800-53 AC family", "NIST SP 800-63", "NIST SP 800-207", "NIST SP 800-162", "OWASP ASVS V2/V3/V4", "CIS Controls v8 (5, 6)", "CISA Zero Trust Maturity Model"],
+      "estimated_rows": "200-400"
+    },
+    "protocols": {
+      "description": "Identity protocol specifications and flow details",
+      "sources": ["IETF OAuth 2.0/2.1 RFCs", "IETF SCIM RFCs", "OpenID Foundation OIDC Core", "OASIS SAML 2.0", "W3C WebAuthn", "FIDO Alliance Passkey guidance"],
+      "estimated_rows": "30-60"
+    },
+    "attack_patterns": {
+      "description": "MITRE ATT&CK IAM-relevant attack techniques",
+      "sources": ["MITRE ATT&CK (STIX/TAXII API)"],
+      "estimated_rows": "50-100"
+    },
+    "iam_weaknesses": {
+      "description": "CWE and CAPEC IAM-related weakness entries",
+      "sources": ["CWE identity/access families (XML)", "CAPEC identity attack patterns (XML)"],
+      "estimated_rows": "50-100"
+    },
+    "architecture_patterns": {
+      "description": "Access models and IAM architecture patterns",
+      "sources": ["NIST SP 800-207 Zero Trust", "NIST SP 800-162 ABAC", "industry best practice (RBAC, PBAC, PAM)"],
+      "estimated_rows": "20-40"
+    },
+    "vendor_configurations": {
+      "description": "Vendor-specific IAM configuration guidance",
+      "sources": ["Azure Entra ID docs", "AWS IAM docs", "GCP IAM docs", "Okta/Auth0 docs", "Ping/ForgeRock docs", "CyberArk docs", "SailPoint docs"],
+      "estimated_rows": "100-200"
+    },
+    "compliance_mappings": {
+      "description": "Cross-framework compliance control mappings",
+      "sources": ["ISO 27001/27002 identity controls", "SOC 2 CC6 criteria", "NIST CSF cross-mapping"],
+      "estimated_rows": "100-200"
+    },
+    "emerging_technologies": {
+      "description": "Emerging IAM technologies and adoption guidance",
+      "sources": ["W3C DIDs", "W3C Verifiable Credentials", "FIDO2/Passkeys", "Decentralized Identity Foundation"],
+      "estimated_rows": "20-50"
+    }
+  },
+  "meta_tools": ["about", "list_sources", "check_data_freshness"],
+  "domain_tools": 22,
+  "total_data_sources": 22
+}

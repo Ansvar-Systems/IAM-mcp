@@ -80,6 +80,6 @@ export async function handler(
 
   return {
     results: results.slice(0, effectiveLimit),
-    _metadata: generateResponseMetadata(),
+    _meta: generateResponseMetadata(),
   };
 }
