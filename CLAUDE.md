@@ -8,14 +8,14 @@
 
 ## Project Overview
 
-IAM Expert MCP server providing identity and access management intelligence via Model Context Protocol. Covers standards advisory (NIST/ISO/CIS/Zero Trust), threat patterns (MITRE ATT&CK/CWE/CAPEC), protocol deep-dives (OAuth/OIDC/SAML/FIDO2), architecture patterns (RBAC/ABAC/PAM), vendor configurations (Azure/AWS/GCP/Okta/CyberArk), compliance cross-mapping, and emerging technology tracking. Strategy A deployment (Vercel, bundled SQLite DB).
+IAM Expert MCP server providing identity and access management intelligence via Model Context Protocol. Covers standards advisory (NIST/ISO/Zero Trust), threat patterns (MITRE ATT&CK/CWE/CAPEC), protocol deep-dives (OAuth/OIDC/SAML/FIDO2), architecture patterns (RBAC/ABAC/PAM), vendor configurations (Azure/AWS/GCP/Okta/CyberArk), compliance cross-mapping, and emerging technology tracking. Distributed as npm stdio package only (Vercel removed 2026-04-26).
 
 ## Architecture
 
-- **Transport:** Dual-channel -- stdio (npm package) + Streamable HTTP (Vercel serverless)
+- **Transport:** stdio (npm package only — Vercel removed 2026-04-26)
 - **Database:** SQLite + FTS5 via `@ansvar/mcp-sqlite` (WASM-compatible, no WAL mode)
-- **Entry points:** `src/index.ts` (stdio), `api/mcp.ts` (Vercel HTTP)
-- **Tool registry:** `src/tools/registry.ts` -- shared between both transports
+- **Entry point:** `src/index.ts` (stdio)
+- **Tool registry:** `src/tools/registry.ts`
 - **Capability gating:** `src/capabilities.ts` -- detects available DB tables at runtime
 - **Tables:** 8 domain tables (`standards`, `protocols`, `attack_patterns`, `iam_weaknesses`, `architecture_patterns`, `vendor_configurations`, `compliance_mappings`, `emerging_technologies`)
 - **Tools:** 22 domain tools + 2 meta tools (`list_sources`, `about`) across 5 categories
@@ -39,8 +39,7 @@ IAM Expert MCP server providing identity and access management intelligence via 
 ## Database
 
 - Schema defined inline in `scripts/build-db.ts`
-- Journal mode: DELETE (not WAL -- required for Vercel serverless)
-- Runtime: copied to `/tmp/database.db` on Vercel cold start
+- Journal mode: DELETE (not WAL)
 - Metadata: `db_metadata` table stores tier, schema_version, built_at, builder
 
 ## Data Pipeline
@@ -58,7 +57,6 @@ IAM Expert MCP server providing identity and access management intelligence via 
 - **NIST** (SP 800-63, 800-53 AC family, 800-207, 800-162) -- US Government, public domain
 - **MITRE** (ATT&CK, CWE, CAPEC) -- Apache-2.0 / terms of use
 - **OWASP** (ASVS V2/V3/V4) -- CC BY-SA 4.0
-- **CIS** (Controls v8 -- Controls 5, 6) -- CIS Terms of Use
 - **CISA** (Zero Trust Maturity Model) -- US Government, public domain
 - **IETF** (OAuth 2.0/2.1 RFCs, SCIM RFCs) -- IETF Trust License
 - **OpenID Foundation** (OIDC Core) -- Apache-2.0
@@ -69,8 +67,10 @@ IAM Expert MCP server providing identity and access management intelligence via 
 - **SOC 2** (CC6 criteria) -- fair use cross-mapping
 - **Vendor docs** (Azure Entra, AWS IAM, GCP IAM, Okta/Auth0, Ping/ForgeRock, CyberArk, SailPoint) -- advisory summaries under fair use
 
+**Removed sources:**
+- **CIS Controls v8** (Controls 5, 6) -- removed 2026-04-26; non-commercial-only license conflicts with commercial gateway use. Phase 4 backfill candidates: NIST CSF 2.0, CISA guidance (both public domain). Check fleet-overlap with `security-controls` MCP before adding new ingestion.
+
 ## Deployment
 
-- Vercel Strategy A: DB bundled in `data/database.db`, included via `vercel.json` includeFiles
 - npm package: `@ansvar/iam-mcp` with bin entry for stdio
-- Estimated DB size: ~80-150 MB (Tier 1 bundled deployment)
+- Estimated DB size: ~80-150 MB (bundled deployment)

@@ -418,7 +418,7 @@ export function buildDatabase(dbPath?: string): void {
     insertMeta.run('built_at', new Date().toISOString());
     insertMeta.run('builder', 'build-db.ts');
     insertMeta.run('domain', 'iam');
-    insertMeta.run('source', 'NIST SP 800-63/800-53/800-207, MITRE ATT&CK/CWE/CAPEC, OWASP ASVS, CIS Controls, CISA Zero Trust, IETF RFCs, OpenID/FIDO/W3C, ISO 27001/27002, SOC 2, Vendor docs');
+    insertMeta.run('source', 'NIST SP 800-63/800-53/800-207, MITRE ATT&CK/CWE/CAPEC, OWASP ASVS, CISA Zero Trust, IETF RFCs, OpenID/FIDO/W3C, ISO 27001/27002, SOC 2, Vendor docs');
     insertMeta.run('licence', 'Mixed: Public Domain (NIST/CISA), Apache-2.0 (OIDC), MITRE Terms of Use (ATT&CK/CWE/CAPEC), CC BY-SA 4.0 (OWASP), Fair Use (vendor guidance/ISO/SOC 2)');
   })();
 

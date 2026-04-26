@@ -1,8 +1,8 @@
 {
   "name": "@ansvar/iam-mcp",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "mcpName": "eu.ansvar/iam-mcp",
-  "description": "IAM expert MCP: standards advisory (NIST/ISO/CIS/Zero Trust), threat patterns (MITRE ATT&CK/CWE/CAPEC), protocol deep-dives (OAuth/OIDC/SAML/FIDO2), architecture patterns (RBAC/ABAC/PAM), vendor configurations (Azure/AWS/GCP/Okta), compliance cross-mapping, and emerging technology tracking",
+  "description": "IAM expert MCP: standards advisory (NIST/ISO/Zero Trust), threat patterns (MITRE ATT&CK/CWE/CAPEC), protocol deep-dives (OAuth/OIDC/SAML/FIDO2), architecture patterns (RBAC/ABAC/PAM), vendor configurations (Azure/AWS/GCP/Okta), compliance cross-mapping, and emerging technology tracking",
   "author": "Ansvar Systems AB <hello@ansvar.ai>",
   "license": "Apache-2.0",
   "type": "module",
@@ -42,7 +42,6 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.15.29",
-    "@vercel/node": "^5.6.4",
     "better-sqlite3": "^12.6.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",

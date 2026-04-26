@@ -5,9 +5,19 @@
       "name": "Access Token Manipulation",
       "tactic": "privilege-escalation",
       "description": "Adversaries may modify access tokens to operate under a different user or system security context to perform actions and bypass access controls. Windows uses access tokens to determine the ownership of a running process and what privileges are associated with it. An adversary can use built-in Windows API functions to copy access tokens from existing processes, create new tokens with duplicated privileges, or modify tokens to impersonate other users. This technique allows adversaries to escalate privileges without needing the target user's credentials by manipulating the security tokens that Windows uses for authorization decisions.",
-      "sub_techniques": ["T1134.001", "T1134.002", "T1134.003", "T1134.004", "T1134.005"],
+      "sub_techniques": [
+        "T1134.001",
+        "T1134.002",
+        "T1134.003",
+        "T1134.004",
+        "T1134.005"
+      ],
       "detection_guidance": "Monitor for Windows API calls associated with token manipulation: DuplicateTokenEx, ImpersonateLoggedOnUser, SetThreadToken, CreateProcessWithTokenW, and AdjustTokenPrivileges. Alert on Sysmon Event ID 10 (ProcessAccess) targeting privileged processes like lsass.exe. Monitor Windows Event ID 4624 with Logon Type 9 (NewCredentials) and Event ID 4672 (special privileges assigned to new logon). Track runas.exe usage and PowerShell token manipulation cmdlets. Alert on processes running with unexpected security context mismatches between parent and child processes.",
-      "mitigation_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-3", "CIS-5.4", "CIS-6.8", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-3",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "Multiple APT groups use token manipulation for privilege escalation. Cobalt Strike's token stealing and make_token commands implement this technique. Metasploit's incognito module provides comprehensive token manipulation capabilities."
@@ -19,7 +29,11 @@
       "description": "Adversaries may duplicate and then impersonate another user's token to escalate privileges and bypass access controls. An adversary can create a new access token that duplicates an existing token using DuplicateToken or DuplicateTokenEx, then use the duplicate token with ImpersonateLoggedOnUser to allow the calling thread to impersonate the token owner. This is commonly used to escalate from a local administrator to SYSTEM by stealing the token of a SYSTEM-level process, or to impersonate a domain administrator whose token exists on the compromised system. Tools like Incognito and Cobalt Strike automate this technique.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for DuplicateTokenEx and ImpersonateLoggedOnUser API calls from non-standard processes. Alert on processes that change their security context after initial creation (token replacement). Monitor Sysmon Event ID 10 for process access to high-privilege processes (lsass.exe, services.exe, winlogon.exe) with PROCESS_QUERY_INFORMATION access rights. Track Windows Event ID 4624 Logon Type 9 events and correlate with subsequent privileged operations. Monitor for Cobalt Strike beacon behaviors associated with token manipulation.",
-      "mitigation_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-3", "CIS-5.4", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-3",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "APT41 and FIN7 use token impersonation for privilege escalation. Cobalt Strike operators routinely steal tokens from domain admin sessions. The Juicy Potato and PrintSpoofer exploits leverage token impersonation for SYSTEM-level access."
@@ -31,7 +45,11 @@
       "description": "Adversaries may create a new process with a duplicated token to escalate privileges and bypass access controls. This technique uses the CreateProcessWithTokenW or CreateProcessAsUserW Windows API functions to create a new process running under the security context of a different user's token. The adversary first obtains a handle to a token (through theft, duplication, or impersonation), then uses it to spawn a new process with the desired privilege level. This is a core technique for privilege escalation on Windows systems and is implemented in most post-exploitation frameworks.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for CreateProcessWithTokenW and CreateProcessAsUserW API calls from unexpected processes. Alert on new processes where the owner SID does not match the parent process owner SID. Track Windows Event ID 4688 (process creation) with Token Elevation Type 2 (elevated token) from non-standard parent processes. Monitor for runas.exe /netonly usage which creates processes with alternate tokens. Correlate process creation events with token manipulation events to identify privilege escalation chains.",
-      "mitigation_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-3", "CIS-5.4", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-3",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "Most post-exploitation frameworks (Cobalt Strike, Metasploit, Sliver) implement this technique for privilege escalation. APT groups routinely use this to spawn shells under different security contexts."
@@ -43,7 +61,11 @@
       "description": "Adversaries may make and impersonate tokens to escalate privileges and bypass access controls. If an adversary has a username and password but the user is not logged on to the system, the adversary can create a logon session for the user using LogonUser and use the resulting token with ImpersonateLoggedOnUser or SetThreadToken. This creates a new logon session with the specified credentials without requiring interactive logon, allowing the adversary to operate under the target user's security context. This technique is commonly used with credentials obtained through credential dumping or other credential access techniques.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for LogonUser API calls (Event ID 4624 Logon Type 9 - NewCredentials) from non-standard processes. Alert on processes creating logon sessions for accounts that are not interactively logged on to the system. Track Windows Event ID 4624 for logons from unexpected processes, especially when followed by privileged operations. Monitor for Cobalt Strike make_token command patterns. Correlate token creation events with subsequent file system and network access under the new security context.",
-      "mitigation_controls": ["NIST-800-53-AC-6", "NIST-800-53-IA-2(1)", "CIS-5.4", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6",
+        "NIST-800-53-IA-2(1)",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "Cobalt Strike's make_token command implements this technique. APT29 has used token manipulation extensively during the SolarWinds campaign for lateral movement and privilege escalation."
@@ -55,7 +77,11 @@
       "description": "Adversaries may spoof the parent process identifier (PPID) of a new process to evade process-monitoring defenses or elevate privileges. New processes are typically spawned directly from their parent, or calling, process unless explicitly specified. By spoofing the PPID, adversaries can make their process appear to be spawned by a different (potentially more trusted) parent process. This can be used to bypass security controls that rely on parent-child process relationships for detection, and in some cases to inherit the security token of the spoofed parent process, enabling privilege escalation.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for processes where the PPID does not match the expected parent process. Alert on processes that use CreateProcess with PROC_THREAD_ATTRIBUTE_PARENT_PROCESS attribute set to a different process. Track Sysmon Event ID 1 (Process Create) for parent-child process mismatches where the ParentProcessId does not match expected parent-child relationships. Monitor for NtCreateUserProcess calls with unusual parent process specifications. Correlate process creation events with ETW process creation traces for PPID discrepancies.",
-      "mitigation_controls": ["NIST-800-53-SI-7", "NIST-800-53-SI-4", "CIS-8.2", "ISO27001-A.8.7"],
+      "mitigation_controls": [
+        "NIST-800-53-SI-7",
+        "NIST-800-53-SI-4",
+        "ISO27001-A.8.7"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "medium",
       "real_world_examples": "Multiple malware families use PPID spoofing to evade EDR detection. CobaltStrike and Sliver C2 frameworks support PPID spoofing for process creation. The technique has been observed in Emotet and TrickBot campaigns."
@@ -67,7 +93,11 @@
       "description": "Adversaries may use SID-History injection to escalate privileges and bypass access controls. The Windows security identifier (SID) history attribute (sIDHistory) is used during domain migrations to preserve access to resources by mapping old domain SIDs to new domain accounts. Adversaries with domain admin privileges can inject arbitrary SIDs into the SID-History attribute of any account, effectively granting that account the privileges of the injected SID. Injecting the Enterprise Admin or Domain Admin SID grants the highest level of Active Directory privileges. This technique provides persistent privilege escalation that survives password resets.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for changes to the sIDHistory attribute on user and group accounts using Windows Event ID 4765 (SID-History added) and Event ID 4766 (SID-History add attempted and failed). Alert on any SID-History modifications as they should only occur during legitimate domain migrations. Monitor for Event ID 4618 (monitored security event pattern occurred) which can be configured for SID-History changes. Track Mimikatz sid::add command patterns. Regularly audit accounts with populated SID-History attributes using Get-ADUser -Filter {SIDHistory -like '*'}.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(7)", "CIS-5.4", "CIS-6.5", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-2(7)",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "SID-History injection has been used by APT groups for persistent domain-level privilege escalation. Mimikatz implements this technique through the sid::add command. The technique has been observed in nation-state operations targeting government networks."
@@ -77,9 +107,21 @@
       "name": "Account Manipulation",
       "tactic": "privilege-escalation",
       "description": "Adversaries may manipulate accounts to maintain and/or elevate access to victim systems. Account manipulation may consist of any action that preserves or modifies adversary access to a compromised account, such as modifying credentials or permission groups. These actions could also include account activity designed to subvert security policies, such as performing iterative password updates to bypass password duration policies and preserve the life of compromised credentials. Account manipulation encompasses adding credentials to cloud accounts, modifying email forwarding rules, adding roles, modifying SSH authorized keys, and registering devices for MFA bypass.",
-      "sub_techniques": ["T1098.001", "T1098.002", "T1098.003", "T1098.004", "T1098.005", "T1098.006"],
+      "sub_techniques": [
+        "T1098.001",
+        "T1098.002",
+        "T1098.003",
+        "T1098.004",
+        "T1098.005",
+        "T1098.006"
+      ],
       "detection_guidance": "Monitor for account modification events across all identity platforms. Alert on Windows Event IDs 4738 (user account changed), 4732/4728 (member added to security group), and 4670 (permissions changed). Track Azure AD audit logs for application credential additions, role assignments, and conditional access policy changes. Monitor for SSH authorized_keys file modifications. Alert on email forwarding rule creation or modification. Track MFA method changes for privileged accounts. Implement change management workflows for account modifications with approval gates.",
-      "mitigation_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-6", "CIS-5.3", "CIS-6.5", "ISO27001-A.5.15", "ISO27001-A.5.18"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-6",
+        "ISO27001-A.5.15",
+        "ISO27001-A.5.18"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "APT29 added credentials to compromised Azure AD applications during the SolarWinds campaign. Lapsus$ modified account permissions in Okta to escalate access. Storm-0558 manipulated Azure AD accounts for persistent Microsoft 365 access."
@@ -91,7 +133,12 @@
       "description": "Adversaries may add adversary-controlled credentials to a cloud account to maintain persistent access to victim accounts and instances within the environment. Cloud accounts can include service principals, managed identities, and user accounts. By adding new credentials (passwords, certificates, federated identity credentials, or API keys) to existing cloud accounts, adversaries establish alternative authentication paths that survive password resets of the original credentials. In Azure AD, adding credentials to service principals or application registrations is particularly dangerous as these often have broad API permissions.",
       "sub_techniques": [],
       "detection_guidance": "Monitor Azure AD audit logs for 'Add service principal credentials' and 'Update application - Certificates and secrets management' events. Alert on new credential additions to service principals and applications, especially outside change management windows. Track AWS IAM for CreateAccessKey and CreateLoginProfile API calls. Monitor GCP for serviceAccountKeys.create events. Alert on credential additions to accounts that already have valid credentials. Implement alerts for new federated identity credential configurations on Azure AD applications.",
-      "mitigation_controls": ["NIST-800-53-AC-2(1)", "NIST-800-53-AC-6", "CIS-16.12", "ISO27001-A.5.15", "ISO27001-A.5.18"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-2(1)",
+        "NIST-800-53-AC-6",
+        "ISO27001-A.5.15",
+        "ISO27001-A.5.18"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "APT29 (NOBELIUM) added credentials to compromised Azure AD service principals during the SolarWinds campaign. Storm-0558 added federated credentials to Azure AD applications for persistent access to Microsoft 365."
@@ -103,7 +150,11 @@
       "description": "Adversaries may add email forwarding rules, delegate access, or inbox rules to maintain persistent access to victim email accounts. Email delegates can read, send, and manage email on behalf of the mailbox owner. Adversaries may create inbox rules to forward emails matching specific criteria to external addresses for data exfiltration, or set up delegate access to maintain email access even after the compromised credentials are reset. In Microsoft 365 environments, transport rules and mail flow rules can be modified at the organizational level to intercept specific email traffic.",
       "sub_techniques": [],
       "detection_guidance": "Monitor Exchange/Microsoft 365 audit logs for New-InboxRule, Set-InboxRule, and Set-Mailbox with ForwardingAddress or ForwardingSMTPAddress modifications. Alert on inbox rules that forward to external email addresses. Track mailbox delegation changes (Add-MailboxPermission, Set-MailboxFolderPermission). Monitor for transport rule modifications at the organizational level. Alert on mail flow rules forwarding to external domains. Review PowerShell and Graph API calls modifying mailbox rules. Regularly audit all mailbox forwarding rules and delegates.",
-      "mitigation_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-3", "CIS-16.9", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-3",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "information_disclosure",
       "severity": "high",
       "real_world_examples": "APT29 created email forwarding rules during the SolarWinds compromise to monitor victim communications. BEC (Business Email Compromise) actors routinely create inbox rules to hide their activity. The Hafnium group used Exchange vulnerabilities and created forwarding rules."
@@ -115,7 +166,12 @@
       "description": "Adversaries may add additional roles or permissions to an adversary-controlled cloud account to maintain persistent access to victim cloud environments. Cloud roles define what actions an identity can perform within cloud services. By assigning elevated roles (Global Administrator, Owner, Security Administrator) to compromised or attacker-created accounts, adversaries ensure persistent privileged access that survives remediation of individual vulnerabilities. This technique is particularly effective in Azure AD where role assignments can be made through PIM with permanent eligibility, or in AWS where IAM policies can grant broad permissions.",
       "sub_techniques": [],
       "detection_guidance": "Monitor Azure AD audit logs for 'Add member to role' and 'Add eligible member to role in PIM' events. Alert on Global Administrator, Privileged Role Administrator, and Application Administrator role assignments. Track AWS IAM for AttachUserPolicy, AttachGroupPolicy, and PutRolePolicy API calls. Monitor GCP for setIamPolicy calls granting owner or editor roles. Alert on role assignments outside of PIM activation workflows. Implement just-in-time access and monitor for permanent role assignments that bypass JIT controls.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(1)", "CIS-6.8", "ISO27001-A.5.15", "ISO27001-A.5.18"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-2(1)",
+        "ISO27001-A.5.15",
+        "ISO27001-A.5.18"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "APT29 assigned Global Administrator roles to compromised service principals during the SolarWinds campaign. Lapsus$ escalated privileges in Okta by manipulating role assignments. Storm-0558 used elevated cloud roles for persistent Microsoft 365 access."
@@ -127,7 +183,11 @@
       "description": "Adversaries may modify SSH authorized_keys files to maintain persistent access to victim systems. The authorized_keys file in a user's .ssh directory specifies which public keys are allowed to authenticate as that user. By adding their own public key to this file, adversaries can maintain persistent SSH access that survives password changes, is difficult to detect without file integrity monitoring, and does not require knowledge of the account password. This technique is particularly effective against cloud instances, DevOps infrastructure, and Linux servers where SSH is the primary access method.",
       "sub_techniques": [],
       "detection_guidance": "Implement file integrity monitoring on ~/.ssh/authorized_keys and /etc/ssh/authorized_keys* files. Alert on any modifications to authorized_keys files, especially additions of new public keys. Monitor for SSH authentication events (sshd logs) using keys not in the authorized key inventory. Track file modification events on authorized_keys files using auditd rules. Alert on new SSH sessions from previously unseen public keys. Compare authorized_keys contents across systems to detect anomalous keys. Monitor for mass authorized_keys modifications across multiple systems.",
-      "mitigation_controls": ["NIST-800-53-AC-3", "NIST-800-53-IA-5(2)", "CIS-5.4", "ISO27001-A.8.5"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-IA-5(2)",
+        "ISO27001-A.8.5"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "The Ebury botnet campaign added SSH keys to compromised Linux servers for persistent access. Cloud infrastructure compromises frequently involve authorized_keys manipulation. APT groups targeting Linux environments routinely add SSH keys for persistence."
@@ -139,7 +199,11 @@
       "description": "Adversaries may register a device to an adversary-controlled account to gain persistent access to victim cloud environments. Many cloud identity providers support device registration, which ties a physical device to an identity for conditional access evaluation, MDM compliance, and certificate-based authentication. By registering a rogue device to a compromised account, adversaries can satisfy device-based conditional access policies, enroll for device-based certificates, and maintain access even after the user's password is reset. In Azure AD, device registration can be exploited to bypass conditional access policies that require compliant or hybrid-joined devices.",
       "sub_techniques": [],
       "detection_guidance": "Monitor Azure AD audit logs for 'Register device' and 'Add registered owner to device' events. Alert on new device registrations for privileged accounts, especially from unusual locations or device types. Track Intune enrollment events for unexpected devices. Monitor for device registrations that occur outside of standard onboarding workflows. Alert on conditional access policy evaluations that rely on newly registered devices. Track Azure AD device compliance state changes. Monitor for multiple device registrations from a single account in a short time period.",
-      "mitigation_controls": ["NIST-800-53-AC-2", "NIST-800-53-IA-3", "CIS-1.4", "ISO27001-A.8.1"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-IA-3",
+        "ISO27001-A.8.1"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "AADInternals toolkit demonstrates device registration abuse for Azure AD conditional access bypass. Researchers have shown how rogue device registration can bypass compliant device requirements in conditional access policies."
@@ -151,7 +215,11 @@
       "description": "Adversaries may add additional roles or permissions to maintain persistent access to container orchestration environments. In Kubernetes, RBAC (Role-Based Access Control) controls access to cluster resources. Adversaries may create new ClusterRoleBindings, RoleBindings, or modify existing ones to grant elevated permissions to compromised service accounts or user accounts. By binding the cluster-admin ClusterRole to their account, adversaries gain full control over all Kubernetes resources including secrets, pods, and namespaces. This technique can also involve creating new service accounts with elevated privileges.",
       "sub_techniques": [],
       "detection_guidance": "Monitor Kubernetes audit logs for create/update operations on ClusterRoleBinding, RoleBinding, ClusterRole, and Role resources. Alert on bindings to the cluster-admin ClusterRole or custom roles with wildcard permissions. Track service account creation and token generation events. Monitor for kubectl commands creating or modifying RBAC resources. Alert on role bindings created outside of GitOps or approved deployment workflows. Implement admission controllers (OPA Gatekeeper, Kyverno) to enforce RBAC policies and prevent unauthorized role escalation.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-AC-2", "CIS-5.4", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-2",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "The TeamTNT cryptomining group manipulated Kubernetes RBAC to gain cluster-admin access. Container escape and privilege escalation via RBAC manipulation has been observed in multiple cloud-native attacks."
@@ -161,9 +229,17 @@
       "name": "Domain or Tenant Policy Modification",
       "tactic": "privilege-escalation",
       "description": "Adversaries may modify the configuration settings of a domain or identity tenant to evade defenses and/or escalate privileges. Domain or tenant configurations define security policies, access controls, and authentication requirements for all accounts within the domain. By modifying these configurations, adversaries can weaken security controls at scale, create backdoor access paths, or disable defensive mechanisms. In Active Directory, this includes Group Policy modification; in cloud environments, it includes tenant-wide settings like conditional access policies, security defaults, and authentication methods.",
-      "sub_techniques": ["T1484.001", "T1484.002"],
+      "sub_techniques": [
+        "T1484.001",
+        "T1484.002"
+      ],
       "detection_guidance": "Monitor for changes to Group Policy Objects (GPOs) using Windows Event ID 5136 (directory service object modified) and Event ID 4739 (domain policy changed). Alert on Azure AD tenant configuration changes via audit logs, especially modifications to conditional access policies, authentication methods, and security defaults. Track changes to password policies, lockout policies, and Kerberos policies. Monitor for GPO modifications that weaken security settings. Implement change management for domain policy changes with multi-person approval.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-CM-3", "CIS-5.4", "ISO27001-A.5.1", "ISO27001-A.8.9"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-CM-3",
+        "ISO27001-A.5.1",
+        "ISO27001-A.8.9"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "APT29 modified Azure AD tenant policies during the SolarWinds campaign. Ransomware operators frequently modify GPOs to distribute ransomware payloads across domains. FIN6 modified Group Policy to deploy POS malware."
@@ -175,7 +251,11 @@
       "description": "Adversaries may modify Group Policy Objects (GPOs) to subvert the intended discretionary access controls for a domain, usually with the intention of escalating privileges on the domain. GPOs are containers for security settings, software deployment, login scripts, and other configurations applied to users and computers in an Active Directory domain. By modifying GPOs, adversaries can disable security tools across the domain, modify firewall rules, change password policies to allow weaker passwords, add startup scripts for persistence, or deploy malware to all domain-joined systems simultaneously.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for GPO modifications using Windows Event ID 5136 (directory object modified) filtering for Group Policy Container objects. Alert on changes to security-sensitive GPO settings: password policies, account lockout, audit policies, and security options. Track SYSVOL share modifications (Event ID 5140/5145) targeting GPO files. Monitor for gpupdate /force execution from unexpected sources. Alert on GPO link changes that apply modified policies to new OUs. Implement GPO change auditing and require multi-person approval for GPO modifications.",
-      "mitigation_controls": ["NIST-800-53-CM-3", "NIST-800-53-AC-6(5)", "CIS-5.4", "ISO27001-A.8.9"],
+      "mitigation_controls": [
+        "NIST-800-53-CM-3",
+        "NIST-800-53-AC-6(5)",
+        "ISO27001-A.8.9"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "Ryuk and Conti ransomware operators modified GPOs to disable Windows Defender and deploy ransomware across domains. FIN6 used GPO modifications to deploy POS malware. APT groups have modified GPOs to weaken password policies for credential access."
@@ -187,7 +267,11 @@
       "description": "Adversaries may add new domain trusts, modify the properties of existing domain trusts, or modify federation trust configurations to evade defenses and/or escalate privileges. Domain trust modifications can allow adversaries to establish trust relationships with attacker-controlled domains, enabling cross-domain authentication and resource access. In cloud environments, modifying federation trust settings (adding new trusted IdPs, modifying SAML configurations) can enable persistent access through forged authentication assertions. Azure AD federation trust modifications are particularly dangerous as they enable Golden SAML attacks.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for changes to Active Directory trust objects using Windows Event ID 4706 (new trust created) and Event ID 4707 (trust removed). Alert on Azure AD federation configuration changes via audit logs, especially modifications to trusted token-signing certificates and issuer URIs. Track changes to AD FS relying party trusts and claims rules. Monitor for netdom.exe trust creation commands. Alert on new federation configurations added to Azure AD custom domains. Implement change management for all trust relationship modifications.",
-      "mitigation_controls": ["NIST-800-53-AC-2(7)", "NIST-800-53-CM-3", "CIS-5.4", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-2(7)",
+        "NIST-800-53-CM-3",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "APT29 modified Azure AD federation trusts during the SolarWinds campaign to enable Golden SAML attacks. Trust modification between domains has been used by APT groups for cross-domain lateral movement in government networks."
@@ -197,9 +281,18 @@
       "name": "Abuse Elevation Control Mechanism",
       "tactic": "privilege-escalation",
       "description": "Adversaries may circumvent mechanisms designed to control elevate privileges to gain higher-level permissions. Most modern systems contain native elevation control mechanisms, such as User Account Control (UAC) on Windows, sudo on Linux/macOS, and cloud IAM assume-role capabilities, that are intended to gate access to privileged operations. These mechanisms require users to provide additional authentication or confirmation before performing sensitive actions. By abusing these elevation control mechanisms through design weaknesses, misconfigurations, or vulnerabilities, adversaries can escalate from standard user to administrator or root-level privileges.",
-      "sub_techniques": ["T1548.001", "T1548.002", "T1548.003", "T1548.004"],
+      "sub_techniques": [
+        "T1548.001",
+        "T1548.002",
+        "T1548.003",
+        "T1548.004"
+      ],
       "detection_guidance": "Monitor for UAC bypass indicators: unexpected auto-elevation of processes, registry modifications to UAC-related keys, and COM object hijacking for elevation. Track sudo usage patterns: monitor /var/log/auth.log for unusual sudo commands and sudoers file modifications. Alert on setuid/setgid binary modifications and newly created setuid files. Monitor cloud IAM assume-role calls for unusual patterns or from unexpected source roles. Track Windows Event ID 4688 with elevated token types and Linux auditd for privilege escalation syscalls (setuid, setreuid, setresuid).",
-      "mitigation_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(7)", "CIS-4.1", "CIS-5.4", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-6(7)",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "UAC bypass techniques are used by virtually all Windows malware families. The DirtyPipe vulnerability (CVE-2022-0847) allowed Linux privilege escalation. Sudo vulnerabilities (CVE-2021-3156, Baron Samedit) enabled root access."
@@ -211,7 +304,11 @@
       "description": "Adversaries may abuse setuid and setgid file permissions to run commands or binaries in the context of a different user, typically root. On Linux and macOS, when the setuid (SUID) or setgid (SGID) bits are set on a binary, it executes with the file owner's (typically root) privileges regardless of who runs it. Adversaries may exploit vulnerable SUID/SGID binaries, create new binaries with these permissions, or modify existing ones to escalate privileges from a standard user to root. Tools like GTFOBins document legitimate SUID binaries that can be abused for privilege escalation.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for new SUID/SGID binaries created on the file system using auditd rules for chmod with mode bits 4000 or 2000. Alert on SUID/SGID binaries outside expected directories (/usr/bin, /usr/sbin, /usr/lib). Regularly scan the file system for SUID/SGID binaries and compare against a known-good baseline (find / -perm -4000 -type f). Monitor for exploitation of known vulnerable SUID binaries listed in GTFOBins. Track file permission changes using auditd and alert on any new setuid/setgid modifications.",
-      "mitigation_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-CM-6", "CIS-4.1", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-CM-6",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "SUID binary abuse is one of the most common Linux privilege escalation techniques used in real-world attacks. The nmap --interactive SUID escape and similar GTFOBins techniques are regularly used by threat actors."
@@ -223,7 +320,11 @@
       "description": "Adversaries may bypass UAC mechanisms to elevate process privileges on a Windows system. Windows User Account Control (UAC) allows a program to elevate its privileges to perform a task under administrator-level permissions, but requires explicit user approval via a consent prompt. There are numerous methods to bypass UAC, including exploiting auto-elevating processes, DLL side-loading into auto-elevated applications, modifying registry keys that control COM object behavior, and abusing the Windows token system. UAC bypass is often the first step after initial compromise to gain administrative privileges on a Windows endpoint.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for known UAC bypass techniques: registry modifications to HKCU\\Software\\Classes\\mscfile\\shell\\open\\command, HKCU\\Software\\Classes\\ms-settings\\shell\\open\\command (fodhelper, computerdefaults bypasses). Alert on auto-elevating processes spawning unexpected child processes. Track Sysmon Event ID 1 for processes with integrity level changes from medium to high without corresponding UAC consent dialog events. Monitor for DLL hijacking in auto-elevated application directories. Alert on eventvwr.exe, fodhelper.exe, computerdefaults.exe spawning cmd.exe or powershell.exe.",
-      "mitigation_controls": ["NIST-800-53-AC-6(7)", "NIST-800-53-CM-6", "CIS-4.1", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(7)",
+        "NIST-800-53-CM-6",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "Most Windows malware includes UAC bypass capabilities. Cobalt Strike and Metasploit include multiple UAC bypass modules. The DarkSide ransomware (Colonial Pipeline attack) used UAC bypass for privilege escalation."
@@ -235,7 +336,11 @@
       "description": "Adversaries may perform sudo caching and/or use the sudoers file to elevate privileges. On Linux and macOS, the sudo utility allows users to perform commands from their terminal with elevated privileges. The sudo command typically requires the user's password, but the system caches the authentication for a configurable timeout period (default 15 minutes), during which subsequent sudo commands do not require re-authentication. Adversaries may abuse this caching mechanism or exploit sudoers misconfigurations (such as NOPASSWD entries, wildcard commands, or writable scripts executed via sudo) to escalate privileges without knowing the root password.",
       "sub_techniques": [],
       "detection_guidance": "Monitor /var/log/auth.log and /var/log/secure for unusual sudo usage patterns. Alert on sudo commands executed by unexpected users or for unusual commands. Track modifications to /etc/sudoers and /etc/sudoers.d/ files using file integrity monitoring. Monitor for sudo timestamp manipulation (touching /var/run/sudo/ts/ files). Alert on sudo usage outside normal hours or from unusual terminal sessions. Track sudo configuration changes that add NOPASSWD entries or wildcard commands. Monitor for CVE-2021-3156 (Baron Samedit) exploitation attempts.",
-      "mitigation_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-CM-6", "CIS-4.1", "CIS-5.4", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-CM-6",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "CVE-2021-3156 (Baron Samedit) was a critical sudo vulnerability allowing privilege escalation to root on major Linux distributions. Sudoers misconfigurations are one of the most common findings in Linux security assessments."
@@ -247,7 +352,11 @@
       "description": "Adversaries may leverage the AuthorizationExecuteWithPrivileges API or AppleScript to escalate privileges by prompting the user for credentials. On macOS, the AuthorizationExecuteWithPrivileges function allows a program to request temporary root privileges by displaying a system dialog asking the user for their password. Adversaries may abuse this legitimate mechanism to trick users into providing their credentials for malicious privilege escalation. Additionally, AppleScript can be used with 'with administrator privileges' to request elevated execution. This technique exploits user trust in system prompts to gain root-level access on macOS systems.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for processes calling AuthorizationExecuteWithPrivileges API on macOS. Alert on AppleScript execution with 'administrator privileges' keyword from unexpected scripts. Track Endpoint Security Framework events for privilege elevation requests. Monitor for new LaunchDaemons or LaunchAgents created after privilege elevation. Alert on security framework authorization events from non-standard applications. Track process execution chains that transition from user-level to root-level processes.",
-      "mitigation_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-SI-7", "CIS-4.1", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-SI-7",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "medium",
       "real_world_examples": "Multiple macOS malware families use AuthorizationExecuteWithPrivileges for privilege escalation. The Shlayer Trojan uses AppleScript privilege elevation prompts. OSX.Dok malware used this technique to install a root certificate."
@@ -259,7 +368,12 @@
       "description": "Adversaries may obtain and abuse credentials of higher-privileged accounts to escalate privileges within a compromised environment. This represents the use of valid accounts specifically for privilege escalation rather than initial access or credential harvesting. After gaining initial access with a standard user account, adversaries may discover and compromise administrator, service, or other privileged account credentials to escalate their access level. This can involve credential dumping from memory, accessing stored credentials, or exploiting trust relationships between accounts and systems to move from standard user to administrator or SYSTEM privileges.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for authentication events where a user accesses resources or systems that are outside their normal access pattern, indicating potential use of stolen privileged credentials. Alert on privilege escalation indicators: standard user accounts suddenly accessing administrative tools, service management interfaces, or domain controller resources. Track Windows Event ID 4672 (special privileges assigned) for accounts not normally granted these privileges. Implement UEBA to detect behavioral anomalies suggesting account privilege misuse. Monitor for lateral movement patterns following credential harvesting events.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(7)", "NIST-800-53-IA-2(1)", "CIS-5.4", "CIS-6.5", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-2(7)",
+        "NIST-800-53-IA-2(1)",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "The Colonial Pipeline attack (2021) began with a compromised VPN credential and escalated through reuse of privileged credentials found in the environment. Most ransomware campaigns escalate privileges through harvested domain admin credentials."
@@ -271,7 +385,11 @@
       "description": "Adversaries may abuse the Windows Task Scheduler to escalate privileges by scheduling tasks that execute under higher-privileged accounts. The Windows Task Scheduler allows programs or scripts to be executed at designated dates and times, and tasks can be configured to run under the security context of SYSTEM, LocalService, or other service accounts. An adversary with local administrator access can create scheduled tasks that run as SYSTEM, effectively escalating from administrator to the highest system privilege level. Tasks can also be created on remote systems using the at command or schtasks with UNC paths for remote privilege escalation.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for scheduled task creation events (Windows Event ID 4698) where the task is configured to run as SYSTEM, LocalService, or other privileged accounts. Alert on schtasks.exe and at.exe usage from non-standard processes. Track Sysmon Event ID 1 for schtasks.exe with /RU SYSTEM or /RU LocalService arguments. Monitor for scheduled tasks created by non-administrative users or from unexpected parent processes. Alert on remote scheduled task creation (Event ID 4698 with remote source). Monitor the Tasks folder (%SystemRoot%\\System32\\Tasks) for new task files.",
-      "mitigation_controls": ["NIST-800-53-AC-6", "NIST-800-53-CM-7", "CIS-5.4", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6",
+        "NIST-800-53-CM-7",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "Numerous ransomware families including Ryuk, Conti, and LockBit use scheduled tasks running as SYSTEM for privilege escalation and persistence. APT groups routinely create scheduled tasks for privilege escalation during post-exploitation."
@@ -283,7 +401,11 @@
       "description": "Adversaries may break out of a container to gain access to the underlying host. Container escape allows adversaries to escalate from the restricted container environment to the host operating system, gaining access to other containers, host resources, and potentially the container orchestration platform. Common escape techniques include exploiting kernel vulnerabilities accessible from within the container, abusing misconfigured container runtimes (privileged containers, mounted Docker socket, host PID namespace), exploiting container runtime vulnerabilities (runc CVE-2019-5736), and leveraging excessive Linux capabilities granted to the container.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for container escape indicators: processes spawned on the host from container contexts, unexpected mount operations, and access to host-level resources from container processes. Alert on container runtime vulnerability exploitation attempts. Monitor Kubernetes audit logs for exec operations into privileged containers. Track seccomp profile violations and AppArmor denial events. Monitor for Docker socket access from within containers. Alert on container processes accessing host PID namespace or network namespace. Track unexpected capability usage (CAP_SYS_ADMIN, CAP_NET_ADMIN) from container processes.",
-      "mitigation_controls": ["NIST-800-53-AC-6", "NIST-800-53-SC-39", "CIS-5.4", "ISO27001-A.8.2"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6",
+        "NIST-800-53-SC-39",
+        "ISO27001-A.8.2"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "CVE-2019-5736 (runc vulnerability) allowed container escape to host. CVE-2020-15257 (containerd) enabled host privilege escalation. The TeamTNT group exploited misconfigured containers for cryptomining. Palo Alto Unit 42 documented Siloscape as the first known malware targeting Windows containers."
@@ -295,7 +417,11 @@
       "description": "Adversaries may exploit software vulnerabilities to escalate privileges on a system. Exploitation of a software vulnerability occurs when an adversary takes advantage of a programming error in a program, service, or within the operating system software or kernel itself to execute adversary-controlled code with elevated privileges. In the IAM context, this includes vulnerabilities in authentication services, identity providers, SSO implementations, and authorization frameworks that can be exploited to gain higher-level access than intended. Vulnerabilities in components like Active Directory, LDAP servers, Kerberos implementations, and cloud IAM services are particularly high-value targets.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for exploitation indicators: unexpected process crashes in authentication services, privilege escalation following application errors, and anomalous system calls from IAM-related processes. Track patch levels for known privilege escalation vulnerabilities in identity infrastructure (AD DS, AD FS, Azure AD Connect). Monitor for process injection into authentication services. Alert on unexpected code execution in LSASS, AD FS, or identity provider processes. Implement application-level monitoring for IAM services and alert on abnormal error rates or crashes.",
-      "mitigation_controls": ["NIST-800-53-SI-2", "NIST-800-53-SI-7", "CIS-7.1", "CIS-7.4", "ISO27001-A.8.8"],
+      "mitigation_controls": [
+        "NIST-800-53-SI-2",
+        "NIST-800-53-SI-7",
+        "ISO27001-A.8.8"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "CVE-2021-42278/42287 (sAMAccountName spoofing/noPac) allowed any domain user to escalate to Domain Admin. ProxyLogon/ProxyShell Exchange vulnerabilities enabled privilege escalation to SYSTEM. CVE-2021-34527 (PrintNightmare) allowed local privilege escalation via the Print Spooler service."
@@ -307,7 +433,12 @@
       "description": "Adversaries may modify cloud tenant conditional access policies to weaken authentication requirements and effectively escalate their privileges. Conditional access policies in Azure AD define conditions under which MFA, device compliance, and other security controls are enforced. By modifying these policies to add exclusions for their compromised accounts, trusted locations for their attack infrastructure, or reducing MFA requirements for specific applications, adversaries can escalate their effective access without modifying account roles directly. This technique is subtle because it weakens the control plane rather than elevating the identity directly.",
       "sub_techniques": [],
       "detection_guidance": "Monitor Azure AD audit logs for all conditional access policy modifications, especially changes that add exclusions, reduce MFA requirements, or add new trusted locations. Alert on conditional access policy changes that reduce security posture (e.g., switching from 'require MFA' to 'grant access'). Track named location additions and modifications. Monitor for policy changes that exempt specific applications from MFA requirements. Implement change management for conditional access policies with multi-person approval. Alert on policy modifications by accounts that have recently shown risk indicators.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-CM-3", "CIS-6.5", "ISO27001-A.5.1", "ISO27001-A.8.9"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-CM-3",
+        "ISO27001-A.5.1",
+        "ISO27001-A.8.9"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "APT29 modified Azure AD conditional access policies during the SolarWinds campaign. Cloud security assessments regularly identify conditional access policy manipulation as a privilege escalation vector. Microsoft Threat Intelligence has documented threat actors weakening conditional access as part of cloud attack chains."
@@ -319,7 +450,11 @@
       "description": "Adversaries may abuse Kubernetes user impersonation to escalate privileges within container environments. Kubernetes allows users with the 'impersonate' verb permission to act as other users, groups, or service accounts. An adversary who obtains impersonation rights can effectively assume the identity of any user or service account in the cluster, including the system:masters group which has unrestricted cluster-admin access. This privilege escalation path is particularly dangerous because impersonation permissions may be granted inadvertently through broad RBAC configurations and are less commonly audited than direct role bindings.",
       "sub_techniques": [],
       "detection_guidance": "Monitor Kubernetes audit logs for API requests with impersonation headers (Impersonate-User, Impersonate-Group). Alert on impersonation of cluster-admin or system:masters identities. Track RBAC configurations that grant the 'impersonate' verb and audit these bindings regularly. Monitor for impersonation requests from service accounts that should not have impersonation permissions. Alert on impersonation of service accounts across namespace boundaries. Implement admission controllers that restrict impersonation permissions to authorized identities only.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-AC-2", "CIS-5.4", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-2",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "critical",
       "real_world_examples": "Kubernetes RBAC privilege escalation through impersonation has been documented by multiple cloud security researchers. The technique has been observed in real-world container environment compromises where broad impersonation permissions were inadvertently granted."
@@ -331,7 +466,11 @@
       "description": "Adversaries may chain cloud IAM role assumptions to escalate from a low-privileged cloud identity to a highly privileged one. In AWS, role chaining involves assuming a series of IAM roles where each role has permission to assume the next, potentially crossing account boundaries. In Azure, this can involve cascading Managed Identity assignments or service principal permission chains. The adversary starts with a minimally privileged identity and progressively assumes roles with greater permissions until reaching the target privilege level. This technique exploits overly permissive IAM trust policies and the complexity of cross-account role relationships.",
       "sub_techniques": [],
       "detection_guidance": "Monitor cloud provider logs for multi-step role assumption chains. Alert on AWS CloudTrail AssumeRole events where the source principal is itself an assumed role, creating a chain of assumptions. Track Azure AD service principal authentication events that cascade across multiple identities. Monitor for role assumption patterns that progressively access more privileged roles. Alert on cross-account role assumptions from accounts not in the established trust baseline. Implement IAM Access Analyzer (AWS) or similar tools to detect unintended role trust chains. Track role assumption paths that reach administrative-level permissions.",
-      "mitigation_controls": ["NIST-800-53-AC-6(5)", "NIST-800-53-AC-3", "CIS-16.12", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-3",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "Cloud IAM role chaining has been demonstrated by security researchers in multiple cloud environments. AWS IAM privilege escalation paths involving role chaining are commonly discovered during cloud security assessments. The technique has been used in real-world cloud breaches to escalate from limited application roles to administrative access."
@@ -343,7 +482,11 @@
       "description": "Adversaries may attempt to bypass cloud IAM permission boundaries and service control policies to perform unauthorized privileged operations. Cloud providers implement layered permission systems including IAM policies, permission boundaries, service control policies (SCPs), and resource-based policies. Adversaries may exploit misconfigurations or logical gaps in these layered controls to perform actions that should be restricted. This includes exploiting resource-based policies that bypass permission boundaries, using AWS STS confused deputy scenarios, or leveraging service-linked roles that are exempt from SCPs. Understanding the interaction between these control layers is essential for both attack and defense.",
       "sub_techniques": [],
       "detection_guidance": "Monitor for API calls that succeed despite expected permission boundary restrictions. Alert on actions performed by identities that should be constrained by permission boundaries or SCPs. Track AWS STS events for unusual session tagging or role assumption patterns. Monitor for resource-based policy modifications that could bypass permission boundaries. Alert on API calls from service-linked roles performing unexpected operations. Implement CloudTrail data event logging for sensitive operations and monitor for access denied events that may indicate boundary testing. Track API calls made through confused deputy exploitation patterns.",
-      "mitigation_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-3", "CIS-16.12", "ISO27001-A.5.15"],
+      "mitigation_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-3",
+        "ISO27001-A.5.15"
+      ],
       "stride_category": "elevation_of_privilege",
       "severity": "high",
       "real_world_examples": "Cloud IAM permission boundary bypass techniques have been documented by multiple security research teams. AWS permission boundary bypass through resource-based policies is a well-known escalation path. Multiple cloud security tools (Pacu, Prowler) include checks for permission boundary bypass conditions."

@@ -1,19 +1,19 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "eu.ansvar/iam-mcp",
-  "description": "IAM expert intelligence: standards advisory (NIST 800-63/800-53, ISO 27001/2, CIS, Zero Trust), threat patterns (MITRE ATT&CK, CWE, CAPEC), protocol deep-dives (OAuth, OIDC, SAML, FIDO2), architecture patterns (RBAC, ABAC, PAM, federation), vendor configurations (Azure Entra, AWS, GCP, Okta, CyberArk), compliance cross-mapping, and emerging technology tracking (passkeys, decentralized identity)",
+  "description": "IAM expert intelligence: standards advisory (NIST 800-63/800-53, ISO 27001/2, Zero Trust), threat patterns (MITRE ATT&CK, CWE, CAPEC), protocol deep-dives (OAuth, OIDC, SAML, FIDO2), architecture patterns (RBAC, ABAC, PAM, federation), vendor configurations (Azure Entra, AWS, GCP, Okta, CyberArk), compliance cross-mapping, and emerging technology tracking (passkeys, decentralized identity)",
   "repository": {
     "url": "https://github.com/Ansvar-Systems/IAM-mcp",
     "source": "github"
   },
   "homepage": "https://ansvar.eu",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "license": "Apache-2.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@ansvar/iam-mcp",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "transport": { "type": "stdio" }
     }
   ]
