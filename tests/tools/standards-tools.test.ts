@@ -186,7 +186,7 @@ describe('map-frameworks', () => {
       from: 'nist-800-53',
     });
 
-    // Should include both forward (nist→iso) and reverse (cis→nist) mappings
+    // Should include both forward (nist→iso) and reverse (iso→nist) mappings
     expect(res.results.length).toBeGreaterThan(0);
     // Forward mappings
     const forward = res.results.filter((m) => m.source_framework === 'nist-800-53' && m.source_control === 'AC-2');

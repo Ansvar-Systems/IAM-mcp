@@ -10,7 +10,10 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-207-TENET-1", "NIST-800-53-AC-3"]
+      "cross_references": [
+        "NIST-800-207-TENET-1",
+        "NIST-800-53-AC-3"
+      ]
     },
     {
       "id": "CISA-ZTMM-ID-INITIAL",
@@ -22,19 +25,25 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-63B-AAL2", "NIST-800-53-AC-2(1)", "CIS-6.3"]
+      "cross_references": [
+        "NIST-800-63B-AAL2",
+        "NIST-800-53-AC-2(1)"
+      ]
     },
     {
       "id": "CISA-ZTMM-ID-ADVANCED",
       "framework": "cisa-zero-trust",
       "section": "Identity Pillar - Advanced",
       "title": "CISA ZTMM Identity Pillar: Advanced Maturity",
-      "description": "At the advanced maturity level, phishing-resistant MFA (FIDO2/WebAuthn) is deployed for all users, not just privileged ones. Continuous authentication and authorization replace one-time authentication events — the system continuously evaluates risk signals (device posture, location, behavior) and adjusts access accordingly. Automated identity lifecycle management is fully integrated with HR systems for joiners, movers, and leavers. Privileged access management (PAM) with just-in-time access and session recording is deployed for all administrative access. Identity federation is established with key partners and cloud services using standards like OIDC and SCIM. Cross-pillar integration connects identity signals with device, network, and data telemetry.",
+      "description": "At the advanced maturity level, phishing-resistant MFA (FIDO2/WebAuthn) is deployed for all users, not just privileged ones. Continuous authentication and authorization replace one-time authentication events \u2014 the system continuously evaluates risk signals (device posture, location, behavior) and adjusts access accordingly. Automated identity lifecycle management is fully integrated with HR systems for joiners, movers, and leavers. Privileged access management (PAM) with just-in-time access and session recording is deployed for all administrative access. Identity federation is established with key partners and cloud services using standards like OIDC and SCIM. Cross-pillar integration connects identity signals with device, network, and data telemetry.",
       "category": "authentication",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-63B-AAL3", "NIST-800-53-AC-2(12)", "CIS-6.5"]
+      "cross_references": [
+        "NIST-800-63B-AAL3",
+        "NIST-800-53-AC-2(12)"
+      ]
     },
     {
       "id": "CISA-ZTMM-ID-OPTIMAL",
@@ -46,19 +55,26 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "optimal",
-      "cross_references": ["NIST-800-63B-AUTH-MF-CRYPTO-DEVICE", "NIST-800-53-AC-3(13)"]
+      "cross_references": [
+        "NIST-800-63B-AUTH-MF-CRYPTO-DEVICE",
+        "NIST-800-53-AC-3(13)"
+      ]
     },
     {
       "id": "CISA-ZTMM-DEVICE-ID",
       "framework": "cisa-zero-trust",
       "section": "Device Pillar - Identity Aspects",
       "title": "CISA ZTMM Device Pillar: Identity-Related Requirements",
-      "description": "The device pillar of the CISA Zero Trust Maturity Model requires that device identity be established and verified as part of access decisions. At initial maturity, a complete device inventory is maintained and devices are enrolled in a management platform. At advanced maturity, device compliance is checked in real-time as part of every access decision — non-compliant devices receive restricted or no access. Device certificates or hardware attestation (TPM-based) provide strong device identity that cannot be spoofed. At optimal maturity, device risk scores are continuously calculated from patch status, security agent health, encryption status, and behavioral signals, and these scores dynamically influence access decisions. Device identity binds with user identity to create a composite trust assessment.",
+      "description": "The device pillar of the CISA Zero Trust Maturity Model requires that device identity be established and verified as part of access decisions. At initial maturity, a complete device inventory is maintained and devices are enrolled in a management platform. At advanced maturity, device compliance is checked in real-time as part of every access decision \u2014 non-compliant devices receive restricted or no access. Device certificates or hardware attestation (TPM-based) provide strong device identity that cannot be spoofed. At optimal maturity, device risk scores are continuously calculated from patch status, security agent health, encryption status, and behavioral signals, and these scores dynamically influence access decisions. Device identity binds with user identity to create a composite trust assessment.",
       "category": "authentication",
       "assurance_level": null,
       "zero_trust_pillar": "devices",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-19", "ISO-27001-A.8.1", "NIST-800-207-TENET-3"]
+      "cross_references": [
+        "NIST-800-53-AC-19",
+        "ISO-27001-A.8.1",
+        "NIST-800-207-TENET-3"
+      ]
     },
     {
       "id": "CISA-ZTMM-VISIBILITY",
@@ -70,7 +86,12 @@
       "assurance_level": null,
       "zero_trust_pillar": "visibility",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(12)", "ISO-27001-A.8.15", "ISO-27001-A.8.16"]
+      "cross_references": [
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-2(12)",
+        "ISO-27001-A.8.15",
+        "ISO-27001-A.8.16"
+      ]
     },
     {
       "id": "CISA-ZTMM-AUTOMATION",
@@ -82,7 +103,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "automation",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-2(1)", "NIST-800-53-AC-2(2)", "ISO-27001-A.5.18"]
+      "cross_references": [
+        "NIST-800-53-AC-2(1)",
+        "NIST-800-53-AC-2(2)",
+        "ISO-27001-A.5.18"
+      ]
     },
     {
       "id": "CISA-ZTMM-GOVERNANCE",
@@ -94,19 +119,26 @@
       "assurance_level": null,
       "zero_trust_pillar": "governance",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-1", "ISO-27001-A.5.1", "SOC2-CC6.1"]
+      "cross_references": [
+        "NIST-800-53-AC-1",
+        "ISO-27001-A.5.1",
+        "SOC2-CC6.1"
+      ]
     },
     {
       "id": "NIST-800-207-TENET-1",
       "framework": "nist-800-207",
       "section": "Tenet 1",
       "title": "All Data Sources and Computing Services Are Considered Resources",
-      "description": "In a zero trust architecture, all data sources and computing services are considered resources that require protection. This includes not just traditional servers and databases but also SaaS applications, serverless functions, IoT devices, user workstations, BYOD devices, and the identity infrastructure itself (directory services, certificate authorities, identity providers). Each resource SHALL have an identity and SHALL participate in the access control framework. The organization SHALL maintain a comprehensive inventory of all resources and SHALL define access policies for each. This tenet eliminates the concept of 'trusted' internal resources that require no authentication — every resource, regardless of location, requires authenticated and authorized access.",
+      "description": "In a zero trust architecture, all data sources and computing services are considered resources that require protection. This includes not just traditional servers and databases but also SaaS applications, serverless functions, IoT devices, user workstations, BYOD devices, and the identity infrastructure itself (directory services, certificate authorities, identity providers). Each resource SHALL have an identity and SHALL participate in the access control framework. The organization SHALL maintain a comprehensive inventory of all resources and SHALL define access policies for each. This tenet eliminates the concept of 'trusted' internal resources that require no authentication \u2014 every resource, regardless of location, requires authenticated and authorized access.",
       "category": "authorization",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-3", "ISO-27001-A.5.9", "CIS-5.1"]
+      "cross_references": [
+        "NIST-800-53-AC-3",
+        "ISO-27001-A.5.9"
+      ]
     },
     {
       "id": "NIST-800-207-TENET-2",
@@ -118,43 +150,58 @@
       "assurance_level": null,
       "zero_trust_pillar": "network",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-17(2)", "ISO-27001-A.8.20", "SOC2-CC6.6"]
+      "cross_references": [
+        "NIST-800-53-AC-17(2)",
+        "ISO-27001-A.8.20",
+        "SOC2-CC6.6"
+      ]
     },
     {
       "id": "NIST-800-207-TENET-3",
       "framework": "nist-800-207",
       "section": "Tenet 3",
       "title": "Access to Individual Enterprise Resources Is Granted on a Per-Session Basis",
-      "description": "Access to resources SHALL be granted on a per-session basis with the minimum privileges needed for the task. Trust in the requester SHALL be evaluated before access is granted, and this evaluation SHALL be based on the current state of the requester's identity, device, behavior, and environment — not on historical trust or previous sessions. Access tokens SHALL have limited lifetimes and SHALL be scoped to specific resources and operations. Just-in-time (JIT) access provisioning SHALL be preferred over standing privileges, especially for administrative access. This tenet means that authentication to one resource does not grant implicit access to other resources, and that access decisions are continuously reevaluated throughout the session.",
+      "description": "Access to resources SHALL be granted on a per-session basis with the minimum privileges needed for the task. Trust in the requester SHALL be evaluated before access is granted, and this evaluation SHALL be based on the current state of the requester's identity, device, behavior, and environment \u2014 not on historical trust or previous sessions. Access tokens SHALL have limited lifetimes and SHALL be scoped to specific resources and operations. Just-in-time (JIT) access provisioning SHALL be preferred over standing privileges, especially for administrative access. This tenet means that authentication to one resource does not grant implicit access to other resources, and that access decisions are continuously reevaluated throughout the session.",
       "category": "authorization",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-3(13)", "NIST-800-53-AC-6", "CIS-6.8"]
+      "cross_references": [
+        "NIST-800-53-AC-3(13)",
+        "NIST-800-53-AC-6"
+      ]
     },
     {
       "id": "NIST-800-207-TENET-4",
       "framework": "nist-800-207",
       "section": "Tenet 4",
       "title": "Access Is Determined by Dynamic Policy",
-      "description": "Access to resources is determined by dynamic policy — including the observable state of client identity, application or service, and the requesting asset — and may include other behavioral and environmental attributes. The policy engine SHALL consider: the identity of the requester (user or service), the state of the authentication (AAL, freshness), the device posture (compliance, patch level, encryption status), the requested resource and operation, the time of request, and the current threat level. Policies SHALL be defined declaratively and enforced consistently across all access points. Dynamic policy enables the organization to respond to changing conditions (new threats, device compromise, behavioral anomalies) by adjusting access in real-time without requiring manual intervention.",
+      "description": "Access to resources is determined by dynamic policy \u2014 including the observable state of client identity, application or service, and the requesting asset \u2014 and may include other behavioral and environmental attributes. The policy engine SHALL consider: the identity of the requester (user or service), the state of the authentication (AAL, freshness), the device posture (compliance, patch level, encryption status), the requested resource and operation, the time of request, and the current threat level. Policies SHALL be defined declaratively and enforced consistently across all access points. Dynamic policy enables the organization to respond to changing conditions (new threats, device compromise, behavioral anomalies) by adjusting access in real-time without requiring manual intervention.",
       "category": "authorization",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-3(13)", "NIST-800-53-AC-2(11)", "ISO-27001-A.5.15"]
+      "cross_references": [
+        "NIST-800-53-AC-3(13)",
+        "NIST-800-53-AC-2(11)",
+        "ISO-27001-A.5.15"
+      ]
     },
     {
       "id": "NIST-800-207-TENET-5",
       "framework": "nist-800-207",
       "section": "Tenet 5",
       "title": "Enterprise Monitors and Measures Integrity and Security Posture of All Assets",
-      "description": "The enterprise SHALL continuously monitor and measure the integrity and security posture of all owned and associated assets. No asset is inherently trusted — trust must be earned through continuous compliance verification. The monitoring system SHALL evaluate device health (OS patch level, antivirus status, endpoint detection and response agent health, disk encryption status, screen lock configuration), application integrity (code signing verification, version currency), and identity system health (identity provider availability, certificate validity, federation trust status). Assets that fail to meet minimum security requirements SHALL have their access reduced or revoked until remediation is verified. This continuous assessment replaces the traditional binary trust model with a graduated trust score.",
+      "description": "The enterprise SHALL continuously monitor and measure the integrity and security posture of all owned and associated assets. No asset is inherently trusted \u2014 trust must be earned through continuous compliance verification. The monitoring system SHALL evaluate device health (OS patch level, antivirus status, endpoint detection and response agent health, disk encryption status, screen lock configuration), application integrity (code signing verification, version currency), and identity system health (identity provider availability, certificate validity, federation trust status). Assets that fail to meet minimum security requirements SHALL have their access reduced or revoked until remediation is verified. This continuous assessment replaces the traditional binary trust model with a graduated trust score.",
       "category": "monitoring",
       "assurance_level": null,
       "zero_trust_pillar": "devices",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-19", "ISO-27001-A.8.1", "CISA-ZTMM-DEVICE-ID"]
+      "cross_references": [
+        "NIST-800-53-AC-19",
+        "ISO-27001-A.8.1",
+        "CISA-ZTMM-DEVICE-ID"
+      ]
     },
     {
       "id": "NIST-800-207-TENET-6",
@@ -166,7 +213,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-3(8)", "NIST-800-53-AC-2(12)", "CISA-ZTMM-ID-ADVANCED"]
+      "cross_references": [
+        "NIST-800-53-AC-3(8)",
+        "NIST-800-53-AC-2(12)",
+        "CISA-ZTMM-ID-ADVANCED"
+      ]
     },
     {
       "id": "NIST-800-207-TENET-7",
@@ -178,55 +229,75 @@
       "assurance_level": null,
       "zero_trust_pillar": "visibility",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(12)", "ISO-27001-A.8.15", "ISO-27001-A.8.16"]
+      "cross_references": [
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-2(12)",
+        "ISO-27001-A.8.15",
+        "ISO-27001-A.8.16"
+      ]
     },
     {
       "id": "NIST-800-207-PDP-PEP",
       "framework": "nist-800-207",
-      "section": "§3 - Logical Components",
+      "section": "\u00a73 - Logical Components",
       "title": "Policy Decision Point and Policy Enforcement Point Architecture",
       "description": "The NIST SP 800-207 zero trust architecture defines two critical logical components: the Policy Decision Point (PDP) and the Policy Enforcement Point (PEP). The PDP consists of the Policy Engine (PE) which makes the access decision, and the Policy Administrator (PA) which establishes and terminates the communication path between the subject and the resource. The PEP is the system component that enables, monitors, and eventually terminates the connection between the subject and the resource based on directives from the PA. All access requests flow through the PEP to the PDP, where a trust algorithm evaluates identity, device, resource, environmental, and behavioral attributes against defined policies. This architecture ensures that every access request is evaluated independently and that policy enforcement is consistent across all access paths.",
       "category": "authorization",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-24", "NIST-800-53-AC-25", "NIST-800-53-AC-3"]
+      "cross_references": [
+        "NIST-800-53-AC-24",
+        "NIST-800-53-AC-25",
+        "NIST-800-53-AC-3"
+      ]
     },
     {
       "id": "NIST-800-207-TRUST-ALGO",
       "framework": "nist-800-207",
-      "section": "§3.3 - Trust Algorithm",
+      "section": "\u00a73.3 - Trust Algorithm",
       "title": "Zero Trust Trust Algorithm",
-      "description": "The trust algorithm is the process used by the Policy Engine to grant or deny access to a resource. Input to the trust algorithm includes: the access request itself (requester identity, requested resource, requested action), the subject database (role, historical behavior, assigned attributes), the asset database (device posture, OS version, installed software, credentials), the resource requirements (sensitivity level, required AAL, required device posture), and threat intelligence (current threat level, known IOCs, recent attack patterns). The trust algorithm combines these inputs — either through a scoring system (assigning numerical confidence values to each input) or a contextual analysis (evaluating each input against a set of qualitative criteria) — to produce an access decision. The algorithm should favor denying access when confidence is low to minimize risk.",
+      "description": "The trust algorithm is the process used by the Policy Engine to grant or deny access to a resource. Input to the trust algorithm includes: the access request itself (requester identity, requested resource, requested action), the subject database (role, historical behavior, assigned attributes), the asset database (device posture, OS version, installed software, credentials), the resource requirements (sensitivity level, required AAL, required device posture), and threat intelligence (current threat level, known IOCs, recent attack patterns). The trust algorithm combines these inputs \u2014 either through a scoring system (assigning numerical confidence values to each input) or a contextual analysis (evaluating each input against a set of qualitative criteria) \u2014 to produce an access decision. The algorithm should favor denying access when confidence is low to minimize risk.",
       "category": "authorization",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-3(13)", "NIST-800-53-AC-24", "CISA-ZTMM-ID-ADVANCED"]
+      "cross_references": [
+        "NIST-800-53-AC-3(13)",
+        "NIST-800-53-AC-24",
+        "CISA-ZTMM-ID-ADVANCED"
+      ]
     },
     {
       "id": "NIST-800-207-DEPLOYMENT-SDP",
       "framework": "nist-800-207",
-      "section": "§3.2.1",
+      "section": "\u00a73.2.1",
       "title": "Zero Trust Deployment: Enhanced Identity Governance (SDP)",
       "description": "The enhanced identity governance deployment model for zero trust uses the identity of actors as the key component of policy creation. Resource access policies are based on identity and assigned attributes. The primary requirement for resource access is the identity of the requesting actor and their assigned privileges. Enterprise resource access is gated through a policy enforcement point managed by the policy administrator. This model works well when organizations have a robust identity governance program and a well-defined RBAC or ABAC model. It is often implemented using Software Defined Perimeter (SDP) or identity-aware proxy patterns where all access is brokered through an identity-aware gateway that evaluates the requester's identity attributes against the resource's access policy before granting access.",
       "category": "authorization",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-3(13)", "NIST-800-53-AC-3(7)", "CIS-6.7"]
+      "cross_references": [
+        "NIST-800-53-AC-3(13)",
+        "NIST-800-53-AC-3(7)"
+      ]
     },
     {
       "id": "NIST-800-207-DEPLOYMENT-MICRO",
       "framework": "nist-800-207",
-      "section": "§3.2.2",
+      "section": "\u00a73.2.2",
       "title": "Zero Trust Deployment: Micro-Segmentation",
-      "description": "The micro-segmentation deployment model for zero trust places individual or small groups of resources on their own network segment protected by a gateway security device that acts as the PEP. The gateway controls access by using identity-aware policies — to reach a resource, the requester must first authenticate and be authorized by the gateway. Micro-segmentation can be implemented using next-generation firewalls, software-defined networking, or host-based segmentation agents. In the identity context, micro-segmentation ensures that network access alone is insufficient — identity verification is required at each segment boundary. This approach is particularly effective for protecting high-value assets such as identity infrastructure (domain controllers, certificate authorities, identity providers) from lateral movement attacks.",
+      "description": "The micro-segmentation deployment model for zero trust places individual or small groups of resources on their own network segment protected by a gateway security device that acts as the PEP. The gateway controls access by using identity-aware policies \u2014 to reach a resource, the requester must first authenticate and be authorized by the gateway. Micro-segmentation can be implemented using next-generation firewalls, software-defined networking, or host-based segmentation agents. In the identity context, micro-segmentation ensures that network access alone is insufficient \u2014 identity verification is required at each segment boundary. This approach is particularly effective for protecting high-value assets such as identity infrastructure (domain controllers, certificate authorities, identity providers) from lateral movement attacks.",
       "category": "authorization",
       "assurance_level": null,
       "zero_trust_pillar": "network",
       "maturity_level": "advanced",
-      "cross_references": ["NIST-800-53-AC-4", "NIST-800-53-AC-3", "ISO-27001-A.8.20"]
+      "cross_references": [
+        "NIST-800-53-AC-4",
+        "NIST-800-53-AC-3",
+        "ISO-27001-A.8.20"
+      ]
     },
     {
       "id": "CISA-ZTMM-ID-MFA-PROGRESSION",
@@ -238,7 +309,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-63B-AAL2", "NIST-800-63B-AAL3", "NIST-800-63B-PHISHING-RESIST", "CIS-6.3", "CIS-6.5"]
+      "cross_references": [
+        "NIST-800-63B-AAL2",
+        "NIST-800-63B-AAL3",
+        "NIST-800-63B-PHISHING-RESIST"
+      ]
     },
     {
       "id": "CISA-ZTMM-ID-LIFECYCLE-AUTO",
@@ -250,19 +325,28 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-2(1)", "NIST-800-53-AC-2(2)", "CIS-5.1", "CIS-5.3", "ISO-27001-A.5.18"]
+      "cross_references": [
+        "NIST-800-53-AC-2(1)",
+        "NIST-800-53-AC-2(2)",
+        "ISO-27001-A.5.18"
+      ]
     },
     {
       "id": "CISA-ZTMM-ID-PAM-MATURITY",
       "framework": "cisa-zero-trust",
       "section": "Identity Pillar - Privileged Access",
       "title": "CISA ZTMM: Privileged Access Management Maturity",
-      "description": "Privileged access management maturity in the CISA ZTMM progresses from shared admin credentials at the traditional level to fully automated just-in-time access at the optimal level. At initial maturity, dedicated admin accounts are established and basic credential vaulting is deployed. At advanced maturity, just-in-time (JIT) privileged access is implemented — standing privileges are eliminated and administrative access is provisioned on-demand for a limited duration with full session recording. Privileged Access Workstations (PAWs) or jump servers are required for all administrative tasks. At optimal maturity, AI-driven anomaly detection monitors all privileged sessions in real-time, automated workflow approval gates enforce separation of duties for high-risk operations, and zero standing privilege is the default for all administrative roles.",
+      "description": "Privileged access management maturity in the CISA ZTMM progresses from shared admin credentials at the traditional level to fully automated just-in-time access at the optimal level. At initial maturity, dedicated admin accounts are established and basic credential vaulting is deployed. At advanced maturity, just-in-time (JIT) privileged access is implemented \u2014 standing privileges are eliminated and administrative access is provisioned on-demand for a limited duration with full session recording. Privileged Access Workstations (PAWs) or jump servers are required for all administrative tasks. At optimal maturity, AI-driven anomaly detection monitors all privileged sessions in real-time, automated workflow approval gates enforce separation of duties for high-risk operations, and zero standing privilege is the default for all administrative roles.",
       "category": "privileged-access",
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(7)", "NIST-800-53-AC-17(4)", "CIS-5.4", "ISO-27001-A.8.2"]
+      "cross_references": [
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-2(7)",
+        "NIST-800-53-AC-17(4)",
+        "ISO-27001-A.8.2"
+      ]
     },
     {
       "id": "CISA-ZTMM-NETWORK-ID",
@@ -274,7 +358,12 @@
       "assurance_level": null,
       "zero_trust_pillar": "network",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-207-DEPLOYMENT-MICRO", "NIST-800-53-AC-4", "NIST-800-53-AC-17", "ISO-27001-A.8.20"]
+      "cross_references": [
+        "NIST-800-207-DEPLOYMENT-MICRO",
+        "NIST-800-53-AC-4",
+        "NIST-800-53-AC-17",
+        "ISO-27001-A.8.20"
+      ]
     }
   ]
 }

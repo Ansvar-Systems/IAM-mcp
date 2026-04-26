@@ -8,13 +8,39 @@
       "description": "Okta Universal Directory is the centralized identity store that aggregates user profiles from multiple sources (Active Directory, LDAP, HR systems, other applications) into a single unified profile. It supports custom attributes, profile mastering (determining which source is authoritative for each attribute), and real-time synchronization with connected directories. Universal Directory enables identity governance by providing a single source of truth for user attributes used in authentication policies, application assignments, and group rules. Group rules automatically assign users to groups based on attribute values, enabling dynamic, attribute-based access provisioning. The directory model supports multiple profile types (user, group, application) with schema extensibility.",
       "best_practices": "1. Define profile mastering rules to establish which source is authoritative for each attribute (HR for name, AD for email). 2. Use custom attributes for organization-specific user properties (cost center, clearance level, employee type). 3. Create group rules based on user attributes for automatic group membership management. 4. Implement attribute-level mappings between directory sources and Okta profiles. 5. Monitor directory sync errors daily and resolve attribute conflicts promptly. 6. Use Okta Expression Language for complex attribute transformations during profile mapping. 7. Implement deactivation policies that trigger when the authoritative HR source removes a user.",
       "common_misconfigurations": [
-        {"issue": "No profile mastering defined; multiple sources overwrite each other", "impact": "User attributes inconsistently overwritten by different directory syncs, causing authentication failures", "severity": "high"},
-        {"issue": "Group rules not implemented; manual group membership management", "impact": "Group memberships not updated when user attributes change, leading to stale access", "severity": "medium"},
-        {"issue": "Custom attributes not leveraged for access policy decisions", "impact": "Authentication policies cannot use organization-specific context (department, location, role) for adaptive access", "severity": "medium"},
-        {"issue": "Directory sync errors not monitored", "impact": "Failed user provisioning or attribute updates cause access issues without detection", "severity": "high"}
+        {
+          "issue": "No profile mastering defined; multiple sources overwrite each other",
+          "impact": "User attributes inconsistently overwritten by different directory syncs, causing authentication failures",
+          "severity": "high"
+        },
+        {
+          "issue": "Group rules not implemented; manual group membership management",
+          "impact": "Group memberships not updated when user attributes change, leading to stale access",
+          "severity": "medium"
+        },
+        {
+          "issue": "Custom attributes not leveraged for access policy decisions",
+          "impact": "Authentication policies cannot use organization-specific context (department, location, role) for adaptive access",
+          "severity": "medium"
+        },
+        {
+          "issue": "Directory sync errors not monitored",
+          "impact": "Failed user provisioning or attribute updates cause access issues without detection",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-2(1)", "ISO-27001-A.5.16", "ISO-27001-A.5.18", "SOC2-CC6.2"],
-      "equivalent_in": {"azure-entra": "Microsoft Entra ID Directory + Entra Connect", "aws-iam": "IAM Identity Center Directory + AD Connector", "gcp-iam": "Cloud Identity + GCDS"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-2(1)",
+        "ISO-27001-A.5.16",
+        "ISO-27001-A.5.18",
+        "SOC2-CC6.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Microsoft Entra ID Directory + Entra Connect",
+        "aws-iam": "IAM Identity Center Directory + AD Connector",
+        "gcp-iam": "Cloud Identity + GCDS"
+      }
     },
     {
       "id": "okta-authentication-policies",
@@ -24,13 +50,39 @@
       "description": "Okta Authentication Policies (formerly App Sign-On Policies in Okta Identity Engine) define the authentication requirements for accessing specific applications. Policies evaluate conditions including user group membership, network zone, device trust status, risk level, and user type, then enforce requirements such as specific authenticator types, re-authentication frequency, and session restrictions. Policies are assigned to applications, and the most specific matching rule within a policy determines the authentication requirements. Okta Identity Engine introduced a unified policy framework where authentication policies replace the legacy MFA enrollment policies and sign-on policies, providing a single point of configuration for per-application access requirements.",
       "best_practices": "1. Create application-specific authentication policies based on resource sensitivity (not one policy for all apps). 2. Require phishing-resistant authenticators (FIDO2, Okta FastPass) for high-sensitivity applications. 3. Use device trust as a condition to differentiate managed and unmanaged device access requirements. 4. Configure re-authentication intervals appropriate to the application sensitivity. 5. Set a catch-all deny rule at the bottom of each policy to ensure no unmatched conditions result in access. 6. Test policy changes with a pilot group before applying to all users. 7. Use Okta's policy simulation tools to validate policy behavior before deployment. 8. Review authentication policy configurations quarterly for alignment with security requirements.",
       "common_misconfigurations": [
-        {"issue": "Single authentication policy applied to all applications regardless of sensitivity", "impact": "Low-sensitivity apps require excessive authentication; high-sensitivity apps under-protected", "severity": "high"},
-        {"issue": "No catch-all deny rule at the end of the policy", "impact": "Users matching no policy rules may be granted default access without intended authentication requirements", "severity": "high"},
-        {"issue": "Device trust not used as a policy condition", "impact": "Unmanaged personal devices access corporate applications with the same requirements as managed devices", "severity": "medium"},
-        {"issue": "Re-authentication interval set too long for sensitive applications", "impact": "Long-lived sessions remain active after device compromise or policy change", "severity": "medium"}
+        {
+          "issue": "Single authentication policy applied to all applications regardless of sensitivity",
+          "impact": "Low-sensitivity apps require excessive authentication; high-sensitivity apps under-protected",
+          "severity": "high"
+        },
+        {
+          "issue": "No catch-all deny rule at the end of the policy",
+          "impact": "Users matching no policy rules may be granted default access without intended authentication requirements",
+          "severity": "high"
+        },
+        {
+          "issue": "Device trust not used as a policy condition",
+          "impact": "Unmanaged personal devices access corporate applications with the same requirements as managed devices",
+          "severity": "medium"
+        },
+        {
+          "issue": "Re-authentication interval set too long for sensitive applications",
+          "impact": "Long-lived sessions remain active after device compromise or policy change",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-IA-2(1)", "NIST-800-207-PDP-PEP", "ISO-27001-A.8.5", "SOC2-CC6.1", "CIS-6.2"],
-      "equivalent_in": {"azure-entra": "Conditional Access Policies", "aws-iam": "IAM Identity Center Authentication Settings", "gcp-iam": "Context-Aware Access + IAP Policies"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-IA-2(1)",
+        "NIST-800-207-PDP-PEP",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Conditional Access Policies",
+        "aws-iam": "IAM Identity Center Authentication Settings",
+        "gcp-iam": "Context-Aware Access + IAP Policies"
+      }
     },
     {
       "id": "okta-mfa-factors",
@@ -40,13 +92,42 @@
       "description": "Okta supports a comprehensive set of authenticator types for multi-factor authentication: Okta Verify (push notifications with number challenge, biometric, TOTP), FIDO2 WebAuthn (hardware security keys, platform authenticators, passkeys), Okta FastPass (device-bound passwordless with phishing resistance), SMS and voice call (restricted authenticators), email magic links, security questions (legacy, not recommended), and third-party OATH TOTP tokens. Authenticator enrollment policies define which authenticators are required, optional, or disabled for each user group. The enrollment framework supports phased rollout strategies where users are prompted to register stronger authenticators when they sign in. Okta Identity Engine provides a unified authenticator model that simplifies management compared to the legacy MFA factor model.",
       "best_practices": "1. Require enrollment of at least two authenticators per user for recovery resilience. 2. Set Okta Verify with push and number challenge as the default authenticator for all users. 3. Require FIDO2 or Okta FastPass enrollment for administrators and privileged users. 4. Disable SMS and voice call authenticators; if required, mark them as 'restricted' and plan migration. 5. Use enrollment campaigns to drive adoption from weaker to stronger authenticators. 6. Configure authenticator enrollment policies per group (admins: FIDO2 required, standard: Okta Verify required). 7. Disable security questions as an authenticator (known-answer authentication is easily compromised). 8. Monitor authenticator enrollment completion rates and follow up with non-compliant users.",
       "common_misconfigurations": [
-        {"issue": "SMS and voice still allowed as MFA factors without restriction or migration plan", "impact": "Users choose weakest available factor; SIM swap attacks bypass MFA for any user using SMS", "severity": "high"},
-        {"issue": "Only one authenticator required per user (no backup)", "impact": "Lost or damaged primary authenticator requires admin intervention and helpdesk account recovery", "severity": "medium"},
-        {"issue": "Security questions still enabled as an authenticator", "impact": "Answers to security questions are guessable or findable via social media research", "severity": "medium"},
-        {"issue": "No phishing-resistant authenticator required for administrators", "impact": "Admin accounts protected only by phishable MFA methods (TOTP, push without number matching)", "severity": "high"}
+        {
+          "issue": "SMS and voice still allowed as MFA factors without restriction or migration plan",
+          "impact": "Users choose weakest available factor; SIM swap attacks bypass MFA for any user using SMS",
+          "severity": "high"
+        },
+        {
+          "issue": "Only one authenticator required per user (no backup)",
+          "impact": "Lost or damaged primary authenticator requires admin intervention and helpdesk account recovery",
+          "severity": "medium"
+        },
+        {
+          "issue": "Security questions still enabled as an authenticator",
+          "impact": "Answers to security questions are guessable or findable via social media research",
+          "severity": "medium"
+        },
+        {
+          "issue": "No phishing-resistant authenticator required for administrators",
+          "impact": "Admin accounts protected only by phishable MFA methods (TOTP, push without number matching)",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-63B-AAL2", "NIST-800-63B-AAL3", "NIST-800-63B-AUTH-MF-CRYPTO-SW", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "SOC2-CC6.1", "OWASP-ASVS-V2.8"],
-      "equivalent_in": {"azure-entra": "Authentication Methods Policy + Registration Campaign", "aws-iam": "IAM MFA Device Types", "gcp-iam": "2-Step Verification Methods + Titan Keys", "auth0": "Auth0 MFA Factors (Guardian, WebAuthn, OTP)"}
+      "compliance_controls": [
+        "NIST-800-63B-AAL2",
+        "NIST-800-63B-AAL3",
+        "NIST-800-63B-AUTH-MF-CRYPTO-SW",
+        "NIST-800-53-IA-2(1)",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1",
+        "OWASP-ASVS-V2.8"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Authentication Methods Policy + Registration Campaign",
+        "aws-iam": "IAM MFA Device Types",
+        "gcp-iam": "2-Step Verification Methods + Titan Keys",
+        "auth0": "Auth0 MFA Factors (Guardian, WebAuthn, OTP)"
+      }
     },
     {
       "id": "okta-adaptive-mfa",
@@ -56,13 +137,41 @@
       "description": "Okta Adaptive MFA evaluates real-time risk signals to dynamically adjust authentication requirements. Risk signals include: new device, new location, impossible travel, new IP address, anonymizing proxy detection, velocity anomalies (rapid sign-in attempts from distributed locations), and Okta ThreatInsight threat intelligence feeds. When risk signals indicate elevated threat, Adaptive MFA can increase authentication requirements (require additional factor, require phishing-resistant factor), block access, or trigger post-authentication session restrictions. When risk signals indicate low threat (known device, known location, corporate network), Adaptive MFA can reduce friction by allowing passwordless or single-factor authentication. This balances security with user experience by adapting requirements to the actual risk level of each authentication event.",
       "best_practices": "1. Enable all risk signal types for comprehensive risk assessment. 2. Set high-risk thresholds to require phishing-resistant MFA (FIDO2, FastPass). 3. Configure medium-risk thresholds to require standard MFA (Okta Verify push). 4. Allow passwordless authentication for low-risk scenarios (known device + known network). 5. Integrate Adaptive MFA with ThreatInsight for IP-based threat intelligence. 6. Monitor risk assessment outcomes in the System Log for tuning effectiveness. 7. Start with report-only mode to understand risk distribution before enforcing adaptive policies.",
       "common_misconfigurations": [
-        {"issue": "Adaptive MFA not enabled; static MFA requirements for all sign-ins", "impact": "Low-risk users experience unnecessary friction; high-risk sign-ins not receiving elevated scrutiny", "severity": "medium"},
-        {"issue": "Risk thresholds not tuned; too many false positives blocking legitimate users", "impact": "Users experience frequent lockouts, helpdesk volume increases, and user satisfaction decreases", "severity": "medium"},
-        {"issue": "High-risk response only requires standard MFA instead of phishing-resistant", "impact": "Elevated risk sign-ins protected by the same MFA that may already be compromised", "severity": "high"},
-        {"issue": "Risk signals not correlated with ThreatInsight threat intelligence", "impact": "Known malicious IPs not factored into risk assessment, missing automated threat mitigation", "severity": "medium"}
+        {
+          "issue": "Adaptive MFA not enabled; static MFA requirements for all sign-ins",
+          "impact": "Low-risk users experience unnecessary friction; high-risk sign-ins not receiving elevated scrutiny",
+          "severity": "medium"
+        },
+        {
+          "issue": "Risk thresholds not tuned; too many false positives blocking legitimate users",
+          "impact": "Users experience frequent lockouts, helpdesk volume increases, and user satisfaction decreases",
+          "severity": "medium"
+        },
+        {
+          "issue": "High-risk response only requires standard MFA instead of phishing-resistant",
+          "impact": "Elevated risk sign-ins protected by the same MFA that may already be compromised",
+          "severity": "high"
+        },
+        {
+          "issue": "Risk signals not correlated with ThreatInsight threat intelligence",
+          "impact": "Known malicious IPs not factored into risk assessment, missing automated threat mitigation",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-207-TRUST-ALGO", "NIST-800-53-AC-7", "NIST-800-53-AC-7(2)", "ISO-27001-A.8.5", "SOC2-CC6.1", "CISA-ZTMM-ID-ADVANCED"],
-      "equivalent_in": {"azure-entra": "Identity Protection Risk Policies + Conditional Access", "aws-iam": "GuardDuty IAM findings (detective, not preventive)", "gcp-iam": "BeyondCorp Enterprise Threat Protection", "auth0": "Adaptive MFA + Attack Protection"}
+      "compliance_controls": [
+        "NIST-800-207-TRUST-ALGO",
+        "NIST-800-53-AC-7",
+        "NIST-800-53-AC-7(2)",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1",
+        "CISA-ZTMM-ID-ADVANCED"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Identity Protection Risk Policies + Conditional Access",
+        "aws-iam": "GuardDuty IAM findings (detective, not preventive)",
+        "gcp-iam": "BeyondCorp Enterprise Threat Protection",
+        "auth0": "Adaptive MFA + Attack Protection"
+      }
     },
     {
       "id": "okta-device-trust",
@@ -72,13 +181,40 @@
       "description": "Okta Device Trust ensures that only managed, compliant devices can access corporate applications through Okta. Device assurance policies evaluate device security posture signals: MDM management status (Intune, Jamf, VMware WS1), disk encryption, screen lock, OS version, jailbreak/root detection, and biometric capability. Okta Verify acts as the device agent that collects and reports device posture signals. Device assurance policies are used as conditions in authentication policies to differentiate access requirements based on device trust level. The framework supports three device states: managed (MDM-enrolled and compliant), registered (Okta Verify installed but not MDM-managed), and unmanaged (no device agent). Different application access levels can be granted based on the device's trust status.",
       "best_practices": "1. Deploy Okta Verify on all corporate-managed devices for device signal collection. 2. Require managed device status for accessing sensitive applications (HR, finance, admin tools). 3. Allow limited access from registered devices (Okta Verify installed but not MDM-managed). 4. Block unmanaged device access to highly sensitive applications. 5. Configure device assurance policies requiring disk encryption, screen lock, and minimum OS version. 6. Integrate with existing MDM (Intune, Jamf) for device compliance signal sourcing. 7. Monitor device trust signal changes in the System Log for posture drift detection.",
       "common_misconfigurations": [
-        {"issue": "Device trust not enabled; all devices treated equally regardless of management status", "impact": "Unmanaged personal devices access sensitive applications without security posture verification", "severity": "high"},
-        {"issue": "Device assurance policy does not require disk encryption", "impact": "Data-at-rest on lost or stolen devices is accessible without decryption key", "severity": "medium"},
-        {"issue": "Okta Verify not deployed on managed devices; MDM status unknown to Okta", "impact": "Device trust decisions cannot incorporate MDM compliance signals; coarse-grained device assessment", "severity": "medium"},
-        {"issue": "No differentiation between managed and unmanaged devices in authentication policies", "impact": "Same authentication requirements regardless of device posture, missing zero trust opportunity", "severity": "medium"}
+        {
+          "issue": "Device trust not enabled; all devices treated equally regardless of management status",
+          "impact": "Unmanaged personal devices access sensitive applications without security posture verification",
+          "severity": "high"
+        },
+        {
+          "issue": "Device assurance policy does not require disk encryption",
+          "impact": "Data-at-rest on lost or stolen devices is accessible without decryption key",
+          "severity": "medium"
+        },
+        {
+          "issue": "Okta Verify not deployed on managed devices; MDM status unknown to Okta",
+          "impact": "Device trust decisions cannot incorporate MDM compliance signals; coarse-grained device assessment",
+          "severity": "medium"
+        },
+        {
+          "issue": "No differentiation between managed and unmanaged devices in authentication policies",
+          "impact": "Same authentication requirements regardless of device posture, missing zero trust opportunity",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-207-TENET-3", "NIST-800-53-AC-19", "CISA-ZTMM-DEVICE-ID", "ISO-27001-A.8.1", "SOC2-CC6.1", "SOC2-CC6.8"],
-      "equivalent_in": {"azure-entra": "Conditional Access Device Compliance + Intune", "aws-iam": "AWS SSO with Device Trust Integration", "gcp-iam": "BeyondCorp Endpoint Verification"}
+      "compliance_controls": [
+        "NIST-800-207-TENET-3",
+        "NIST-800-53-AC-19",
+        "CISA-ZTMM-DEVICE-ID",
+        "ISO-27001-A.8.1",
+        "SOC2-CC6.1",
+        "SOC2-CC6.8"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Conditional Access Device Compliance + Intune",
+        "aws-iam": "AWS SSO with Device Trust Integration",
+        "gcp-iam": "BeyondCorp Endpoint Verification"
+      }
     },
     {
       "id": "okta-network-zones",
@@ -88,13 +224,39 @@
       "description": "Okta Network Zones define network boundaries based on IP address ranges, ASN (Autonomous System Numbers), and dynamic zone types (Okta-managed IP blocklists). Zones are categorized as: IP zones (specific IP ranges for corporate offices, VPN egress, trusted partners), dynamic zones (Okta-curated threat intelligence blocklists including TOR exit nodes, anonymizing proxies, and known malicious IPs), and enhanced dynamic zones (ASN-based for ISP identification). Network Zones are used as conditions in authentication policies and sign-on policies to apply different requirements based on network origin. Corporate network zones can reduce MFA friction, while untrusted or dynamic threat zones can increase requirements or block access entirely.",
       "best_practices": "1. Define IP zones for all corporate office and VPN egress IP ranges. 2. Enable dynamic zones to block TOR exit nodes, anonymizing proxies, and known malicious IPs. 3. Use network zones as conditions in authentication policies alongside device trust and risk level. 4. Do not exempt corporate networks from MFA for privileged accounts. 5. Update IP zones when corporate network infrastructure changes (new offices, VPN changes). 6. Create separate zones for partner/vendor IP ranges if trusted partner access is required. 7. Monitor sign-in attempts from blocked dynamic zones for threat intelligence correlation.",
       "common_misconfigurations": [
-        {"issue": "Dynamic threat zones not enabled; known malicious IPs not blocked", "impact": "Authentication attempts from TOR exit nodes, proxies, and known attack infrastructure proceed normally", "severity": "high"},
-        {"issue": "Corporate network zone exempts all users from MFA", "impact": "Any device on the corporate network authenticates without MFA; VPN/network compromise bypasses MFA entirely", "severity": "high"},
-        {"issue": "IP zones not updated when network infrastructure changes", "impact": "New corporate locations treated as untrusted; decommissioned IPs still trusted", "severity": "medium"},
-        {"issue": "Network zones used as sole access control without other conditions", "impact": "IP spoofing or VPN tunneling bypasses network-only access restrictions", "severity": "medium"}
+        {
+          "issue": "Dynamic threat zones not enabled; known malicious IPs not blocked",
+          "impact": "Authentication attempts from TOR exit nodes, proxies, and known attack infrastructure proceed normally",
+          "severity": "high"
+        },
+        {
+          "issue": "Corporate network zone exempts all users from MFA",
+          "impact": "Any device on the corporate network authenticates without MFA; VPN/network compromise bypasses MFA entirely",
+          "severity": "high"
+        },
+        {
+          "issue": "IP zones not updated when network infrastructure changes",
+          "impact": "New corporate locations treated as untrusted; decommissioned IPs still trusted",
+          "severity": "medium"
+        },
+        {
+          "issue": "Network zones used as sole access control without other conditions",
+          "impact": "IP spoofing or VPN tunneling bypasses network-only access restrictions",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-17(1)", "NIST-800-53-AC-17(4)", "ISO-27001-A.8.5", "SOC2-CC6.1", "SOC2-CC6.6"],
-      "equivalent_in": {"azure-entra": "Named Locations (IP and Country-Based)", "aws-iam": "IAM Policy Conditions (aws:SourceIp)", "gcp-iam": "Access Context Manager IP Conditions"}
+      "compliance_controls": [
+        "NIST-800-53-AC-17(1)",
+        "NIST-800-53-AC-17(4)",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1",
+        "SOC2-CC6.6"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Named Locations (IP and Country-Based)",
+        "aws-iam": "IAM Policy Conditions (aws:SourceIp)",
+        "gcp-iam": "Access Context Manager IP Conditions"
+      }
     },
     {
       "id": "okta-system-log",
@@ -104,13 +266,41 @@
       "description": "The Okta System Log provides a comprehensive audit trail of all events in the Okta tenant: authentication events (success, failure, MFA challenge, risk evaluation), administrative actions (policy changes, user management, app configuration), directory sync events, provisioning events, and security threat events. The System Log supports real-time streaming via Log Streaming (AWS EventBridge, Splunk HEC) for SIEM integration, webhooks via Event Hooks for real-time event-driven automation, and API-based polling for log aggregation. Each event includes actor (who), target (what), client (from where), outcome (result), and detailed context (authentication method, device, location, risk factors). The System Log is the primary data source for Okta security operations, incident investigation, and compliance reporting.",
       "best_practices": "1. Configure Log Streaming to SIEM (Splunk, Sentinel, Chronicle) for real-time security monitoring. 2. Create alerts for critical events: admin role assignments, policy changes, MFA factor resets. 3. Monitor authentication failure patterns for credential stuffing and brute force detection. 4. Use Event Hooks for automated incident response (e.g., disable user after N failed MFA attempts). 5. Retain System Log data in the SIEM for minimum 1 year beyond Okta's retention period. 6. Build Okta security dashboards correlating authentication, risk, and administrative events. 7. Review System Log for administrative actions by service accounts and API tokens daily. 8. Use the System Log API for automated compliance report generation.",
       "common_misconfigurations": [
-        {"issue": "System Log not streamed to SIEM; only viewed in Okta admin console", "impact": "Security events not correlated with other security signals; no automated alerting or long-term retention", "severity": "high"},
-        {"issue": "No alerts for administrative actions (policy changes, user deactivation, MFA resets)", "impact": "Malicious admin actions or compromised admin accounts not detected in real time", "severity": "high"},
-        {"issue": "Event Hooks not used for automated incident response", "impact": "Manual response to security events introduces delays; active attacks continue during investigation", "severity": "medium"},
-        {"issue": "System Log retention not extended via SIEM export", "impact": "Okta retains logs for 90 days; historical evidence unavailable for incident investigation beyond that", "severity": "medium"}
+        {
+          "issue": "System Log not streamed to SIEM; only viewed in Okta admin console",
+          "impact": "Security events not correlated with other security signals; no automated alerting or long-term retention",
+          "severity": "high"
+        },
+        {
+          "issue": "No alerts for administrative actions (policy changes, user deactivation, MFA resets)",
+          "impact": "Malicious admin actions or compromised admin accounts not detected in real time",
+          "severity": "high"
+        },
+        {
+          "issue": "Event Hooks not used for automated incident response",
+          "impact": "Manual response to security events introduces delays; active attacks continue during investigation",
+          "severity": "medium"
+        },
+        {
+          "issue": "System Log retention not extended via SIEM export",
+          "impact": "Okta retains logs for 90 days; historical evidence unavailable for incident investigation beyond that",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(12)", "NIST-800-53-AC-6(9)", "ISO-27001-A.8.15", "ISO-27001-A.8.16", "SOC2-CC7.2", "SOC2-CC5.2"],
-      "equivalent_in": {"azure-entra": "Entra ID Diagnostic Logs + Event Hubs", "aws-iam": "CloudTrail + EventBridge", "gcp-iam": "Cloud Audit Logs + Pub/Sub"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-2(12)",
+        "NIST-800-53-AC-6(9)",
+        "ISO-27001-A.8.15",
+        "ISO-27001-A.8.16",
+        "SOC2-CC7.2",
+        "SOC2-CC5.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Diagnostic Logs + Event Hubs",
+        "aws-iam": "CloudTrail + EventBridge",
+        "gcp-iam": "Cloud Audit Logs + Pub/Sub"
+      }
     },
     {
       "id": "okta-lifecycle-management",
@@ -120,13 +310,42 @@
       "description": "Okta Lifecycle Management automates user provisioning and deprovisioning across connected applications using SCIM 2.0, proprietary connectors, and custom API integrations. When a user is created in the authoritative source (HR system, AD), Okta automatically creates accounts in assigned applications with appropriate role and group mapperships. When a user is deactivated or deleted, Okta deactivates or deletes their accounts across all provisioned applications. The provisioning framework supports: attribute-level mappings between Okta profiles and application schemas, group-based application assignment (assign application to group, all group members get provisioned), provisioning rules for conditional provisioning, and import/matching rules for linking existing application accounts to Okta identities.",
       "best_practices": "1. Connect HR system (Workday, BambooHR, SAP) as the authoritative identity source via HR-driven provisioning. 2. Enable automatic deprovisioning for all connected applications to ensure timely access removal. 3. Use group-based application assignment for scalable, attribute-driven access provisioning. 4. Configure provisioning error notifications and monitor daily for failed operations. 5. Test provisioning flows in a sandbox application instance before production deployment. 6. Map only necessary attributes to downstream applications (least privilege at the attribute level). 7. Implement matching rules for existing application accounts during initial Okta integration.",
       "common_misconfigurations": [
-        {"issue": "Automatic deprovisioning not enabled for connected applications", "impact": "Deactivated users in Okta retain active accounts in downstream applications", "severity": "critical"},
-        {"issue": "HR system not integrated as authoritative source; manual user creation in Okta", "impact": "User lifecycle not synchronized with employment status; delayed onboarding and offboarding", "severity": "high"},
-        {"issue": "Provisioning errors not monitored; failed operations not remediated", "impact": "Users assigned applications but not actually provisioned; or deprovisioned users not actually removed", "severity": "high"},
-        {"issue": "Overly broad attribute mapping to downstream applications", "impact": "Sensitive user attributes (SSN, salary, home address) pushed to applications that do not need them", "severity": "medium"}
+        {
+          "issue": "Automatic deprovisioning not enabled for connected applications",
+          "impact": "Deactivated users in Okta retain active accounts in downstream applications",
+          "severity": "critical"
+        },
+        {
+          "issue": "HR system not integrated as authoritative source; manual user creation in Okta",
+          "impact": "User lifecycle not synchronized with employment status; delayed onboarding and offboarding",
+          "severity": "high"
+        },
+        {
+          "issue": "Provisioning errors not monitored; failed operations not remediated",
+          "impact": "Users assigned applications but not actually provisioned; or deprovisioned users not actually removed",
+          "severity": "high"
+        },
+        {
+          "issue": "Overly broad attribute mapping to downstream applications",
+          "impact": "Sensitive user attributes (SSN, salary, home address) pushed to applications that do not need them",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-2(1)", "NIST-800-53-AC-2(2)", "ISO-27001-A.5.16", "ISO-27001-A.5.18", "ISO-27001-A.6.5", "SOC2-CC6.2"],
-      "equivalent_in": {"azure-entra": "Entra ID Provisioning + Lifecycle Workflows", "aws-iam": "IAM Identity Center SCIM Provisioning", "gcp-iam": "Cloud Identity SCIM + GCDS", "sailpoint": "Provisioning Connectors + Lifecycle Events"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-2(1)",
+        "NIST-800-53-AC-2(2)",
+        "ISO-27001-A.5.16",
+        "ISO-27001-A.5.18",
+        "ISO-27001-A.6.5",
+        "SOC2-CC6.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Provisioning + Lifecycle Workflows",
+        "aws-iam": "IAM Identity Center SCIM Provisioning",
+        "gcp-iam": "Cloud Identity SCIM + GCDS",
+        "sailpoint": "Provisioning Connectors + Lifecycle Events"
+      }
     },
     {
       "id": "okta-workflows",
@@ -136,13 +355,41 @@
       "description": "Okta Workflows is a no-code identity orchestration platform that enables building complex identity automation flows without custom development. Workflows are triggered by Okta events (user activation, group membership change, MFA factor reset, application assignment) or scheduled triggers. Flow cards provide connectors to hundreds of applications (Slack, ServiceNow, Jira, AWS, Azure, Google Workspace) and logic operations (if/else, loops, data manipulation). Common use cases include: automated onboarding sequences (create accounts, send welcome messages, assign equipment), offboarding workflows (revoke tokens, transfer data, notify managers), self-service access request with approval chains, and security incident response automation (disable user, revoke sessions, create incident ticket).",
       "best_practices": "1. Implement offboarding workflows that go beyond account deactivation (revoke OAuth tokens, transfer data ownership, notify team). 2. Create access request workflows with manager approval for sensitive applications. 3. Use workflows for automated security response (account lockout after risk detection, MFA factor reset notification). 4. Monitor workflow execution logs for failures and error handling effectiveness. 5. Version control workflow configurations using Okta Workflows export/import. 6. Test workflows in a preview/sandbox environment before production deployment. 7. Use connection delegation to avoid sharing API credentials across workflow builders.",
       "common_misconfigurations": [
-        {"issue": "Workflows not implemented for offboarding; manual deprovisioning relied upon", "impact": "Incomplete offboarding; OAuth tokens, shared drives, and service accounts not revoked", "severity": "high"},
-        {"issue": "Error handling not implemented in critical workflows", "impact": "Workflow failures silently skip steps; user left partially provisioned or deprovisioned", "severity": "high"},
-        {"issue": "Workflow connector credentials shared with all workflow builders", "impact": "Any workflow builder can access sensitive API connections for downstream applications", "severity": "medium"},
-        {"issue": "No monitoring of workflow execution success/failure rates", "impact": "Failed automations not detected; manual processes assumed to be automated", "severity": "medium"}
+        {
+          "issue": "Workflows not implemented for offboarding; manual deprovisioning relied upon",
+          "impact": "Incomplete offboarding; OAuth tokens, shared drives, and service accounts not revoked",
+          "severity": "high"
+        },
+        {
+          "issue": "Error handling not implemented in critical workflows",
+          "impact": "Workflow failures silently skip steps; user left partially provisioned or deprovisioned",
+          "severity": "high"
+        },
+        {
+          "issue": "Workflow connector credentials shared with all workflow builders",
+          "impact": "Any workflow builder can access sensitive API connections for downstream applications",
+          "severity": "medium"
+        },
+        {
+          "issue": "No monitoring of workflow execution success/failure rates",
+          "impact": "Failed automations not detected; manual processes assumed to be automated",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2(1)", "NIST-800-53-AC-2(2)", "ISO-27001-A.5.18", "ISO-27001-A.6.5", "SOC2-CC6.2", "SOC2-CC8.1"],
-      "equivalent_in": {"azure-entra": "Lifecycle Workflows + Logic Apps", "aws-iam": "Step Functions + EventBridge + Lambda", "gcp-iam": "Cloud Workflows + Eventarc", "sailpoint": "SailPoint Workflows"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2(1)",
+        "NIST-800-53-AC-2(2)",
+        "ISO-27001-A.5.18",
+        "ISO-27001-A.6.5",
+        "SOC2-CC6.2",
+        "SOC2-CC8.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Lifecycle Workflows + Logic Apps",
+        "aws-iam": "Step Functions + EventBridge + Lambda",
+        "gcp-iam": "Cloud Workflows + Eventarc",
+        "sailpoint": "SailPoint Workflows"
+      }
     },
     {
       "id": "okta-saml-oidc-integration",
@@ -152,13 +399,40 @@
       "description": "Okta provides a comprehensive application integration network (OIN) with thousands of pre-built SAML 2.0 and OpenID Connect (OIDC) application integrations. SAML integrations enable SSO where Okta acts as the Identity Provider (IdP) issuing SAML assertions to Service Provider (SP) applications. OIDC integrations use OAuth 2.0 authorization code flow with PKCE for modern web and mobile application authentication. The OIN provides pre-configured settings (entity IDs, ACS URLs, claim mappings) for popular applications, reducing integration effort. Custom SAML and OIDC integrations support applications not in the OIN. Application sign-on policies control the authentication requirements per application, enabling risk-based access control at the application level.",
       "best_practices": "1. Use OIDC with PKCE for new application integrations (preferred over SAML for modern apps). 2. Configure SAML assertion signing and encryption for sensitive application integrations. 3. Use the OIN pre-built integration when available instead of custom SAML/OIDC configuration. 4. Map minimum necessary user attributes in SAML assertions and OIDC claims. 5. Configure session management (idle timeout, max session duration) per application. 6. Test SSO integration in a sandbox environment before production deployment. 7. Monitor SSO authentication events per application for anomalous patterns. 8. Implement SLO (Single Logout) for applications that support it to prevent session persistence.",
       "common_misconfigurations": [
-        {"issue": "SAML assertions not signed or using SHA-1 signing algorithm", "impact": "SAML assertion tampering or forgery enabling identity spoofing at the service provider", "severity": "critical"},
-        {"issue": "OIDC client secret stored insecurely in client-side application", "impact": "Client secret exposed in JavaScript bundle or mobile app binary, enabling token theft", "severity": "critical"},
-        {"issue": "Overly broad claim/attribute mapping in SAML assertions", "impact": "Sensitive user attributes (phone, address, employee ID) sent to applications that do not need them", "severity": "medium"},
-        {"issue": "Single logout (SLO) not configured", "impact": "User signs out of Okta but remains authenticated in downstream applications via active sessions", "severity": "medium"}
+        {
+          "issue": "SAML assertions not signed or using SHA-1 signing algorithm",
+          "impact": "SAML assertion tampering or forgery enabling identity spoofing at the service provider",
+          "severity": "critical"
+        },
+        {
+          "issue": "OIDC client secret stored insecurely in client-side application",
+          "impact": "Client secret exposed in JavaScript bundle or mobile app binary, enabling token theft",
+          "severity": "critical"
+        },
+        {
+          "issue": "Overly broad claim/attribute mapping in SAML assertions",
+          "impact": "Sensitive user attributes (phone, address, employee ID) sent to applications that do not need them",
+          "severity": "medium"
+        },
+        {
+          "issue": "Single logout (SLO) not configured",
+          "impact": "User signs out of Okta but remains authenticated in downstream applications via active sessions",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-63C-FAL1", "NIST-800-63C-FAL2", "NIST-800-63C-ASSERTION-PROTECTION", "NIST-800-53-IA-8", "ISO-27001-A.8.5", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Enterprise Application SSO (SAML/OIDC)", "aws-iam": "IAM Identity Center Application Assignments", "gcp-iam": "Google Workspace SAML Apps + Cloud Identity OIDC"}
+      "compliance_controls": [
+        "NIST-800-63C-FAL1",
+        "NIST-800-63C-FAL2",
+        "NIST-800-63C-ASSERTION-PROTECTION",
+        "NIST-800-53-IA-8",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Enterprise Application SSO (SAML/OIDC)",
+        "aws-iam": "IAM Identity Center Application Assignments",
+        "gcp-iam": "Google Workspace SAML Apps + Cloud Identity OIDC"
+      }
     },
     {
       "id": "okta-api-access-management",
@@ -168,13 +442,41 @@
       "description": "Okta API Access Management enables organizations to define custom authorization servers that issue OAuth 2.0 access tokens for API protection. Custom authorization servers support custom scopes, custom claims, access policies, and token lifetime configuration. Access policies define which clients can request which scopes based on conditions (client type, user group, network zone). Custom claims can be derived from user profile attributes, group memberships, or app-specific metadata, enabling rich authorization context in JWT access tokens. This enables fine-grained API authorization where the API validates scopes and claims in the access token rather than implementing its own authorization logic. The org authorization server (for Okta APIs) is separate from custom authorization servers (for your APIs).",
       "best_practices": "1. Create dedicated custom authorization servers per API domain (e.g., orders-api, payments-api). 2. Define granular scopes aligned to API operations (read:orders, write:payments). 3. Use access policies to restrict scope grants based on client type and user group. 4. Include user roles and permissions as custom claims for API-level authorization decisions. 5. Set access token lifetime appropriate to the API use case (short for sensitive APIs). 6. Validate token signature, issuer, audience, and expiration in the API (do not trust blindly). 7. Use PKCE for all public clients (mobile, SPA) and client credentials for server-to-server. 8. Monitor token issuance patterns for anomalous volumes or unexpected scope requests.",
       "common_misconfigurations": [
-        {"issue": "Single authorization server with all scopes for all APIs", "impact": "Access token granted for one API includes scopes for all APIs, violating least privilege", "severity": "high"},
-        {"issue": "Access tokens with long lifetime (>1 hour) for sensitive APIs", "impact": "Stolen access tokens remain valid for extended period, enabling prolonged unauthorized API access", "severity": "high"},
-        {"issue": "API does not validate token claims; trusts any valid Okta token", "impact": "Token issued for a different API or client accepted, enabling cross-API access", "severity": "critical"},
-        {"issue": "No access policy restrictions; any authenticated user can request any scope", "impact": "Users obtain tokens with scopes exceeding their authorization level", "severity": "high"}
+        {
+          "issue": "Single authorization server with all scopes for all APIs",
+          "impact": "Access token granted for one API includes scopes for all APIs, violating least privilege",
+          "severity": "high"
+        },
+        {
+          "issue": "Access tokens with long lifetime (>1 hour) for sensitive APIs",
+          "impact": "Stolen access tokens remain valid for extended period, enabling prolonged unauthorized API access",
+          "severity": "high"
+        },
+        {
+          "issue": "API does not validate token claims; trusts any valid Okta token",
+          "impact": "Token issued for a different API or client accepted, enabling cross-API access",
+          "severity": "critical"
+        },
+        {
+          "issue": "No access policy restrictions; any authenticated user can request any scope",
+          "impact": "Users obtain tokens with scopes exceeding their authorization level",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-24", "ISO-27001-A.8.5", "ISO-27001-A.8.9", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Microsoft Identity Platform (App Registrations + Scopes)", "aws-iam": "Amazon Cognito + API Gateway Authorizers", "gcp-iam": "Identity Platform + API Gateway + Endpoints", "auth0": "Auth0 APIs (Custom API Registration)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-24",
+        "ISO-27001-A.8.5",
+        "ISO-27001-A.8.9",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Microsoft Identity Platform (App Registrations + Scopes)",
+        "aws-iam": "Amazon Cognito + API Gateway Authorizers",
+        "gcp-iam": "Identity Platform + API Gateway + Endpoints",
+        "auth0": "Auth0 APIs (Custom API Registration)"
+      }
     },
     {
       "id": "okta-threatinsight",
@@ -184,12 +486,35 @@
       "description": "Okta ThreatInsight provides automated threat detection and mitigation by analyzing authentication traffic patterns across the entire Okta customer network. Because Okta processes billions of authentication events across thousands of organizations, it identifies malicious IP addresses conducting credential stuffing, password spraying, and brute force attacks across multiple tenants. When ThreatInsight detects a malicious IP, it can automatically block or challenge authentication attempts from that IP before they reach the customer's authentication pipeline, preventing account lockouts and reducing helpdesk burden from large-scale credential attacks. ThreatInsight operates at the network edge (pre-authentication) and provides an additional layer of protection beyond individual tenant policies.",
       "best_practices": "1. Enable ThreatInsight in log-and-block mode for maximum protection (not just log mode). 2. Combine ThreatInsight with Okta's rate limiting for defense-in-depth against volumetric attacks. 3. Exclude known legitimate IP ranges from ThreatInsight blocking to prevent false positives. 4. Monitor ThreatInsight events in the System Log for threat intelligence about attacks targeting your organization. 5. Correlate ThreatInsight blocked IPs with your SIEM for broader threat context. 6. Review ThreatInsight effectiveness metrics monthly (blocked attempts, false positive rate).",
       "common_misconfigurations": [
-        {"issue": "ThreatInsight in log-only mode instead of log-and-block", "impact": "Malicious IPs detected but not blocked; credential stuffing attacks proceed against your tenant", "severity": "high"},
-        {"issue": "Legitimate corporate IPs not excluded from ThreatInsight", "impact": "Shared IP ranges (office NAT, VPN) blocked when another tenant on the same IP triggers detection", "severity": "medium"},
-        {"issue": "ThreatInsight events not monitored or correlated with SIEM", "impact": "Credential attack intelligence not leveraged for broader security awareness and response", "severity": "medium"}
+        {
+          "issue": "ThreatInsight in log-only mode instead of log-and-block",
+          "impact": "Malicious IPs detected but not blocked; credential stuffing attacks proceed against your tenant",
+          "severity": "high"
+        },
+        {
+          "issue": "Legitimate corporate IPs not excluded from ThreatInsight",
+          "impact": "Shared IP ranges (office NAT, VPN) blocked when another tenant on the same IP triggers detection",
+          "severity": "medium"
+        },
+        {
+          "issue": "ThreatInsight events not monitored or correlated with SIEM",
+          "impact": "Credential attack intelligence not leveraged for broader security awareness and response",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-7", "NIST-800-53-AC-7(2)", "ISO-27001-A.8.16", "SOC2-CC6.1", "SOC2-CC7.2"],
-      "equivalent_in": {"azure-entra": "Entra ID Smart Lockout + Identity Protection", "aws-iam": "WAF Rate Limiting + GuardDuty", "gcp-iam": "Cloud Armor + Security Command Center", "auth0": "Attack Protection (Bot Detection + Brute Force)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-7",
+        "NIST-800-53-AC-7(2)",
+        "ISO-27001-A.8.16",
+        "SOC2-CC6.1",
+        "SOC2-CC7.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Smart Lockout + Identity Protection",
+        "aws-iam": "WAF Rate Limiting + GuardDuty",
+        "gcp-iam": "Cloud Armor + Security Command Center",
+        "auth0": "Attack Protection (Bot Detection + Brute Force)"
+      }
     },
     {
       "id": "okta-admin-roles",
@@ -199,13 +524,41 @@
       "description": "Okta provides a tiered administrative role model with built-in roles (Super Admin, Org Admin, App Admin, User Admin, Helpdesk Admin, Read-Only Admin, Report Admin, Group Admin, API Access Management Admin) and custom admin roles with granular permission sets. Super Admin has unrestricted access and should be reserved for break-glass scenarios. Custom admin roles allow defining precise permission combinations (e.g., user management for specific groups only, application configuration for specific apps only). Resource sets can further scope admin roles to specific groups, apps, or OUs. Okta supports admin session management with idle timeout, MFA requirements, and session duration limits. Admin roles can be temporarily assigned via workflows for just-in-time privileged access patterns.",
       "best_practices": "1. Minimize Super Admin role assignments (maximum 2-3 break-glass accounts). 2. Use custom admin roles with resource set scoping instead of broad built-in roles. 3. Require phishing-resistant MFA (FIDO2) for all admin role sessions. 4. Configure short session timeouts for admin sessions (30 minutes idle, 4 hours maximum). 5. Implement JIT admin role assignment via Okta Workflows for temporary privileged access. 6. Monitor admin role assignments and administrative actions in the System Log. 7. Conduct quarterly access reviews of all admin role assignments. 8. Use separate admin accounts from regular user accounts for privileged operations.",
       "common_misconfigurations": [
-        {"issue": "Too many Super Admin assignments (more than 3)", "impact": "Broad administrative access increases attack surface; compromise of any Super Admin yields full tenant control", "severity": "critical"},
-        {"issue": "Broad built-in roles (Org Admin) used when custom roles with scoping would suffice", "impact": "Administrators have tenant-wide permissions when they only need to manage specific groups or apps", "severity": "high"},
-        {"issue": "No MFA required for admin sessions", "impact": "Stolen admin credentials provide direct access to tenant administration without additional verification", "severity": "critical"},
-        {"issue": "Admin session timeout too long (hours without re-authentication)", "impact": "Abandoned admin sessions on shared or stolen devices provide prolonged administrative access", "severity": "medium"}
+        {
+          "issue": "Too many Super Admin assignments (more than 3)",
+          "impact": "Broad administrative access increases attack surface; compromise of any Super Admin yields full tenant control",
+          "severity": "critical"
+        },
+        {
+          "issue": "Broad built-in roles (Org Admin) used when custom roles with scoping would suffice",
+          "impact": "Administrators have tenant-wide permissions when they only need to manage specific groups or apps",
+          "severity": "high"
+        },
+        {
+          "issue": "No MFA required for admin sessions",
+          "impact": "Stolen admin credentials provide direct access to tenant administration without additional verification",
+          "severity": "critical"
+        },
+        {
+          "issue": "Admin session timeout too long (hours without re-authentication)",
+          "impact": "Abandoned admin sessions on shared or stolen devices provide prolonged administrative access",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-AC-6(5)", "NIST-800-53-AC-5", "ISO-27001-A.8.2", "SOC2-CC6.1", "SOC2-CC6.3"],
-      "equivalent_in": {"azure-entra": "Entra ID Roles + PIM + Administrative Units", "aws-iam": "IAM Roles + Organizations Delegated Admin", "gcp-iam": "IAM Custom Roles + Organization Admin"}
+      "compliance_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-6(2)",
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-5",
+        "ISO-27001-A.8.2",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Roles + PIM + Administrative Units",
+        "aws-iam": "IAM Roles + Organizations Delegated Admin",
+        "gcp-iam": "IAM Custom Roles + Organization Admin"
+      }
     },
     {
       "id": "okta-fastpass",
@@ -215,13 +568,40 @@
       "description": "Okta FastPass provides phishing-resistant passwordless authentication by binding authentication to the device hardware. When a user authenticates, Okta Verify generates a cryptographic proof using a device-bound private key (stored in the platform's secure enclave: TPM on Windows, Secure Enclave on macOS/iOS, TEE on Android), combined with biometric or PIN verification. The authentication is origin-bound (tied to the Okta domain), making it immune to phishing attacks that redirect to look-alike pages. FastPass works across desktop and mobile platforms, supports silent re-authentication for session refresh, and can function as both a primary authenticator (passwordless) and a second factor. FastPass meets NIST AAL2 requirements and provides phishing resistance equivalent to FIDO2 security keys without requiring external hardware.",
       "best_practices": "1. Deploy Okta FastPass as the default authentication method for all users with managed devices. 2. Require FastPass or FIDO2 for privileged account authentication via authentication strength policies. 3. Enable silent re-authentication for FastPass to reduce friction during session refresh. 4. Use FastPass with device assurance to combine passwordless authentication with device posture verification. 5. Create a phased rollout plan starting with IT and security teams before organization-wide deployment. 6. Configure FastPass alongside FIDO2 as backup authentication methods for each other. 7. Monitor FastPass adoption metrics and address enrollment barriers.",
       "common_misconfigurations": [
-        {"issue": "FastPass available but not enforced; users continue using passwords", "impact": "Phishing-resistant authentication available but not adopted; users remain vulnerable to credential phishing", "severity": "medium"},
-        {"issue": "FastPass not combined with device assurance", "impact": "Passwordless authentication on devices without posture verification (unencrypted, unmanaged)", "severity": "medium"},
-        {"issue": "No backup authenticator registered alongside FastPass", "impact": "Device loss or Okta Verify app reinstallation requires admin intervention for recovery", "severity": "medium"},
-        {"issue": "FastPass not required for admin accounts", "impact": "Admin accounts use phishable authentication methods despite FastPass being available", "severity": "high"}
+        {
+          "issue": "FastPass available but not enforced; users continue using passwords",
+          "impact": "Phishing-resistant authentication available but not adopted; users remain vulnerable to credential phishing",
+          "severity": "medium"
+        },
+        {
+          "issue": "FastPass not combined with device assurance",
+          "impact": "Passwordless authentication on devices without posture verification (unencrypted, unmanaged)",
+          "severity": "medium"
+        },
+        {
+          "issue": "No backup authenticator registered alongside FastPass",
+          "impact": "Device loss or Okta Verify app reinstallation requires admin intervention for recovery",
+          "severity": "medium"
+        },
+        {
+          "issue": "FastPass not required for admin accounts",
+          "impact": "Admin accounts use phishable authentication methods despite FastPass being available",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-63B-AAL2", "NIST-800-63B-PHISHING-RESIST", "NIST-800-63B-AUTH-MF-CRYPTO-SW", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Windows Hello for Business + Authenticator Passwordless", "aws-iam": "N/A (no equivalent native feature)", "gcp-iam": "Passkeys + Titan Security Keys"}
+      "compliance_controls": [
+        "NIST-800-63B-AAL2",
+        "NIST-800-63B-PHISHING-RESIST",
+        "NIST-800-63B-AUTH-MF-CRYPTO-SW",
+        "NIST-800-53-IA-2(1)",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Windows Hello for Business + Authenticator Passwordless",
+        "aws-iam": "N/A (no equivalent native feature)",
+        "gcp-iam": "Passkeys + Titan Security Keys"
+      }
     },
     {
       "id": "auth0-actions",
@@ -231,13 +611,39 @@
       "description": "Auth0 Actions are serverless Node.js functions that execute at specific points in the authentication pipeline: Post-Login (after authentication, before token issuance), Pre-User-Registration (before account creation), Post-User-Registration (after account creation), Send-Phone-Message (custom SMS/voice delivery), Machine-to-Machine (client credentials flow customization), and Password-Reset-Post-Challenge (after password reset verification). Actions replace the legacy Rules and Hooks with a modern, composable architecture that supports versioning, testing, and secret management. Post-Login Actions are the most powerful, enabling custom claims injection, step-up authentication triggering, risk-based access decisions using external APIs, and deny/allow logic based on user metadata or third-party fraud detection services.",
       "best_practices": "1. Use Post-Login Actions for custom claim enrichment (roles, permissions, tenant context) rather than hardcoding in application. 2. Implement Pre-User-Registration Actions for fraud detection and identity verification during signup. 3. Handle errors gracefully in Actions; uncaught exceptions can block authentication for all users. 4. Use the Auth0 Secrets feature for API keys and credentials needed in Actions; never hardcode. 5. Test Actions thoroughly in a development tenant before deploying to production. 6. Monitor Action execution metrics (success rate, latency) in the Auth0 Dashboard. 7. Use the Action versioning system for safe deployments and rollbacks. 8. Keep Action execution time under 10 seconds to avoid authentication timeouts.",
       "common_misconfigurations": [
-        {"issue": "Post-Login Action calls external API without timeout or error handling", "impact": "External API outage blocks all authentication, causing complete service disruption", "severity": "critical"},
-        {"issue": "Sensitive credentials hardcoded in Action code instead of using Secrets", "impact": "API keys and credentials visible in source code, logs, and version history", "severity": "high"},
-        {"issue": "No Pre-Registration Action for fraud prevention", "impact": "Automated bot signups and fraudulent accounts created without validation", "severity": "medium"},
-        {"issue": "Action execution latency not monitored", "impact": "Slow external API calls increase authentication latency without awareness or remediation", "severity": "medium"}
+        {
+          "issue": "Post-Login Action calls external API without timeout or error handling",
+          "impact": "External API outage blocks all authentication, causing complete service disruption",
+          "severity": "critical"
+        },
+        {
+          "issue": "Sensitive credentials hardcoded in Action code instead of using Secrets",
+          "impact": "API keys and credentials visible in source code, logs, and version history",
+          "severity": "high"
+        },
+        {
+          "issue": "No Pre-Registration Action for fraud prevention",
+          "impact": "Automated bot signups and fraudulent accounts created without validation",
+          "severity": "medium"
+        },
+        {
+          "issue": "Action execution latency not monitored",
+          "impact": "Slow external API calls increase authentication latency without awareness or remediation",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-IA-2", "ISO-27001-A.8.5", "ISO-27001-A.8.25", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure AD B2C Custom Policies (REST API calls)", "okta": "Okta Inline Hooks + Event Hooks", "gcp-iam": "Identity Platform Blocking Functions"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-IA-2",
+        "ISO-27001-A.8.5",
+        "ISO-27001-A.8.25",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD B2C Custom Policies (REST API calls)",
+        "okta": "Okta Inline Hooks + Event Hooks",
+        "gcp-iam": "Identity Platform Blocking Functions"
+      }
     },
     {
       "id": "auth0-organizations",
@@ -247,13 +653,40 @@
       "description": "Auth0 Organizations provides multi-tenancy capabilities for B2B SaaS applications, enabling each customer organization to have its own authentication experience within a single Auth0 tenant. Each organization can configure its own identity provider (enterprise SSO via SAML/OIDC), MFA requirements, branding (login page customization), and member management. Organizations support invitation-based member onboarding, organization-specific roles for authorization, and automatic routing of users to their organization's login experience based on email domain. The org_id claim in tokens identifies which organization the user authenticated for, enabling the application to apply organization-specific authorization. This eliminates the need to create separate Auth0 tenants per customer, simplifying management while maintaining isolation.",
       "best_practices": "1. Use Organizations for all B2B SaaS applications with multiple customer tenants. 2. Configure enterprise SSO (SAML/OIDC) at the organization level for customers requiring corporate IdP integration. 3. Define organization-specific roles that map to application permissions. 4. Use the org_id claim in access tokens for organization-scoped API authorization. 5. Enable invitation-based member management for controlled organization onboarding. 6. Configure organization-specific MFA policies based on customer security requirements. 7. Implement home realm discovery (email domain to organization mapping) for seamless login routing. 8. Use organization metadata for storing customer-specific configuration.",
       "common_misconfigurations": [
-        {"issue": "Separate Auth0 tenants created per customer instead of using Organizations", "impact": "Unmanageable tenant sprawl; each tenant requires separate monitoring, updates, and Action deployments", "severity": "medium"},
-        {"issue": "org_id claim not validated in API authorization", "impact": "Users from one organization can access another organization's data by manipulating API calls", "severity": "critical"},
-        {"issue": "No enterprise SSO configured for organizations that require it", "impact": "Customer employees must create separate Auth0 credentials instead of using their corporate IdP", "severity": "medium"},
-        {"issue": "Same roles and permissions across all organizations without customization", "impact": "Authorization model does not accommodate different customer requirements for access control", "severity": "low"}
+        {
+          "issue": "Separate Auth0 tenants created per customer instead of using Organizations",
+          "impact": "Unmanageable tenant sprawl; each tenant requires separate monitoring, updates, and Action deployments",
+          "severity": "medium"
+        },
+        {
+          "issue": "org_id claim not validated in API authorization",
+          "impact": "Users from one organization can access another organization's data by manipulating API calls",
+          "severity": "critical"
+        },
+        {
+          "issue": "No enterprise SSO configured for organizations that require it",
+          "impact": "Customer employees must create separate Auth0 credentials instead of using their corporate IdP",
+          "severity": "medium"
+        },
+        {
+          "issue": "Same roles and permissions across all organizations without customization",
+          "impact": "Authorization model does not accommodate different customer requirements for access control",
+          "severity": "low"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-5", "ISO-27001-A.5.15", "ISO-27001-A.5.19", "SOC2-CC6.1", "SOC2-CC6.4"],
-      "equivalent_in": {"azure-entra": "Azure AD B2C Tenants + Custom Policies", "okta": "Okta Customer Identity Cloud (shared infrastructure)", "gcp-iam": "Identity Platform Multi-Tenancy"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-5",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.5.19",
+        "SOC2-CC6.1",
+        "SOC2-CC6.4"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD B2C Tenants + Custom Policies",
+        "okta": "Okta Customer Identity Cloud (shared infrastructure)",
+        "gcp-iam": "Identity Platform Multi-Tenancy"
+      }
     },
     {
       "id": "auth0-attack-protection",
@@ -263,13 +696,40 @@
       "description": "Auth0 Attack Protection is a suite of defensive mechanisms that operate at different layers: Bot Detection uses CAPTCHA challenges and device fingerprinting to block automated authentication attempts. Brute Force Protection locks user accounts after a configurable number of failed login attempts from the same IP, with notification emails and automatic unlocking after a cooldown period. Suspicious IP Throttling rate-limits authentication attempts from IPs exhibiting attack patterns (high failure rates, multiple accounts targeted). Breached Password Detection checks user passwords against known breach databases during authentication and registration, forcing password changes when a breach is detected. These protections operate in the authentication pipeline before user credentials are evaluated, providing pre-authentication defense.",
       "best_practices": "1. Enable all Attack Protection features (bot detection, brute force, suspicious IP throttling, breached password). 2. Configure brute force protection thresholds appropriate to your user base (5-10 attempts before lockout). 3. Enable breached password detection in strict mode (block and require password change). 4. Use bot detection with progressive challenges (invisible CAPTCHA first, visible CAPTCHA on suspicious activity). 5. Configure notification emails for brute force lockouts so users are aware of potential account compromise. 6. Monitor Attack Protection metrics in the Auth0 Dashboard for attack volume trends. 7. Whitelist internal testing IPs from brute force protection to prevent test automation lockouts.",
       "common_misconfigurations": [
-        {"issue": "Bot detection not enabled; no CAPTCHA on login and registration", "impact": "Automated credential stuffing and bot-driven account creation proceed without friction", "severity": "high"},
-        {"issue": "Breached password detection disabled or in report-only mode", "impact": "Users with known-compromised passwords continue to authenticate without forced password change", "severity": "high"},
-        {"issue": "Brute force lockout threshold too high (>20 attempts)", "impact": "Attackers can attempt many passwords before lockout, increasing credential compromise probability", "severity": "medium"},
-        {"issue": "Suspicious IP throttling disabled", "impact": "Distributed credential stuffing from multiple IPs not rate-limited at the IP level", "severity": "medium"}
+        {
+          "issue": "Bot detection not enabled; no CAPTCHA on login and registration",
+          "impact": "Automated credential stuffing and bot-driven account creation proceed without friction",
+          "severity": "high"
+        },
+        {
+          "issue": "Breached password detection disabled or in report-only mode",
+          "impact": "Users with known-compromised passwords continue to authenticate without forced password change",
+          "severity": "high"
+        },
+        {
+          "issue": "Brute force lockout threshold too high (>20 attempts)",
+          "impact": "Attackers can attempt many passwords before lockout, increasing credential compromise probability",
+          "severity": "medium"
+        },
+        {
+          "issue": "Suspicious IP throttling disabled",
+          "impact": "Distributed credential stuffing from multiple IPs not rate-limited at the IP level",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-7", "NIST-800-53-AC-7(2)", "NIST-800-63B-THROTTLE", "NIST-800-63B-VERIFIER-SECRETS", "ISO-27001-A.8.5", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Entra ID Smart Lockout + Identity Protection", "okta": "ThreatInsight + Rate Limiting", "gcp-iam": "Cloud Armor + reCAPTCHA Enterprise"}
+      "compliance_controls": [
+        "NIST-800-53-AC-7",
+        "NIST-800-53-AC-7(2)",
+        "NIST-800-63B-THROTTLE",
+        "NIST-800-63B-VERIFIER-SECRETS",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Smart Lockout + Identity Protection",
+        "okta": "ThreatInsight + Rate Limiting",
+        "gcp-iam": "Cloud Armor + reCAPTCHA Enterprise"
+      }
     },
     {
       "id": "auth0-adaptive-mfa",
@@ -279,13 +739,40 @@
       "description": "Auth0 Adaptive MFA provides risk-based multi-factor authentication that evaluates confidence signals to determine when MFA is required. Risk assessment considers: new device (device not previously seen for this user), impossible travel (authentication from geographically impossible location given previous sign-in), new IP address, untrusted IP (known VPN, proxy, or malicious IP), and overall confidence score. When the confidence score falls below the configured threshold, MFA is triggered. When the score is high (known device, known location, normal behavior), MFA can be skipped for reduced friction. Auth0 MFA supports multiple factor types: Auth0 Guardian (push notifications), WebAuthn (FIDO2 hardware keys and platform authenticators), OTP (TOTP via authenticator apps), SMS, voice call, email, and recovery codes.",
       "best_practices": "1. Enable Adaptive MFA with the 'always' option for high-security applications. 2. Configure the confidence threshold to balance security and user experience (lower threshold = more MFA prompts). 3. Prefer Auth0 Guardian or WebAuthn over SMS/voice for stronger factor types. 4. Require recovery code enrollment for all users as MFA backup. 5. Use Post-Login Actions to implement custom risk signals beyond Auth0's built-in assessment. 6. Monitor MFA challenge rates and success rates for tuning the confidence threshold. 7. Configure MFA enrollment during the first login to ensure all users have a registered factor.",
       "common_misconfigurations": [
-        {"issue": "MFA set to 'never' instead of 'always' or 'adaptive'", "impact": "No multi-factor authentication; single-factor password authentication for all users", "severity": "critical"},
-        {"issue": "Only SMS MFA factor enabled; no push notification or WebAuthn option", "impact": "Users limited to weakest MFA factor vulnerable to SIM swapping and SS7 interception", "severity": "high"},
-        {"issue": "Adaptive MFA confidence threshold too high (rarely triggers MFA)", "impact": "MFA not prompted for most authentication events including potentially risky ones", "severity": "high"},
-        {"issue": "No recovery codes provisioned; users locked out when MFA device lost", "impact": "MFA device loss requires admin intervention for account recovery", "severity": "medium"}
+        {
+          "issue": "MFA set to 'never' instead of 'always' or 'adaptive'",
+          "impact": "No multi-factor authentication; single-factor password authentication for all users",
+          "severity": "critical"
+        },
+        {
+          "issue": "Only SMS MFA factor enabled; no push notification or WebAuthn option",
+          "impact": "Users limited to weakest MFA factor vulnerable to SIM swapping and SS7 interception",
+          "severity": "high"
+        },
+        {
+          "issue": "Adaptive MFA confidence threshold too high (rarely triggers MFA)",
+          "impact": "MFA not prompted for most authentication events including potentially risky ones",
+          "severity": "high"
+        },
+        {
+          "issue": "No recovery codes provisioned; users locked out when MFA device lost",
+          "impact": "MFA device loss requires admin intervention for account recovery",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-63B-AAL2", "NIST-800-63B-AUTH-MF-CRYPTO-SW", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "SOC2-CC6.1", "OWASP-ASVS-V2.8"],
-      "equivalent_in": {"azure-entra": "Identity Protection Risk Policies + Conditional Access", "okta": "Adaptive MFA + ThreatInsight", "gcp-iam": "BeyondCorp Threat and Data Protection"}
+      "compliance_controls": [
+        "NIST-800-63B-AAL2",
+        "NIST-800-63B-AUTH-MF-CRYPTO-SW",
+        "NIST-800-53-IA-2(1)",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1",
+        "OWASP-ASVS-V2.8"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Identity Protection Risk Policies + Conditional Access",
+        "okta": "Adaptive MFA + ThreatInsight",
+        "gcp-iam": "BeyondCorp Threat and Data Protection"
+      }
     },
     {
       "id": "auth0-rbac",
@@ -295,13 +782,42 @@
       "description": "Auth0 RBAC provides a built-in authorization model where permissions are grouped into roles, and roles are assigned to users. Permissions are defined per API (e.g., read:articles, write:articles, delete:articles) and organized into roles (e.g., editor = read + write, admin = read + write + delete). When RBAC is enabled for an API, the user's permissions are included as a 'permissions' claim in the access token, enabling the API to make authorization decisions based on the token contents without additional API calls to Auth0. Roles can also be assigned at the organization level for multi-tenant applications, allowing different role assignments per organization. The authorization model supports both direct permission assignment (per-user) and role-based assignment for scalability.",
       "best_practices": "1. Enable RBAC and the 'Add Permissions in the Access Token' setting for APIs requiring authorization. 2. Design roles around job functions (viewer, editor, admin) not individual permissions. 3. Use organization-level roles for B2B multi-tenant applications with different permissions per customer. 4. Validate permissions in the access token at the API level; do not trust client-side role checks. 5. Implement the principle of least privilege: start with minimal roles and add permissions as needed. 6. Audit role assignments quarterly and remove users from roles they no longer need. 7. Use Auth0 Management API to programmatically manage role assignments from your application.",
       "common_misconfigurations": [
-        {"issue": "Permissions not included in access tokens; API makes separate calls to check authorization", "impact": "Additional latency per API request; Auth0 Management API rate limits constrain authorization checks", "severity": "medium"},
-        {"issue": "Roles too coarse-grained (single 'admin' role with all permissions)", "impact": "Users who need one admin function receive all admin permissions, violating least privilege", "severity": "high"},
-        {"issue": "Role assignments not audited; stale assignments accumulate", "impact": "Users retain elevated roles after job function changes, accumulating permissions over time", "severity": "medium"},
-        {"issue": "Authorization logic in the client application only, not validated in the API", "impact": "Authenticated users bypass client-side role checks by calling the API directly", "severity": "critical"}
+        {
+          "issue": "Permissions not included in access tokens; API makes separate calls to check authorization",
+          "impact": "Additional latency per API request; Auth0 Management API rate limits constrain authorization checks",
+          "severity": "medium"
+        },
+        {
+          "issue": "Roles too coarse-grained (single 'admin' role with all permissions)",
+          "impact": "Users who need one admin function receive all admin permissions, violating least privilege",
+          "severity": "high"
+        },
+        {
+          "issue": "Role assignments not audited; stale assignments accumulate",
+          "impact": "Users retain elevated roles after job function changes, accumulating permissions over time",
+          "severity": "medium"
+        },
+        {
+          "issue": "Authorization logic in the client application only, not validated in the API",
+          "impact": "Authenticated users bypass client-side role checks by calling the API directly",
+          "severity": "critical"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-5", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.3", "OWASP-ASVS-V4.1"],
-      "equivalent_in": {"azure-entra": "App Roles + RBAC (appRoles in manifest)", "okta": "API Access Management (scopes + claims)", "gcp-iam": "IAM Roles + Custom Roles", "aws-iam": "IAM Policies (identity-based)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-5",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3",
+        "OWASP-ASVS-V4.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "App Roles + RBAC (appRoles in manifest)",
+        "okta": "API Access Management (scopes + claims)",
+        "gcp-iam": "IAM Roles + Custom Roles",
+        "aws-iam": "IAM Policies (identity-based)"
+      }
     },
     {
       "id": "auth0-machine-to-machine",
@@ -311,13 +827,41 @@
       "description": "Auth0 Machine-to-Machine applications use the OAuth 2.0 Client Credentials flow for server-to-server authentication without user involvement. M2M applications authenticate with a client_id and client_secret (or private_key_jwt for stronger authentication) to obtain access tokens scoped to specific APIs and permissions. Common use cases include: backend service communication, CI/CD pipeline authentication, cron job API access, IoT device authentication, and microservice-to-microservice calls. Each M2M application should represent a specific service or workload, with the minimum necessary API scopes granted. Token caching is critical for M2M performance since each authentication request counts against Auth0's rate limits.",
       "best_practices": "1. Create dedicated M2M applications per service/workload; never share client credentials across services. 2. Grant only the minimum necessary API scopes per M2M application. 3. Use private_key_jwt client authentication instead of client_secret for production services. 4. Implement token caching in the client to avoid excessive token requests (rate limit awareness). 5. Rotate client secrets on a regular schedule (90 days) using credential rotation support. 6. Monitor M2M token issuance in Auth0 logs for anomalous patterns. 7. Use M2M Actions for custom logic during client credentials flow (IP validation, custom claims). 8. Set appropriate token expiration (short for sensitive APIs, longer for low-risk internal services).",
       "common_misconfigurations": [
-        {"issue": "Single M2M application shared across multiple services", "impact": "Compromise of any service exposes shared credentials with access to all authorized APIs", "severity": "high"},
-        {"issue": "Client secret not rotated; same secret used since application creation", "impact": "Long-lived credential increases exposure window; any past credential leak provides persistent access", "severity": "high"},
-        {"issue": "All API scopes granted to M2M application when only a subset is needed", "impact": "Compromised service obtains tokens with permissions exceeding its functional requirements", "severity": "high"},
-        {"issue": "No token caching; new token requested for every API call", "impact": "Auth0 rate limits exceeded during high-traffic periods, causing authentication failures", "severity": "medium"}
+        {
+          "issue": "Single M2M application shared across multiple services",
+          "impact": "Compromise of any service exposes shared credentials with access to all authorized APIs",
+          "severity": "high"
+        },
+        {
+          "issue": "Client secret not rotated; same secret used since application creation",
+          "impact": "Long-lived credential increases exposure window; any past credential leak provides persistent access",
+          "severity": "high"
+        },
+        {
+          "issue": "All API scopes granted to M2M application when only a subset is needed",
+          "impact": "Compromised service obtains tokens with permissions exceeding its functional requirements",
+          "severity": "high"
+        },
+        {
+          "issue": "No token caching; new token requested for every API call",
+          "impact": "Auth0 rate limits exceeded during high-traffic periods, causing authentication failures",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-IA-5", "ISO-27001-A.5.17", "ISO-27001-A.8.9", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "App Registrations with Client Credentials Flow", "okta": "OAuth 2.0 Service Apps (Client Credentials)", "gcp-iam": "Service Account Key Authentication", "aws-iam": "IAM Roles for Service-to-Service"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-IA-5",
+        "ISO-27001-A.5.17",
+        "ISO-27001-A.8.9",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "App Registrations with Client Credentials Flow",
+        "okta": "OAuth 2.0 Service Apps (Client Credentials)",
+        "gcp-iam": "Service Account Key Authentication",
+        "aws-iam": "IAM Roles for Service-to-Service"
+      }
     },
     {
       "id": "auth0-custom-db-connections",
@@ -327,13 +871,39 @@
       "description": "Auth0 Custom Database Connections enable authentication against an existing external user database during migration to Auth0. Custom database scripts (Login, Create, Verify, Change Password, Delete, Get User) are Node.js functions that execute against the external database via secure network connections. Two modes are available: proxy mode (Auth0 always authenticates against the external DB, no migration) and lazy migration mode (users are migrated to Auth0's database on first successful login, gradually reducing dependency on the external DB). Lazy migration is the recommended approach for transitioning from a legacy identity system to Auth0 without requiring a big-bang migration or user password resets. Custom DB connections support rate limiting and connection pooling configurations.",
       "best_practices": "1. Use lazy migration mode to gradually migrate users from legacy databases to Auth0. 2. Implement proper error handling in custom database scripts; unhandled errors block authentication. 3. Use bcrypt or Argon2 password hashing in custom DB scripts; never store or transmit plaintext passwords. 4. Configure connection pooling for the external database to avoid connection exhaustion. 5. Set up monitoring for custom DB script execution failures and latency. 6. Implement the Get User script to support password reset and email verification for migrated users. 7. Plan for external database decommission: track migration progress and set a target date for cutoff. 8. Use Auth0 Secrets for database connection strings; never hardcode credentials in scripts.",
       "common_misconfigurations": [
-        {"issue": "Custom DB scripts without error handling", "impact": "Unhandled database errors cause authentication failures for all users on the custom connection", "severity": "critical"},
-        {"issue": "Proxy mode used permanently instead of lazy migration", "impact": "Permanent dependency on external database; no path to decommissioning legacy identity system", "severity": "medium"},
-        {"issue": "Database connection string hardcoded in custom script", "impact": "Credentials visible in Auth0 dashboard and logs; credential rotation requires script modification", "severity": "high"},
-        {"issue": "No monitoring of migration progress in lazy migration mode", "impact": "Unknown percentage of users migrated; cannot plan external database decommission timeline", "severity": "low"}
+        {
+          "issue": "Custom DB scripts without error handling",
+          "impact": "Unhandled database errors cause authentication failures for all users on the custom connection",
+          "severity": "critical"
+        },
+        {
+          "issue": "Proxy mode used permanently instead of lazy migration",
+          "impact": "Permanent dependency on external database; no path to decommissioning legacy identity system",
+          "severity": "medium"
+        },
+        {
+          "issue": "Database connection string hardcoded in custom script",
+          "impact": "Credentials visible in Auth0 dashboard and logs; credential rotation requires script modification",
+          "severity": "high"
+        },
+        {
+          "issue": "No monitoring of migration progress in lazy migration mode",
+          "impact": "Unknown percentage of users migrated; cannot plan external database decommission timeline",
+          "severity": "low"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-IA-5(1)", "NIST-800-63B-VERIFIER-SECRETS", "ISO-27001-A.5.17", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure AD B2C Custom DB (via API Connectors)", "okta": "Custom Identity Provider (OIDC/SAML) + Import API", "gcp-iam": "Identity Platform Custom Authentication"}
+      "compliance_controls": [
+        "NIST-800-53-IA-5",
+        "NIST-800-53-IA-5(1)",
+        "NIST-800-63B-VERIFIER-SECRETS",
+        "ISO-27001-A.5.17",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD B2C Custom DB (via API Connectors)",
+        "okta": "Custom Identity Provider (OIDC/SAML) + Import API",
+        "gcp-iam": "Identity Platform Custom Authentication"
+      }
     },
     {
       "id": "auth0-universal-login",
@@ -343,13 +913,40 @@
       "description": "Auth0 Universal Login provides a centralized, hosted login page for all applications integrated with Auth0, eliminating the need for each application to implement its own authentication UI. The Universal Login Page supports: customizable branding (logo, colors, fonts), multiple authentication methods (username/password, social, enterprise SSO, passwordless), localization, and Adaptive MFA. New Universal Login uses Auth0's hosted UI widgets with customization via the Auth0 Dashboard. Classic Universal Login uses Lock.js or custom HTML/CSS for full UI control. The hosted approach provides several security advantages: authentication credentials are entered on the Auth0 domain (not the application domain), reducing phishing risk; security updates to the login experience are applied centrally; and first-party cookies on the Auth0 domain enable SSO across applications without third-party cookie issues.",
       "best_practices": "1. Use New Universal Login (Auth0-hosted) instead of embedded login for security and SSO benefits. 2. Customize branding to match your application for a consistent user experience. 3. Configure login page to prioritize enterprise SSO for B2B applications (show SSO login prominently). 4. Enable passwordless authentication options (email magic link, WebAuthn) alongside traditional login. 5. Customize the login page per application or organization using Auth0 Prompt customization. 6. Implement Custom Domains for Universal Login to use your own domain instead of *.auth0.com. 7. Test login page rendering across browsers and devices.",
       "common_misconfigurations": [
-        {"issue": "Embedded login (Lock.js in application) used instead of Universal Login redirect", "impact": "Credentials entered on application domain; cannot leverage auth0.com first-party cookies for SSO; phishing risk increased", "severity": "high"},
-        {"issue": "Custom domain not configured for Universal Login", "impact": "Users redirected to generic *.auth0.com domain, reducing brand trust and increasing phishing susceptibility", "severity": "medium"},
-        {"issue": "Classic Universal Login with outdated Lock.js version", "impact": "Known vulnerabilities in older Lock.js versions not patched; missing modern authentication features", "severity": "medium"},
-        {"issue": "No branding customization; default Auth0 login page displayed", "impact": "Users do not recognize the login page, reducing trust and increasing support inquiries", "severity": "low"}
+        {
+          "issue": "Embedded login (Lock.js in application) used instead of Universal Login redirect",
+          "impact": "Credentials entered on application domain; cannot leverage auth0.com first-party cookies for SSO; phishing risk increased",
+          "severity": "high"
+        },
+        {
+          "issue": "Custom domain not configured for Universal Login",
+          "impact": "Users redirected to generic *.auth0.com domain, reducing brand trust and increasing phishing susceptibility",
+          "severity": "medium"
+        },
+        {
+          "issue": "Classic Universal Login with outdated Lock.js version",
+          "impact": "Known vulnerabilities in older Lock.js versions not patched; missing modern authentication features",
+          "severity": "medium"
+        },
+        {
+          "issue": "No branding customization; default Auth0 login page displayed",
+          "impact": "Users do not recognize the login page, reducing trust and increasing support inquiries",
+          "severity": "low"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-IA-2", "NIST-800-53-AC-8", "NIST-800-63B-AUTH-MEMORIZED", "ISO-27001-A.8.5", "SOC2-CC6.1", "OWASP-ASVS-V2.1"],
-      "equivalent_in": {"azure-entra": "Azure AD B2C User Flows / Custom Policies UI", "okta": "Okta Sign-In Widget + Custom Hosted Login", "gcp-iam": "Identity Platform UI (FirebaseUI)"}
+      "compliance_controls": [
+        "NIST-800-53-IA-2",
+        "NIST-800-53-AC-8",
+        "NIST-800-63B-AUTH-MEMORIZED",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1",
+        "OWASP-ASVS-V2.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD B2C User Flows / Custom Policies UI",
+        "okta": "Okta Sign-In Widget + Custom Hosted Login",
+        "gcp-iam": "Identity Platform UI (FirebaseUI)"
+      }
     },
     {
       "id": "auth0-anomaly-detection",
@@ -359,13 +956,40 @@
       "description": "Auth0 Anomaly Detection identifies and responds to suspicious authentication patterns: brute force protection (account lockout after repeated failures), breached password detection (checking credentials against known breach databases), and suspicious login detection (new device, new location, impossible travel). Auth0 Log Streams enable real-time export of authentication and management events to external systems: Amazon EventBridge, Azure Event Hubs, Datadog, Mixpanel, Splunk, and custom webhook endpoints. Auth0 Tenant Logs provide searchable audit history of all authentication events, management API calls, token exchanges, and system events. Each event includes user context, client information, geographic data, and outcome details. Log retention varies by plan (2-30 days), making log streaming to external storage essential for compliance.",
       "best_practices": "1. Configure Log Streams to SIEM for real-time monitoring and long-term retention beyond Auth0's retention period. 2. Enable all anomaly detection features (brute force, breached password, suspicious login). 3. Create SIEM alerts for critical events: admin actions, authentication failures, breached password detections. 4. Use Datadog or Splunk integration for real-time dashboards of authentication metrics. 5. Monitor authentication success/failure ratios per application for credential stuffing detection. 6. Export logs to immutable storage for compliance evidence retention (1+ year). 7. Correlate Auth0 events with application logs for end-to-end security visibility.",
       "common_misconfigurations": [
-        {"issue": "No Log Streams configured; logs only available in Auth0 Dashboard", "impact": "Authentication events not integrated with SIEM; no long-term retention beyond Auth0's plan limits", "severity": "high"},
-        {"issue": "Anomaly detection features not fully enabled", "impact": "Brute force attacks, breached password usage, and suspicious logins not detected or mitigated", "severity": "high"},
-        {"issue": "Log retention insufficient for compliance (default 2 days on free plan)", "impact": "Audit evidence unavailable for incident investigation or compliance audits beyond retention period", "severity": "high"},
-        {"issue": "Critical event alerts not configured in SIEM", "impact": "Auth0 admin actions and authentication anomalies not surfaced to security operations team", "severity": "medium"}
+        {
+          "issue": "No Log Streams configured; logs only available in Auth0 Dashboard",
+          "impact": "Authentication events not integrated with SIEM; no long-term retention beyond Auth0's plan limits",
+          "severity": "high"
+        },
+        {
+          "issue": "Anomaly detection features not fully enabled",
+          "impact": "Brute force attacks, breached password usage, and suspicious logins not detected or mitigated",
+          "severity": "high"
+        },
+        {
+          "issue": "Log retention insufficient for compliance (default 2 days on free plan)",
+          "impact": "Audit evidence unavailable for incident investigation or compliance audits beyond retention period",
+          "severity": "high"
+        },
+        {
+          "issue": "Critical event alerts not configured in SIEM",
+          "impact": "Auth0 admin actions and authentication anomalies not surfaced to security operations team",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-7", "NIST-800-53-AC-7(2)", "ISO-27001-A.8.15", "ISO-27001-A.8.16", "SOC2-CC7.2"],
-      "equivalent_in": {"azure-entra": "Entra ID Identity Protection + Diagnostic Settings", "okta": "ThreatInsight + System Log + Log Streaming", "gcp-iam": "Security Command Center + Cloud Audit Logs"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-7",
+        "NIST-800-53-AC-7(2)",
+        "ISO-27001-A.8.15",
+        "ISO-27001-A.8.16",
+        "SOC2-CC7.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Identity Protection + Diagnostic Settings",
+        "okta": "ThreatInsight + System Log + Log Streaming",
+        "gcp-iam": "Security Command Center + Cloud Audit Logs"
+      }
     },
     {
       "id": "auth0-enterprise-connections",
@@ -375,13 +999,41 @@
       "description": "Auth0 Enterprise Connections enable federated SSO with customer identity providers for B2B applications. Supported protocols include SAML 2.0, OpenID Connect, WS-Federation, Active Directory/LDAP (via Auth0 AD/LDAP Connector agent), Google Workspace, Azure AD (Entra ID), ADFS, and PingFederate. Each connection represents a trust relationship with an external IdP where Auth0 acts as the Service Provider (SP) or OIDC Relying Party (RP). Connection-level settings control: user attribute mapping from IdP claims to Auth0 profile, automatic provisioning of federated users, login experience customization, and MFA requirements. Multiple enterprise connections can coexist in a single tenant, enabling a multi-customer B2B platform where each customer authenticates through their own corporate IdP.",
       "best_practices": "1. Use OIDC connections for modern IdP integrations (preferred over SAML for new connections). 2. Validate SAML assertion signatures with the IdP's current signing certificate. 3. Implement automated certificate rotation procedures for SAML connections (certificates expire). 4. Configure user attribute mapping to populate Auth0 profile with necessary IdP claims. 5. Enable automatic user provisioning for federated users to create Auth0 profiles on first login. 6. Use Auth0 Organizations to associate enterprise connections with specific customer tenants. 7. Test enterprise connections with the IdP's sandbox environment before production. 8. Monitor connection health and authentication success rates per enterprise connection.",
       "common_misconfigurations": [
-        {"issue": "SAML signing certificate not rotated before expiration", "impact": "Enterprise SSO breaks when IdP rotates its signing certificate; all federated users locked out", "severity": "critical"},
-        {"issue": "User attribute mapping incomplete; critical IdP claims not mapped to Auth0 profile", "impact": "Federated users missing profile data needed for application authorization (department, role)", "severity": "medium"},
-        {"issue": "AD/LDAP connector agent not updated or monitored", "impact": "Connector outage blocks authentication for all AD-federated users; no alerting on connector health", "severity": "high"},
-        {"issue": "SAML assertion not validated for signature, audience, and expiration", "impact": "Forged or replayed SAML assertions accepted, enabling authentication bypass", "severity": "critical"}
+        {
+          "issue": "SAML signing certificate not rotated before expiration",
+          "impact": "Enterprise SSO breaks when IdP rotates its signing certificate; all federated users locked out",
+          "severity": "critical"
+        },
+        {
+          "issue": "User attribute mapping incomplete; critical IdP claims not mapped to Auth0 profile",
+          "impact": "Federated users missing profile data needed for application authorization (department, role)",
+          "severity": "medium"
+        },
+        {
+          "issue": "AD/LDAP connector agent not updated or monitored",
+          "impact": "Connector outage blocks authentication for all AD-federated users; no alerting on connector health",
+          "severity": "high"
+        },
+        {
+          "issue": "SAML assertion not validated for signature, audience, and expiration",
+          "impact": "Forged or replayed SAML assertions accepted, enabling authentication bypass",
+          "severity": "critical"
+        }
       ],
-      "compliance_controls": ["NIST-800-63C-FAL1", "NIST-800-63C-FAL2", "NIST-800-63C-ASSERTION-PROTECTION", "NIST-800-53-IA-8", "ISO-27001-A.5.19", "SOC2-CC6.1", "SOC2-CC6.4"],
-      "equivalent_in": {"azure-entra": "Entra ID External Identities + Cross-Tenant Access", "okta": "Inbound Federation (SAML/OIDC) + AD Agent", "gcp-iam": "Cloud Identity Federation + GCDS"}
+      "compliance_controls": [
+        "NIST-800-63C-FAL1",
+        "NIST-800-63C-FAL2",
+        "NIST-800-63C-ASSERTION-PROTECTION",
+        "NIST-800-53-IA-8",
+        "ISO-27001-A.5.19",
+        "SOC2-CC6.1",
+        "SOC2-CC6.4"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID External Identities + Cross-Tenant Access",
+        "okta": "Inbound Federation (SAML/OIDC) + AD Agent",
+        "gcp-iam": "Cloud Identity Federation + GCDS"
+      }
     },
     {
       "id": "auth0-social-connections",
@@ -391,13 +1043,39 @@
       "description": "Auth0 Social Connections enable authentication via social identity providers (Google, Facebook, Apple, Microsoft, LinkedIn, GitHub, Twitter, and 40+ others) using OAuth 2.0 or OpenID Connect. Social login reduces registration friction by eliminating password creation. Auth0 normalizes user profiles from different social providers into a consistent format, handles token exchange and refresh, and supports account linking (merging social and email/password identities for the same user). Passwordless authentication provides alternative login methods without passwords: email magic links (user clicks a link sent to their email), email OTP (user enters a code sent to their email), and SMS OTP (user enters a code sent via text). These methods eliminate password-related vulnerabilities (stuffing, spraying, phishing) for consumer applications.",
       "best_practices": "1. Enable only social providers relevant to your user base; too many options create decision paralysis. 2. Implement account linking rules to merge social identities with existing email/password accounts. 3. Request minimum OAuth scopes from social providers (profile, email only). 4. Enable email verification for social sign-up to confirm email ownership. 5. Use email magic links for passwordless authentication instead of SMS OTP (more secure). 6. Configure social connection branding to match your application's login experience. 7. Monitor social provider API changes and deprecations that may affect authentication flows.",
       "common_misconfigurations": [
-        {"issue": "Excessive OAuth scopes requested from social providers", "impact": "Application requests access to user's contacts, posts, or other private data unnecessarily", "severity": "medium"},
-        {"issue": "Account linking not implemented; duplicate accounts for the same user", "impact": "User has separate accounts for social and email login, with different permissions and data", "severity": "medium"},
-        {"issue": "Email verification not required for social sign-up", "impact": "Social accounts with unverified emails used for identity confusion or account takeover", "severity": "high"},
-        {"issue": "Social provider developer keys used in production (Auth0 shared keys)", "impact": "Rate limits and reliability issues; Auth0 branding shown on consent screen instead of your app", "severity": "medium"}
+        {
+          "issue": "Excessive OAuth scopes requested from social providers",
+          "impact": "Application requests access to user's contacts, posts, or other private data unnecessarily",
+          "severity": "medium"
+        },
+        {
+          "issue": "Account linking not implemented; duplicate accounts for the same user",
+          "impact": "User has separate accounts for social and email login, with different permissions and data",
+          "severity": "medium"
+        },
+        {
+          "issue": "Email verification not required for social sign-up",
+          "impact": "Social accounts with unverified emails used for identity confusion or account takeover",
+          "severity": "high"
+        },
+        {
+          "issue": "Social provider developer keys used in production (Auth0 shared keys)",
+          "impact": "Rate limits and reliability issues; Auth0 branding shown on consent screen instead of your app",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-63A-IAL1", "NIST-800-63B-AAL1", "NIST-800-53-IA-2", "ISO-27001-A.5.16", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure AD B2C Social Identity Providers + Email OTP", "okta": "Social Login + Email Factor", "gcp-iam": "Identity Platform Social Providers + Email/Phone Auth"}
+      "compliance_controls": [
+        "NIST-800-63A-IAL1",
+        "NIST-800-63B-AAL1",
+        "NIST-800-53-IA-2",
+        "ISO-27001-A.5.16",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD B2C Social Identity Providers + Email OTP",
+        "okta": "Social Login + Email Factor",
+        "gcp-iam": "Identity Platform Social Providers + Email/Phone Auth"
+      }
     },
     {
       "id": "auth0-tenant-logs",
@@ -407,13 +1085,40 @@
       "description": "Auth0 Tenant Logs capture all events occurring within an Auth0 tenant, providing the audit trail necessary for security monitoring and compliance. Events are categorized into types: successful and failed logins (with detailed failure reasons), token exchange events, management API operations, user profile changes, MFA enrollment and challenge events, password reset attempts, and anomaly detection triggers. Each log entry includes: event type, timestamp, user information, client application, IP address, user agent, geographic location, and event-specific details. Tenant Logs are accessible via the Auth0 Dashboard (with filtering and search), the Management API (for programmatic access), and Log Streams (for real-time export). Retention periods vary by subscription plan: 2 days (Free), 3 days (Essential), 5 days (Professional), 30 days (Enterprise).",
       "best_practices": "1. Export tenant logs to external storage immediately (Log Streams) to extend beyond Auth0's retention limits. 2. Create dashboards for key authentication metrics: login success rate, MFA adoption, factor usage distribution. 3. Alert on management API events that modify security settings (rules, connections, MFA configuration). 4. Use log event types (success_login, failed_login, guardian_enrollment) for focused monitoring. 5. Correlate tenant logs with application logs using the session_id or correlation_id. 6. Build compliance reports from tenant log data for SOC 2 and ISO 27001 audits. 7. Monitor login failure reasons to identify user experience issues vs security threats.",
       "common_misconfigurations": [
-        {"issue": "Tenant logs not exported; relying solely on Auth0 Dashboard retention", "impact": "Log data lost after 2-30 days; incident investigation impossible beyond retention window", "severity": "high"},
-        {"issue": "Management API events not monitored", "impact": "Admin configuration changes (rule modifications, connection changes) not detected or audited", "severity": "high"},
-        {"issue": "No distinction between normal login failures and credential stuffing patterns", "impact": "Credential stuffing attacks hidden within normal login failure noise", "severity": "medium"},
-        {"issue": "Log data not used for compliance reporting", "impact": "Manual compliance evidence gathering instead of automated log-based audit reports", "severity": "low"}
+        {
+          "issue": "Tenant logs not exported; relying solely on Auth0 Dashboard retention",
+          "impact": "Log data lost after 2-30 days; incident investigation impossible beyond retention window",
+          "severity": "high"
+        },
+        {
+          "issue": "Management API events not monitored",
+          "impact": "Admin configuration changes (rule modifications, connection changes) not detected or audited",
+          "severity": "high"
+        },
+        {
+          "issue": "No distinction between normal login failures and credential stuffing patterns",
+          "impact": "Credential stuffing attacks hidden within normal login failure noise",
+          "severity": "medium"
+        },
+        {
+          "issue": "Log data not used for compliance reporting",
+          "impact": "Manual compliance evidence gathering instead of automated log-based audit reports",
+          "severity": "low"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-6(9)", "ISO-27001-A.8.15", "ISO-27001-A.8.16", "SOC2-CC7.2", "SOC2-CC5.2"],
-      "equivalent_in": {"azure-entra": "Entra ID Sign-In and Audit Logs", "okta": "System Log", "gcp-iam": "Cloud Audit Logs (Admin Activity + Data Access)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-6(9)",
+        "ISO-27001-A.8.15",
+        "ISO-27001-A.8.16",
+        "SOC2-CC7.2",
+        "SOC2-CC5.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Sign-In and Audit Logs",
+        "okta": "System Log",
+        "gcp-iam": "Cloud Audit Logs (Admin Activity + Data Access)"
+      }
     },
     {
       "id": "okta-identity-governance",
@@ -423,13 +1128,41 @@
       "description": "Okta Identity Governance extends the Okta platform with enterprise-grade identity governance capabilities: access certifications, access requests with approval workflows, entitlement management, and governance reporting. OIG provides a unified platform where access governance is natively integrated with Okta's authentication and lifecycle management, rather than requiring a separate IGA product. Key capabilities include: periodic access certifications with AI-assisted recommendations, self-service access request portal with approval chains, fine-grained entitlement visibility across all connected applications, separation of duties policy detection, and governance analytics dashboards. OIG is designed for organizations that want identity governance without deploying a separate IGA solution like SailPoint or Saviynt.",
       "best_practices": "1. Enable access certifications for all sensitive applications on a quarterly cycle. 2. Configure access request workflows with business-owner approvals for sensitive access. 3. Use entitlement visibility to understand effective permissions across all Okta-connected applications. 4. Implement SoD policies for conflicting entitlements (financial controls, admin access conflicts). 5. Use governance analytics dashboards for compliance reporting and executive visibility. 6. Integrate OIG with Okta Lifecycle Management for automated provisioning based on governance decisions. 7. Track certification completion rates and remediation timelines as KPIs.",
       "common_misconfigurations": [
-        {"issue": "Access certifications not configured despite OIG being licensed", "impact": "Governance capability deployed but not operationalized; no periodic access review occurring", "severity": "high"},
-        {"issue": "Access request workflow bypassed; direct application assignment by admins", "impact": "Access granted without approval workflow, bypassing governance controls", "severity": "medium"},
-        {"issue": "Entitlement visibility limited to Okta-assigned apps; not all access covered", "impact": "Governance blind spots for applications not integrated with Okta", "severity": "medium"},
-        {"issue": "No SoD policies configured", "impact": "Conflicting access combinations not detected or prevented", "severity": "medium"}
+        {
+          "issue": "Access certifications not configured despite OIG being licensed",
+          "impact": "Governance capability deployed but not operationalized; no periodic access review occurring",
+          "severity": "high"
+        },
+        {
+          "issue": "Access request workflow bypassed; direct application assignment by admins",
+          "impact": "Access granted without approval workflow, bypassing governance controls",
+          "severity": "medium"
+        },
+        {
+          "issue": "Entitlement visibility limited to Okta-assigned apps; not all access covered",
+          "impact": "Governance blind spots for applications not integrated with Okta",
+          "severity": "medium"
+        },
+        {
+          "issue": "No SoD policies configured",
+          "impact": "Conflicting access combinations not detected or prevented",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-1", "NIST-800-53-AC-2(4)", "NIST-800-53-AC-5", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.2", "SOC2-CC6.3"],
-      "equivalent_in": {"azure-entra": "Entra ID Governance (Access Reviews + Entitlement Management)", "sailpoint": "IdentityNow / Identity Security Cloud", "aws-iam": "Custom IGA workflows with Access Analyzer"}
+      "compliance_controls": [
+        "NIST-800-53-AC-1",
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-5",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.5.18",
+        "SOC2-CC6.2",
+        "SOC2-CC6.3"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Governance (Access Reviews + Entitlement Management)",
+        "sailpoint": "IdentityNow / Identity Security Cloud",
+        "aws-iam": "Custom IGA workflows with Access Analyzer"
+      }
     },
     {
       "id": "okta-privileged-access",
@@ -439,13 +1172,43 @@
       "description": "Okta Privileged Access provides unified privileged access management for infrastructure (servers, Kubernetes clusters) and applications. OPA integrates with Okta Identity for seamless authentication and extends privileged access controls to SSH/RDP sessions, Kubernetes clusters, and cloud infrastructure. Key capabilities include: zero-standing privileges (just-in-time access with approval workflows), session recording for SSH and RDP sessions, passwordless server access using Okta Verify and client certificates (no SSH keys or passwords), and application-level privileged access control. OPA replaces traditional VPN + SSH key-based access patterns with identity-centric, recorded, and governed privileged access. It is designed for modern cloud and hybrid infrastructure where traditional PAM solutions face deployment challenges.",
       "best_practices": "1. Deploy OPA for all server SSH/RDP access to replace static SSH keys and VPN-based access. 2. Configure just-in-time access with approval workflows for production server access. 3. Enable session recording for all privileged sessions for audit and forensic purposes. 4. Use passwordless server access with Okta Verify certificates instead of SSH keys. 5. Integrate OPA with Okta Identity Engine authentication policies for consistent MFA enforcement. 6. Monitor privileged session activity and access request patterns in Okta System Log. 7. Define access policies per server group or Kubernetes cluster based on sensitivity.",
       "common_misconfigurations": [
-        {"issue": "Static SSH keys still used for server access instead of OPA passwordless", "impact": "Long-lived SSH keys not managed, rotated, or auditable; no session recording for SSH sessions", "severity": "high"},
-        {"issue": "No approval workflow for production server access", "impact": "Users access production infrastructure without authorization gate or justification requirement", "severity": "high"},
-        {"issue": "Session recording not enabled", "impact": "No forensic record of administrative actions on servers during privileged sessions", "severity": "medium"},
-        {"issue": "OPA not integrated with Okta authentication policies", "impact": "Privileged access uses different authentication requirements than standard application access", "severity": "medium"}
+        {
+          "issue": "Static SSH keys still used for server access instead of OPA passwordless",
+          "impact": "Long-lived SSH keys not managed, rotated, or auditable; no session recording for SSH sessions",
+          "severity": "high"
+        },
+        {
+          "issue": "No approval workflow for production server access",
+          "impact": "Users access production infrastructure without authorization gate or justification requirement",
+          "severity": "high"
+        },
+        {
+          "issue": "Session recording not enabled",
+          "impact": "No forensic record of administrative actions on servers during privileged sessions",
+          "severity": "medium"
+        },
+        {
+          "issue": "OPA not integrated with Okta authentication policies",
+          "impact": "Privileged access uses different authentication requirements than standard application access",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-AC-17(1)", "ISO-27001-A.8.2", "ISO-27001-A.8.15", "SOC2-CC6.1", "SOC2-CC7.2", "CISA-ZTMM-ID-PAM-MATURITY"],
-      "equivalent_in": {"azure-entra": "Azure Bastion + PIM", "aws-iam": "Systems Manager Session Manager + IAM Roles", "gcp-iam": "IAP TCP Forwarding + OS Login + PAM", "cyberark": "Privileged Session Manager (PSM)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-6(2)",
+        "NIST-800-53-AC-17(1)",
+        "ISO-27001-A.8.2",
+        "ISO-27001-A.8.15",
+        "SOC2-CC6.1",
+        "SOC2-CC7.2",
+        "CISA-ZTMM-ID-PAM-MATURITY"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Bastion + PIM",
+        "aws-iam": "Systems Manager Session Manager + IAM Roles",
+        "gcp-iam": "IAP TCP Forwarding + OS Login + PAM",
+        "cyberark": "Privileged Session Manager (PSM)"
+      }
     },
     {
       "id": "auth0-custom-domains",
@@ -455,13 +1218,37 @@
       "description": "Auth0 Custom Domains allow organizations to use their own domain (e.g., login.yourcompany.com) for the Universal Login page instead of the default *.auth0.com domain. Custom domains provide several security and user experience benefits: users see a recognizable, branded domain on the login page, reducing phishing susceptibility; first-party cookies on the custom domain enable seamless SSO across applications on the same parent domain; and custom domains avoid third-party cookie blocking by browser privacy features. Branding customization includes: logo, colors, fonts, custom HTML templates, localization, and custom error pages. Custom domains require configuring CNAME DNS records and TLS certificates (Auth0-managed or self-managed). Custom email templates for verification, password reset, and MFA notification can also be branded.",
       "best_practices": "1. Configure a custom domain for all production Auth0 tenants to establish brand trust. 2. Use the same parent domain as your application (app.example.com uses login.example.com) for first-party cookies. 3. Use Auth0-managed TLS certificates for simplified certificate lifecycle management. 4. Customize the login page with organization branding to help users recognize legitimate login pages. 5. Implement localization for international user bases with Auth0's built-in language support. 6. Use custom error pages for branded error handling during authentication failures. 7. Test custom domain configuration across browsers and devices before production deployment.",
       "common_misconfigurations": [
-        {"issue": "Default *.auth0.com domain used in production", "impact": "Users unfamiliar with Auth0 may not trust the generic login domain; third-party cookie issues affect SSO", "severity": "medium"},
-        {"issue": "Custom domain DNS records not properly configured", "impact": "Authentication redirects fail or fall back to generic Auth0 domain unexpectedly", "severity": "high"},
-        {"issue": "TLS certificate expired or misconfigured on custom domain", "impact": "Browser security warnings during authentication, blocking user login", "severity": "high"},
-        {"issue": "Branding not customized; generic Auth0 login page displayed", "impact": "Users cannot visually verify legitimacy of the login page, increasing phishing risk", "severity": "low"}
+        {
+          "issue": "Default *.auth0.com domain used in production",
+          "impact": "Users unfamiliar with Auth0 may not trust the generic login domain; third-party cookie issues affect SSO",
+          "severity": "medium"
+        },
+        {
+          "issue": "Custom domain DNS records not properly configured",
+          "impact": "Authentication redirects fail or fall back to generic Auth0 domain unexpectedly",
+          "severity": "high"
+        },
+        {
+          "issue": "TLS certificate expired or misconfigured on custom domain",
+          "impact": "Browser security warnings during authentication, blocking user login",
+          "severity": "high"
+        },
+        {
+          "issue": "Branding not customized; generic Auth0 login page displayed",
+          "impact": "Users cannot visually verify legitimacy of the login page, increasing phishing risk",
+          "severity": "low"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-8", "ISO-27001-A.8.5", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure AD B2C Custom Domain + Branding", "okta": "Okta Custom Domain + Sign-In Widget Branding", "gcp-iam": "Identity Platform Custom Domain"}
+      "compliance_controls": [
+        "NIST-800-53-AC-8",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD B2C Custom Domain + Branding",
+        "okta": "Okta Custom Domain + Sign-In Widget Branding",
+        "gcp-iam": "Identity Platform Custom Domain"
+      }
     },
     {
       "id": "auth0-fine-grained-authorization",
@@ -471,13 +1258,40 @@
       "description": "Auth0 Fine-Grained Authorization (FGA), based on the open-source OpenFGA project (inspired by Google Zanzibar), provides relationship-based access control (ReBAC) for complex authorization scenarios. Unlike traditional RBAC (role-to-permission mapping), FGA defines access based on relationships between entities: 'user X is a viewer of document Y', 'user X is a member of team Z which owns project W'. The authorization model uses a type system defining object types, relations, and relationship tuples stored in the FGA service. Authorization checks evaluate whether a relationship path exists between a user and a resource. FGA excels at: hierarchical access (folder permissions inheriting to files), shared access (document sharing with specific users or groups), and organizational hierarchies (team membership granting project access).",
       "best_practices": "1. Use FGA for applications with complex authorization beyond simple RBAC (document sharing, multi-tenant hierarchies). 2. Design the authorization model carefully; relationship types are difficult to change after deployment. 3. Use the FGA Playground to test authorization models before implementation. 4. Batch relationship tuple writes for performance during bulk operations. 5. Implement authorization checks as close to the data layer as possible for consistency. 6. Use the FGA list objects API for UI-level filtering (show only accessible resources). 7. Monitor FGA query latency and optimize the authorization model for read performance.",
       "common_misconfigurations": [
-        {"issue": "FGA model too complex; excessive relationship types create performance issues", "impact": "Authorization checks slow down as relationship graph grows, impacting application performance", "severity": "medium"},
-        {"issue": "Authorization checks implemented client-side only", "impact": "Users bypass FGA by calling the API directly, accessing resources they should not", "severity": "critical"},
-        {"issue": "Relationship tuples not cleaned up when access is revoked", "impact": "Stale relationship tuples grant access to users who should no longer have it", "severity": "high"},
-        {"issue": "No monitoring of FGA authorization decisions", "impact": "Access denials and authorization patterns not visible for security analysis", "severity": "medium"}
+        {
+          "issue": "FGA model too complex; excessive relationship types create performance issues",
+          "impact": "Authorization checks slow down as relationship graph grows, impacting application performance",
+          "severity": "medium"
+        },
+        {
+          "issue": "Authorization checks implemented client-side only",
+          "impact": "Users bypass FGA by calling the API directly, accessing resources they should not",
+          "severity": "critical"
+        },
+        {
+          "issue": "Relationship tuples not cleaned up when access is revoked",
+          "impact": "Stale relationship tuples grant access to users who should no longer have it",
+          "severity": "high"
+        },
+        {
+          "issue": "No monitoring of FGA authorization decisions",
+          "impact": "Access denials and authorization patterns not visible for security analysis",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-3(7)", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "N/A (no native ReBAC; use Azure AD app roles + custom logic)", "aws-iam": "Amazon Verified Permissions (Cedar-based)", "okta": "N/A (use downstream authorization service)", "gcp-iam": "N/A (no native ReBAC service)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-3(7)",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "N/A (no native ReBAC; use Azure AD app roles + custom logic)",
+        "aws-iam": "Amazon Verified Permissions (Cedar-based)",
+        "okta": "N/A (use downstream authorization service)",
+        "gcp-iam": "N/A (no native ReBAC service)"
+      }
     }
   ]
 }

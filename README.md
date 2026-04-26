@@ -1,6 +1,6 @@
 # IAM Expert MCP
 
-Comprehensive identity and access management intelligence for the [Model Context Protocol](https://modelcontextprotocol.io/), covering standards advisory (NIST/ISO/CIS/Zero Trust), threat patterns (MITRE ATT&CK/CWE/CAPEC), protocol deep-dives (OAuth/OIDC/SAML/FIDO2), architecture patterns (RBAC/ABAC/PAM), vendor configurations (Azure/AWS/GCP/Okta/CyberArk), compliance cross-mapping, and emerging technology tracking (passkeys, decentralized identity).
+Comprehensive identity and access management intelligence for the [Model Context Protocol](https://modelcontextprotocol.io/), covering standards advisory (NIST/ISO/Zero Trust), threat patterns (MITRE ATT&CK/CWE/CAPEC), protocol deep-dives (OAuth/OIDC/SAML/FIDO2), architecture patterns (RBAC/ABAC/PAM), vendor configurations (Azure/AWS/GCP/Okta/CyberArk), compliance cross-mapping, and emerging technology tracking (passkeys, decentralized identity).
 
 **MCP Registry:** `eu.ansvar/iam-mcp`
 **npm:** `@ansvar/iam-mcp`
@@ -10,11 +10,11 @@ Comprehensive identity and access management intelligence for the [Model Context
 
 ## Deployment Tier
 
-**MEDIUM** -- dual tier, free database bundled in npm package.
+**MEDIUM** -- stdio (npm package, bundled database).
 
 | Tier | Platform | Database | Content |
 |------|----------|----------|---------|
-| **Free** | Vercel (Hobby) / npm (stdio) | ~80-150 MB bundled | Standards, protocols, attack patterns, CWE/CAPEC, architecture patterns, vendor configs, compliance mappings, emerging tech |
+| **Free** | npm (stdio) | ~80-150 MB bundled | Standards, protocols, attack patterns, CWE/CAPEC, architecture patterns, vendor configs, compliance mappings, emerging tech |
 
 ---
 
@@ -29,7 +29,6 @@ Comprehensive identity and access management intelligence for the [Model Context
 | [CWE](https://cwe.mitre.org) | MITRE | XML download | Weekly | CWE ToU | Identity/access weakness families |
 | [CAPEC](https://capec.mitre.org) | MITRE | XML download | Weekly | CAPEC ToU | Identity attack patterns |
 | [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/) | OWASP | GitHub markdown | Monthly | CC BY-SA 4.0 | V2 Auth, V3 Session, V4 Access Control |
-| [CIS Controls v8](https://www.cisecurity.org/controls) | CIS | CSV/JSON | Monthly | CIS ToU | Controls 5, 6 (identity) |
 | [CISA ZTMM](https://www.cisa.gov/zero-trust-maturity-model) | CISA | PDF extraction | Quarterly | Public Domain | Zero Trust maturity pillars |
 | OAuth/OIDC/SAML/FIDO2/SCIM | IETF/W3C/OASIS/FIDO | Spec extraction | Monthly-Quarterly | Various | Protocol specifications |
 | Azure Entra / AWS IAM / GCP IAM | Microsoft/AWS/Google | Vendor docs | Monthly | Fair use | Platform-specific guidance |
@@ -41,6 +40,9 @@ Comprehensive identity and access management intelligence for the [Model Context
 | FIDO Alliance | FIDO Alliance | HTML extraction | Monthly | FIDO Terms | Passkey guidance |
 
 > Full provenance metadata: [`sources.yml`](./sources.yml)
+
+**Removed sources:**
+- **CIS Controls v8** (Controls 5, 6) — removed 2026-04-26. Non-commercial-only license conflicts with commercial gateway use. Phase 4 backfill candidates: NIST CSF 2.0, CISA guidance (both public domain). Check fleet-overlap with `security-controls` MCP before adding new ingestion.
 
 ---
 
@@ -59,14 +61,6 @@ Comprehensive identity and access management intelligence for the [Model Context
 }
 ```
 
-### Vercel Streamable HTTP (ChatGPT / Claude.ai)
-
-Once deployed, the public endpoint will be available at:
-
-```
-https://iam-mcp.vercel.app/api/mcp
-```
-
 ---
 
 ## Tools
@@ -75,7 +69,7 @@ https://iam-mcp.vercel.app/api/mcp
 
 | Tool | Description |
 |------|-------------|
-| `get_iam_standard` | Full details on a specific IAM control/requirement (NIST, ISO, CIS, SOC 2) |
+| `get_iam_standard` | Full details on a specific IAM control/requirement (NIST, ISO, SOC 2) |
 | `search_iam_requirements` | Find IAM requirements by topic, framework, or category |
 | `check_iam_compliance` | Given implemented controls, check compliance against a target framework |
 | `map_frameworks` | Cross-reference a control between frameworks (e.g., ISO 27001 -> NIST 800-53) |
@@ -131,17 +125,15 @@ https://iam-mcp.vercel.app/api/mcp
 
 | Component | Records | Est. Size |
 |-----------|---------|-----------|
-| Standards & frameworks | ~300-400 | ~15-25 MB |
+| Standards & frameworks | ~280-360 | ~13-22 MB |
 | Protocols | ~30 | ~2-5 MB |
 | Attack patterns (ATT&CK) | ~150-200 | ~10-20 MB |
 | IAM weaknesses (CWE/CAPEC) | ~80-100 | ~5-10 MB |
 | Architecture patterns | ~40-50 | ~3-5 MB |
 | Vendor configurations | ~200-300 | ~20-40 MB |
-| Compliance mappings | ~500+ | ~5-10 MB |
+| Compliance mappings | ~450+ | ~4-8 MB |
 | Emerging technologies | ~30-40 | ~3-5 MB |
-| **Total** | **~1,300-1,500+** | **~80-150 MB** |
-
-**Delivery strategy:** DB bundled in npm package (Strategy A -- fits within Vercel 250 MB function limit).
+| **Total** | **~1,260-1,400+** | **~75-140 MB** |
 
 ---
 
@@ -194,9 +186,6 @@ IAM-mcp/
 │   ├── SECURITY.md
 │   └── ISSUE_TEMPLATE/
 │       └── data-error.md
-├── api/
-│   ├── mcp.ts                        # Vercel Streamable HTTP endpoint
-│   └── health.ts                     # Health check endpoint
 ├── data/
 │   ├── seed/                         # Seed JSON files (gitignored)
 │   └── .gitkeep
@@ -221,30 +210,7 @@ IAM-mcp/
 │   │   └── metadata.ts               # ToolResponse + metadata helpers
 │   └── tools/
 │       ├── registry.ts               # Tool registration (shared)
-│       ├── get-iam-standard.ts
-│       ├── search-iam-requirements.ts
-│       ├── check-iam-compliance.ts
-│       ├── map-frameworks.ts
-│       ├── get-assurance-levels.ts
-│       ├── get-iam-attack.ts
-│       ├── search-iam-threats.ts
-│       ├── get-iam-weakness.ts
-│       ├── assess-iam-posture.ts
-│       ├── get-iam-stride-patterns.ts
-│       ├── get-protocol.ts
-│       ├── get-access-model.ts
-│       ├── recommend-architecture.ts
-│       ├── get-lifecycle-pattern.ts
-│       ├── get-zero-trust-pattern.ts
-│       ├── get-vendor-config.ts
-│       ├── compare-vendors.ts
-│       ├── get-misconfigurations.ts
-│       ├── get-migration-path.ts
-│       ├── get-emerging-technology.ts
-│       ├── get-machine-identity.ts
-│       ├── assess-iam-maturity.ts
-│       ├── list-sources.ts
-│       └── about.ts
+│       └── ...                       # 22 domain tools + 2 meta tools
 ├── __tests__/
 │   └── contract/
 │       └── golden.test.ts            # Contract tests against golden data
@@ -256,7 +222,6 @@ IAM-mcp/
 ├── package.json
 ├── tsconfig.json
 ├── vitest.config.ts
-├── vercel.json
 ├── CLAUDE.md
 ├── CHANGELOG.md
 ├── LICENSE
@@ -267,11 +232,9 @@ IAM-mcp/
 
 ## Related Documents
 
-- [MCP Quality Standard](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/mcp-quality-standard.md) -- quality requirements for all Ansvar MCPs
-- [MCP Infrastructure Blueprint](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/mcp-infrastructure-blueprint.md) -- infrastructure implementation templates
-- [MCP Deployment Tiers](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/mcp-deployment-tiers.md) -- free vs. professional tier strategy
-- [MCP Server Registry](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/mcp-server-registry.md) -- operational registry of all MCPs
-- [IAM Expert MCP Design](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/plans/2026-02-20-iam-mcp-design.md) -- design document
+- [MCP Quality Standard](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/mcp-quality-standard.md)
+- [MCP Infrastructure Blueprint](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/mcp-infrastructure-blueprint.md)
+- [IAM Expert MCP Design](https://github.com/Ansvar-Systems/Ansvar-Architecture-Documentation/blob/main/docs/plans/2026-02-20-iam-mcp-design.md)
 
 ---
 

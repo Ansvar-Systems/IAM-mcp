@@ -7,12 +7,36 @@
       "description": "Role-Based Access Control assigns permissions to roles rather than directly to users, and users are then assigned to roles. The NIST RBAC model (INCITS 359-2012) defines four components: Core RBAC (users, roles, permissions, sessions), Hierarchical RBAC (role inheritance), Static Separation of Duty (SSD constraints at assignment time), and Dynamic Separation of Duty (DSD constraints at activation time). RBAC dramatically simplifies administration for large organizations because permission changes only need to be made at the role level rather than per-user. The model works best when organizational roles map cleanly to access requirements, which is common in structured enterprises but less effective in fluid project-based organizations.",
       "when_to_use": "- Enterprise environments with well-defined organizational roles and job functions\n- Compliance requirements mandate clear role-to-permission mappings (SOX, HIPAA, PCI-DSS)\n- Organizations with hundreds to thousands of users needing consistent access patterns\n- Regulatory environments requiring auditable access control decisions\n- Systems where access needs can be expressed as discrete permissions grouped by job function",
       "when_not_to_use": "Not suitable when access decisions depend on contextual attributes like time, location, or resource properties that cannot be captured in static roles. Avoid when the number of roles would approach the number of users (role explosion), which commonly occurs in fine-grained multi-tenant SaaS applications. Poor fit for environments where users frequently need ad-hoc access combinations that don't map to predefined roles.",
-      "components": ["Policy Administration Point (PAP)", "Policy Decision Point (PDP)", "Role Store / Directory", "User-Role Assignment Module", "Permission-Role Assignment Module", "Session Manager", "Role Hierarchy Engine"],
+      "components": [
+        "Policy Administration Point (PAP)",
+        "Policy Decision Point (PDP)",
+        "Role Store / Directory",
+        "User-Role Assignment Module",
+        "Permission-Role Assignment Module",
+        "Session Manager",
+        "Role Hierarchy Engine"
+      ],
       "data_flow": "1. User authenticates and establishes a session. 2. User activates one or more assigned roles for the session. 3. When accessing a resource, the PEP intercepts the request. 4. PDP looks up active roles for the session, resolves role hierarchy, and evaluates permissions assigned to those roles. 5. PDP checks SSD/DSD constraints to ensure no conflicting roles are simultaneously active. 6. Access granted or denied based on permission evaluation.",
       "strengths": "Simple conceptual model that business stakeholders understand. Well-studied with NIST formal model (INCITS 359). Straightforward auditing since role assignments directly show what each user can do. Efficient administration for organizations with clear role structures. Broad vendor support across all major IAM platforms. Reduces administrative overhead by orders of magnitude compared to per-user permissions.",
       "weaknesses": "Role explosion when fine-grained permissions are needed across many resource types and tenants. Difficult to express context-dependent policies (time-of-day, IP address, risk level). Role engineering is a significant upfront investment and ongoing maintenance burden. Static role assignments cannot adapt to dynamic risk conditions. Over-provisioning risk when users accumulate roles across job changes (role creep).",
-      "compliance_mappings": ["NIST-800-53-AC-2", "NIST-800-53-AC-3", "NIST-800-53-AC-5", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.1", "SOC2-CC6.3", "CIS-6.8", "OWASP-ASVS-V4.1"],
-      "related_patterns": ["abac", "rbac-hierarchical", "rbac-sod", "hybrid-rbac-abac", "claims-based"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-5",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.5.18",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3",
+        "OWASP-ASVS-V4.1"
+      ],
+      "related_patterns": [
+        "abac",
+        "rbac-hierarchical",
+        "rbac-sod",
+        "hybrid-rbac-abac",
+        "claims-based"
+      ]
     },
     {
       "id": "abac",
@@ -21,12 +45,38 @@
       "description": "Attribute-Based Access Control makes authorization decisions by evaluating policies against attributes of the subject (user), resource (object), action, and environment. Defined by NIST SP 800-162, ABAC uses a four-component architecture: Policy Enforcement Point (PEP) intercepts requests, Policy Decision Point (PDP) evaluates policies, Policy Information Point (PIP) provides attribute data, and Policy Administration Point (PAP) manages policies. ABAC can express complex, fine-grained access rules such as 'doctors can view patient records only during their shift at the facility where the patient is admitted.' This model scales to millions of policy combinations without role explosion because policies are expressed as attribute comparisons rather than explicit role-permission mappings.",
       "when_to_use": "- Access decisions depend on dynamic context: time, location, device posture, risk score, resource classification\n- Fine-grained authorization needed across many resource types without role explosion\n- Multi-tenant SaaS platforms where tenant isolation must be policy-driven\n- Cross-organizational data sharing requiring attribute-based trust evaluation\n- Government and defense environments with mandatory classification-based access (which ABAC naturally expresses)",
       "when_not_to_use": "Overkill for small applications with simple role structures where RBAC suffices. Avoid when the organization lacks the maturity to define, manage, and audit attribute schemas and policies. The upfront investment in attribute taxonomy and policy engineering is substantial and not justified for applications with fewer than a handful of access patterns. Debugging complex ABAC policies is harder than RBAC role assignments.",
-      "components": ["Policy Enforcement Point (PEP)", "Policy Decision Point (PDP)", "Policy Information Point (PIP)", "Policy Administration Point (PAP)", "Attribute Store / Repository", "Policy Language Engine (XACML/ALFA/Cedar)", "Context Handler", "Obligation Service"],
+      "components": [
+        "Policy Enforcement Point (PEP)",
+        "Policy Decision Point (PDP)",
+        "Policy Information Point (PIP)",
+        "Policy Administration Point (PAP)",
+        "Attribute Store / Repository",
+        "Policy Language Engine (XACML/ALFA/Cedar)",
+        "Context Handler",
+        "Obligation Service"
+      ],
       "data_flow": "1. User request intercepted by PEP at the resource boundary. 2. PEP constructs an authorization request with subject, resource, action, and environment attributes. 3. PDP receives the request and queries PIP(s) for any additional attributes needed. 4. PDP evaluates applicable policies against the collected attributes. 5. PDP returns a decision (Permit/Deny/Not Applicable/Indeterminate) with optional obligations. 6. PEP enforces the decision and executes any obligations (logging, data filtering, notifications).",
       "strengths": "Extremely flexible and expressive - can model virtually any access control scenario. Eliminates role explosion by making decisions based on attribute comparisons. Supports dynamic, context-aware decisions incorporating real-time risk signals. Policies can be audited and reasoned about independently of user populations. Naturally supports data classification and compartmentalization. NIST-standardized architecture (SP 800-162) with formal model.",
       "weaknesses": "Complex to implement, test, and debug - policy conflicts can be subtle and hard to detect. Requires mature attribute management infrastructure and governance. Performance overhead from attribute collection and policy evaluation on every request. Difficult for non-technical stakeholders to understand or review policies. Limited tooling compared to RBAC - fewer commercial products with full ABAC support. Policy language learning curve (XACML is notoriously verbose).",
-      "compliance_mappings": ["NIST-800-53-AC-3", "NIST-800-53-AC-3(7)", "NIST-800-53-AC-3(13)", "NIST-800-53-AC-16", "NIST-800-207-PDP-PEP", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1", "OWASP-ASVS-V4.1", "OWASP-ASVS-V4.2"],
-      "related_patterns": ["rbac", "pbac", "hybrid-rbac-abac", "zt-identity-centric", "claims-based"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-3(7)",
+        "NIST-800-53-AC-3(13)",
+        "NIST-800-53-AC-16",
+        "NIST-800-207-PDP-PEP",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.8.3",
+        "SOC2-CC6.1",
+        "OWASP-ASVS-V4.1",
+        "OWASP-ASVS-V4.2"
+      ],
+      "related_patterns": [
+        "rbac",
+        "pbac",
+        "hybrid-rbac-abac",
+        "zt-identity-centric",
+        "claims-based"
+      ]
     },
     {
       "id": "rebac",
@@ -35,12 +85,33 @@
       "description": "Relationship-Based Access Control determines authorization based on the relationship between a subject and a resource within a directed graph. Pioneered by Google's Zanzibar system (published 2019), ReBAC models permissions as graph traversals: a user can edit a document if they are an editor of that document, or an editor of a folder that contains the document, or a member of a group that is an editor of the folder. Implementations include SpiceDB, OpenFGA, and Ory Keto. ReBAC excels at modeling hierarchical and collaborative access patterns where permissions flow through ownership, membership, and containment relationships. The authorization check becomes a graph reachability query from the subject to the resource through permitted relationship paths.",
       "when_to_use": "- Collaborative applications with document/resource sharing (Google Drive, Notion, Figma model)\n- Hierarchical resource structures where permissions inherit through containment (folders, projects, organizations)\n- Social and collaborative platforms where access depends on relationships between entities\n- Multi-tenant applications requiring fine-grained, per-resource authorization\n- Systems needing to express access like 'viewers of parent can view children' naturally",
       "when_not_to_use": "Avoid when access decisions primarily depend on user attributes or environmental context rather than resource relationships. Not ideal for classification-based access control (government/military) where labels, not relationships, drive decisions. Graph-based authorization can have latency challenges at extreme scale without specialized infrastructure. Poor fit for simple applications where RBAC role assignments are sufficient.",
-      "components": ["Relationship Tuple Store (subject#relation@resource)", "Authorization Check Engine (graph traversal)", "Namespace / Type Definition Schema", "Watch/Changelog API for cache invalidation", "Consistency Token System (Zookies/ZedTokens)", "Relationship Write API", "Schema Management / Migration Tool"],
+      "components": [
+        "Relationship Tuple Store (subject#relation@resource)",
+        "Authorization Check Engine (graph traversal)",
+        "Namespace / Type Definition Schema",
+        "Watch/Changelog API for cache invalidation",
+        "Consistency Token System (Zookies/ZedTokens)",
+        "Relationship Write API",
+        "Schema Management / Migration Tool"
+      ],
       "data_flow": "1. Relationships are written as tuples: (user:alice, editor, document:report). 2. When alice requests access, the check API receives (user:alice, view, document:report). 3. The engine evaluates the namespace schema: 'view' is granted to 'editor' and 'viewer'. 4. Engine checks direct relationships, then traverses parent relationships (document's folder, folder's org). 5. Graph traversal finds that alice is an editor, which includes view permission. 6. Decision returned with a consistency token to prevent stale reads.",
       "strengths": "Natural model for collaborative and hierarchical access patterns. Scales to trillions of relationships (Google Zanzibar serves billions of checks/second). Fine-grained per-resource authorization without role explosion. Consistency model handles distributed caching correctly. Open-source implementations available (SpiceDB, OpenFGA). Schema-driven with formal type checking of relationship definitions.",
       "weaknesses": "Requires a specialized relationship store and query engine - not a simple library. Debugging authorization requires understanding graph traversal paths. Not intuitive for attribute-based or classification-based access patterns. Migration from RBAC to ReBAC requires re-modeling all authorization data. Operational complexity of maintaining a high-availability relationship store. Limited ecosystem compared to RBAC - fewer developers have experience with the model.",
-      "compliance_mappings": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-3(7)", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.3", "OWASP-ASVS-V4.1"],
-      "related_patterns": ["rbac", "abac", "pbac", "hybrid-rbac-abac"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-3(7)",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3",
+        "OWASP-ASVS-V4.1"
+      ],
+      "related_patterns": [
+        "rbac",
+        "abac",
+        "pbac",
+        "hybrid-rbac-abac"
+      ]
     },
     {
       "id": "pbac",
@@ -49,12 +120,35 @@
       "description": "Policy-Based Access Control externalizes authorization logic into a dedicated policy engine that evaluates rules written in a purpose-built policy language. Unlike ABAC which is a conceptual model, PBAC emphasizes the operational architecture: policies-as-code authored, versioned, tested, and deployed independently from application code. Key implementations include Open Policy Agent (OPA) with Rego language, AWS Cedar, Google CEL, and Styra DAS. PBAC decouples the authorization decision from the application, enabling consistent policy enforcement across microservices, APIs, Kubernetes admission control, and infrastructure-as-code. Policies are typically evaluated locally with sub-millisecond latency using compiled policy bundles.",
       "when_to_use": "- Microservices architectures needing consistent authorization across many services\n- Organizations adopting policy-as-code for compliance automation and GitOps workflows\n- Kubernetes environments requiring admission control and workload authorization\n- API gateways and service meshes needing externalized authorization decisions\n- Environments where authorization policies must be version-controlled, tested, and audited as code",
       "when_not_to_use": "Unnecessary overhead for monolithic applications with straightforward authorization needs. Avoid when the team lacks engineering maturity to manage policy-as-code lifecycle (authoring, testing, deployment, monitoring). The policy language learning curve (Rego, Cedar) can slow down development teams unfamiliar with declarative logic programming. Not a good fit when business users need to manage policies without developer involvement.",
-      "components": ["Policy Engine (OPA/Cedar/Casbin)", "Policy Language Runtime", "Policy Bundle Distribution System", "Decision Logging / Audit Trail", "Policy Testing Framework", "Data Source Integration Layer", "Policy Administration UI", "Sidecar or Library Deployment"],
+      "components": [
+        "Policy Engine (OPA/Cedar/Casbin)",
+        "Policy Language Runtime",
+        "Policy Bundle Distribution System",
+        "Decision Logging / Audit Trail",
+        "Policy Testing Framework",
+        "Data Source Integration Layer",
+        "Policy Administration UI",
+        "Sidecar or Library Deployment"
+      ],
       "data_flow": "1. Application or API gateway sends authorization query to the policy engine with input data (subject, action, resource, context). 2. Policy engine loads the applicable policy bundle (pre-compiled for performance). 3. Engine evaluates all relevant rules against the input and any external data sources. 4. Decision (allow/deny) returned with optional reasons and obligations. 5. Decision is logged for audit. 6. Application enforces the decision. Policy bundles are periodically refreshed from a central policy server.",
       "strengths": "Decouples authorization logic from application code, enabling independent policy evolution. Policies can be version-controlled, tested, and reviewed like code (GitOps-friendly). Sub-millisecond evaluation when policies are compiled and evaluated locally. Rich ecosystem for Kubernetes (OPA Gatekeeper), API gateways (Envoy ext_authz), and cloud platforms. Supports complex logic including data lookup, aggregation, and conditional rules. Strong audit trail of all decisions.",
       "weaknesses": "Policy languages have a steep learning curve (Rego's Datalog-inspired syntax is unfamiliar to most developers). Debugging policy evaluation requires understanding the engine's evaluation model. Distributed policy consistency requires careful bundle distribution and caching. Operational overhead of running and monitoring policy engines across infrastructure. Policy sprawl can occur without governance - hundreds of policies become hard to reason about. Limited standardization - each engine uses a different policy language.",
-      "compliance_mappings": ["NIST-800-53-AC-3", "NIST-800-53-AC-3(4)", "NIST-800-53-AC-24", "NIST-800-207-PDP-PEP", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1", "OWASP-ASVS-V4.1"],
-      "related_patterns": ["abac", "rbac", "zt-identity-centric", "hybrid-rbac-abac"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-3(4)",
+        "NIST-800-53-AC-24",
+        "NIST-800-207-PDP-PEP",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.8.3",
+        "SOC2-CC6.1",
+        "OWASP-ASVS-V4.1"
+      ],
+      "related_patterns": [
+        "abac",
+        "rbac",
+        "zt-identity-centric",
+        "hybrid-rbac-abac"
+      ]
     },
     {
       "id": "dac",
@@ -63,12 +157,27 @@
       "description": "Discretionary Access Control allows resource owners to grant or revoke access to their resources at their own discretion. The canonical implementation is the POSIX file permission model (user/group/other with read/write/execute bits) and Access Control Lists (ACLs). In DAC, the owner of an object has full authority over who can access it and can delegate that authority to others. DAC is the default access control model in most operating systems (Linux, Windows NTFS, macOS) and cloud storage systems (S3 bucket policies, Google Drive sharing). While intuitive and flexible, DAC provides no mechanism to prevent authorized users from re-sharing data, making it insufficient for environments requiring mandatory data classification enforcement.",
       "when_to_use": "- File systems and storage platforms where resource owners should control sharing\n- Collaborative environments where users need autonomy to share resources with colleagues\n- Small-scale systems where simplicity is prioritized over centralized control\n- Operating system-level file and process permissions\n- Situations where the overhead of centralized access management is not justified",
       "when_not_to_use": "Unsuitable for environments handling classified or regulated data where data owners must not have authority to weaken access controls (use MAC instead). Avoid in healthcare, financial, or government systems where regulatory mandates require centralized access policy enforcement. DAC cannot prevent information leakage through authorized users re-sharing data. Not appropriate when compliance frameworks require demonstrable separation of duties enforcement.",
-      "components": ["Access Control List (ACL) Store", "Resource Owner Registry", "Permission Propagation Engine", "ACL Evaluation Engine", "Ownership Transfer Mechanism"],
+      "components": [
+        "Access Control List (ACL) Store",
+        "Resource Owner Registry",
+        "Permission Propagation Engine",
+        "ACL Evaluation Engine",
+        "Ownership Transfer Mechanism"
+      ],
       "data_flow": "1. Resource creator becomes the owner with full control permissions. 2. Owner sets ACL entries granting specific permissions to other users or groups. 3. When a user requests access, the system evaluates the ACL for the specific resource. 4. If the user matches an ACL entry with the required permission, access is granted. 5. Owner can modify ACL entries at any time. 6. Authorized users may further share access (depending on implementation), creating potential for uncontrolled permission propagation.",
       "strengths": "Simple, intuitive model that users understand without training. Universal implementation in all major operating systems and storage platforms. Low administrative overhead - owners manage their own resources. Flexible and responsive to collaboration needs without involving administrators. Well-understood security properties from decades of research and deployment.",
       "weaknesses": "No protection against authorized users re-sharing data (Trojan Horse problem). No centralized control over access policies - every owner makes independent decisions. Audit complexity grows rapidly as each resource has its own ACL. Cannot enforce organization-wide data classification policies. Users tend to over-share for convenience, leading to excessive access. ACL management at scale becomes unwieldy without additional governance tooling.",
-      "compliance_mappings": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "SOC2-CC6.1"],
-      "related_patterns": ["mac", "rbac", "rebac"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1"
+      ],
+      "related_patterns": [
+        "mac",
+        "rbac",
+        "rebac"
+      ]
     },
     {
       "id": "mac",
@@ -77,12 +186,33 @@
       "description": "Mandatory Access Control enforces access decisions based on security labels (classifications) assigned to both subjects and objects by a central authority, not by resource owners. The Bell-LaPadula model (confidentiality) enforces 'no read up, no write down' - a subject at Secret level can read Secret and below but cannot read Top Secret, and cannot write to a lower classification to prevent data leakage. The Biba model (integrity) inverts this: 'no read down, no write up.' MAC is mandated for military and intelligence systems (Common Criteria EAL4+) and implemented in SELinux, AppArmor, and Windows Mandatory Integrity Control. Labels are assigned by security administrators and cannot be changed by resource owners, providing strong protection against insider threats and Trojan Horse attacks that defeat DAC.",
       "when_to_use": "- Military, intelligence, and classified government systems requiring formal security policies\n- High-assurance environments where data classification labels must be centrally enforced\n- Systems requiring Common Criteria certification (EAL4+ typically requires MAC)\n- Environments where insider threat prevention is a primary security objective\n- Container and process isolation (SELinux/AppArmor) to limit blast radius of compromised services",
       "when_not_to_use": "Excessive for most commercial and enterprise applications where RBAC or ABAC provides sufficient control. MAC's rigidity makes it impractical for collaborative environments where users need flexibility in sharing. The administrative overhead of classifying all subjects and objects is only justified for high-security environments. Avoid in user-facing applications where the inability to share or delegate access would create unacceptable friction.",
-      "components": ["Security Label Manager", "Classification Authority", "Bell-LaPadula / Biba Policy Engine", "Label Assignment Service", "Mandatory Policy Enforcement Module", "Security Clearance Registry", "Cross-Domain Solution (for multi-level systems)"],
+      "components": [
+        "Security Label Manager",
+        "Classification Authority",
+        "Bell-LaPadula / Biba Policy Engine",
+        "Label Assignment Service",
+        "Mandatory Policy Enforcement Module",
+        "Security Clearance Registry",
+        "Cross-Domain Solution (for multi-level systems)"
+      ],
       "data_flow": "1. Central authority assigns security labels (classifications) to all subjects (users, processes) and objects (files, resources). 2. User authenticates and their security clearance level is established. 3. When accessing a resource, the MAC engine compares the subject's clearance with the object's classification. 4. Bell-LaPadula: Read allowed if subject clearance >= object classification; Write allowed if subject clearance <= object classification. 5. Decision is mandatory - neither the subject nor the resource owner can override it. 6. All label changes require security administrator authorization.",
       "strengths": "Provably prevents information leakage through formal mathematical models. Immune to Trojan Horse attacks that defeat DAC (compromised processes cannot write to lower classifications). Centralized policy enforcement that resource owners cannot circumvent. Required for military and government classified system certification. Strong foundation for container isolation (SELinux Type Enforcement). Well-studied formal models with decades of academic and practical validation.",
       "weaknesses": "Extremely rigid - users cannot share or delegate access without administrator intervention. Massive administrative overhead in classifying all subjects and objects. The 'no write down' rule can create practical difficulties (a Top Secret user cannot send email to a Secret user). Limited commercial tooling and vendor support outside government/defense markets. Difficult to retrofit onto existing systems not designed for MAC from the start. Covert channel analysis required for high-assurance implementations.",
-      "compliance_mappings": ["NIST-800-53-AC-3(8)", "NIST-800-53-AC-16", "NIST-800-53-AC-4", "NIST-800-53-AC-4(1)", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1"],
-      "related_patterns": ["dac", "rbac", "abac", "zt-data-protection"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-3(8)",
+        "NIST-800-53-AC-16",
+        "NIST-800-53-AC-4",
+        "NIST-800-53-AC-4(1)",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.8.3",
+        "SOC2-CC6.1"
+      ],
+      "related_patterns": [
+        "dac",
+        "rbac",
+        "abac",
+        "zt-data-protection"
+      ]
     },
     {
       "id": "rbac-hierarchical",
@@ -91,12 +221,34 @@
       "description": "Hierarchical RBAC extends the base RBAC model with role inheritance, where senior roles automatically inherit all permissions of their junior roles. NIST defines two types: General Hierarchical RBAC supports arbitrary partial order role hierarchies (a role can inherit from multiple parent roles), while Limited Hierarchical RBAC restricts the hierarchy to a tree (single inheritance). For example, a 'Department Manager' role inherits all permissions of 'Team Lead,' which inherits all permissions of 'Employee.' This dramatically reduces the number of explicit permission assignments needed, as common permissions only need to be assigned once at the base role. Hierarchical RBAC is the most widely deployed RBAC variant in enterprise IAM products including Azure AD (Entra ID), Active Directory, and all major IGA platforms.",
       "when_to_use": "- Organizations with clear hierarchical authority structures (military, government, large enterprises)\n- When common baseline permissions should be inherited by all roles in a branch\n- Reducing role administration overhead by assigning permissions at the most general applicable level\n- Enterprise directory structures where organizational hierarchy maps to access hierarchy\n- When audit requirements need to trace permission grants through inheritance chains",
       "when_not_to_use": "Avoid when the organizational structure is flat or matrix-based and inheritance creates over-provisioning. Not suitable when different branches of the hierarchy need the same base permissions with different restrictions - inheritance only adds permissions, it does not subtract. Problematic when multiple inheritance creates unintended permission accumulation that is hard to audit. Avoid when roles in different hierarchy branches should be mutually exclusive (use SoD constraints instead).",
-      "components": ["Role Hierarchy Definition Engine", "Inheritance Resolution Service", "Permission Aggregation Calculator", "Role Graph Visualization Tool", "Effective Permission Calculator", "Role Assignment Service", "Hierarchy Constraint Validator"],
+      "components": [
+        "Role Hierarchy Definition Engine",
+        "Inheritance Resolution Service",
+        "Permission Aggregation Calculator",
+        "Role Graph Visualization Tool",
+        "Effective Permission Calculator",
+        "Role Assignment Service",
+        "Hierarchy Constraint Validator"
+      ],
       "data_flow": "1. Administrator defines roles and organizes them into a hierarchy (parent-child relationships). 2. Permissions are assigned to roles; child roles inherit parent permissions. 3. When a user with role R requests access, the PDP resolves the transitive closure of all ancestors of R. 4. Effective permissions are the union of permissions from R and all inherited roles. 5. Access is granted if any role in the resolved set has the required permission. 6. Changes to parent role permissions automatically propagate to all descendant roles.",
       "strengths": "Dramatically reduces permission administration by leveraging inheritance. Natural mapping to organizational hierarchies. Well-supported by all major IAM vendors and directory services. Easy to audit by visualizing the role hierarchy graph. Scalable to thousands of roles when hierarchy is well-designed. Formal NIST model provides clear semantics for inheritance resolution.",
       "weaknesses": "Inheritance can create unintended permission accumulation (a role inherits more than intended from multiple ancestors). Difficult to express 'inherit all except X' without restructuring the hierarchy. Deep hierarchies become hard to reason about and audit. Changes to roles high in the hierarchy cascade broadly, creating change management risk. General hierarchical RBAC (multiple inheritance) can create diamond inheritance problems. Over-reliance on hierarchy can lead to permission sprawl.",
-      "compliance_mappings": ["NIST-800-53-AC-2", "NIST-800-53-AC-3", "NIST-800-53-AC-5", "NIST-800-53-AC-6", "NIST-800-53-AC-6(7)", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.1", "SOC2-CC6.3"],
-      "related_patterns": ["rbac", "rbac-sod", "hybrid-rbac-abac"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-5",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-6(7)",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.5.18",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3"
+      ],
+      "related_patterns": [
+        "rbac",
+        "rbac-sod",
+        "hybrid-rbac-abac"
+      ]
     },
     {
       "id": "rbac-sod",
@@ -105,12 +257,35 @@
       "description": "RBAC with Separation of Duties extends the RBAC model with constraints that prevent a single user from holding conflicting roles that, in combination, could enable fraud or abuse. The NIST RBAC model defines two types: Static Separation of Duty (SSD) prevents conflicting role assignments at provisioning time (a user cannot be assigned both 'Payment Approver' and 'Payment Initiator'), and Dynamic Separation of Duty (DSD) prevents conflicting roles from being activated in the same session (a user could hold both audit and operations roles but cannot activate both simultaneously). SoD is a fundamental internal control required by financial regulations (SOX), healthcare regulations (HIPAA), and security frameworks (NIST, ISO 27001). Implementing SoD computationally requires maintaining a conflict matrix and evaluating it during role assignment and session activation.",
       "when_to_use": "- Financial systems requiring fraud prevention controls (SOX compliance)\n- Any system where conflicting duties must be separated (e.g., developer vs. deployer, requestor vs. approver)\n- Healthcare systems where prescribing and dispensing must be separated\n- Regulatory environments requiring demonstrable internal controls\n- Procurement systems separating purchase requisition, approval, and payment functions",
       "when_not_to_use": "Unnecessary overhead in small organizations where a single person must perform multiple functions (in such cases, compensating controls like audit logging are used instead). Avoid over-constraining SoD in startup environments where role overlap is unavoidable. DSD adds session management complexity that may not be justified in stateless API-only architectures. SoD constraints that are too strict can block legitimate work, requiring exception processes that undermine the control.",
-      "components": ["SoD Conflict Matrix / Policy Store", "Static SoD Enforcement Engine (assignment-time)", "Dynamic SoD Enforcement Engine (session-time)", "SoD Violation Detection and Reporting", "Exception / Override Workflow with Approval", "SoD Simulation / What-If Analysis Tool", "Conflict Resolution Service"],
+      "components": [
+        "SoD Conflict Matrix / Policy Store",
+        "Static SoD Enforcement Engine (assignment-time)",
+        "Dynamic SoD Enforcement Engine (session-time)",
+        "SoD Violation Detection and Reporting",
+        "Exception / Override Workflow with Approval",
+        "SoD Simulation / What-If Analysis Tool",
+        "Conflict Resolution Service"
+      ],
       "data_flow": "1. Administrator defines SoD constraints as pairs or sets of mutually exclusive roles. 2. Static SoD: When assigning a role to a user, the system checks all SoD constraints; if the new role conflicts with an existing role, assignment is blocked. 3. Dynamic SoD: When a user activates a role in a session, the system verifies no conflicting role is already active; if so, activation is denied. 4. SoD violations are logged and reported. 5. Exception workflows allow temporary SoD overrides with multi-party approval and enhanced monitoring. 6. Periodic SoD compliance reports identify any violations that need remediation.",
       "strengths": "Essential internal control for fraud prevention and regulatory compliance. Computationally enforceable - cannot be bypassed through social engineering. Both static and dynamic variants provide defense in depth. Well-understood by auditors and compliance frameworks. Automated enforcement eliminates reliance on manual review processes. Formal model with clear mathematical properties (constraint satisfaction).",
       "weaknesses": "Can be overly restrictive in small teams where role overlap is necessary. SoD conflicts in complex role hierarchies can be difficult to identify and resolve. Exception/override processes can become a loophole if not properly governed. Defining the right SoD constraints requires deep business process understanding. DSD adds complexity to session management infrastructure. No standardized format for SoD constraint definitions across vendors.",
-      "compliance_mappings": ["NIST-800-53-AC-5", "NIST-800-53-AC-3", "NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(5)", "ISO-27001-A.5.3", "ISO-27001-A.8.2", "SOC2-CC5.2", "SOC2-CC6.1", "OWASP-ASVS-V4.1"],
-      "related_patterns": ["rbac", "rbac-hierarchical", "sod-enforcement", "access-certification"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-5",
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-6(5)",
+        "ISO-27001-A.5.3",
+        "ISO-27001-A.8.2",
+        "SOC2-CC5.2",
+        "SOC2-CC6.1",
+        "OWASP-ASVS-V4.1"
+      ],
+      "related_patterns": [
+        "rbac",
+        "rbac-hierarchical",
+        "sod-enforcement",
+        "access-certification"
+      ]
     },
     {
       "id": "hybrid-rbac-abac",
@@ -119,12 +294,38 @@
       "description": "Hybrid RBAC+ABAC combines role-based and attribute-based access control to leverage the administrative simplicity of roles with the contextual flexibility of attributes. In this model, RBAC provides the coarse-grained baseline (roles define broad access categories), while ABAC policies apply fine-grained constraints based on attributes (time, location, device, resource sensitivity, risk score). For example, a 'Physician' role grants access to patient records (RBAC), but only for patients currently assigned to that physician, during working hours, from a trusted device (ABAC conditions). This is the most common enterprise access control architecture in practice because pure RBAC leads to role explosion and pure ABAC is too complex for most organizations to implement fully. NIST SP 800-162 explicitly acknowledges this hybrid approach as the recommended enterprise pattern.",
       "when_to_use": "- Enterprise environments that have outgrown pure RBAC but cannot justify full ABAC migration\n- When roles provide useful coarse-grained grouping but contextual constraints are also needed\n- Healthcare, financial, and government systems requiring both role-based auditing and context-aware decisions\n- Migration path from legacy RBAC systems toward more flexible authorization\n- Multi-application environments where some apps need RBAC simplicity and others need ABAC flexibility",
       "when_not_to_use": "Unnecessary complexity if pure RBAC satisfies all access control requirements without role explosion. Avoid if the organization cannot maintain both a role model and an attribute taxonomy - choose one. Not suitable when the hybrid approach masks the need for a fundamental re-architecture of the authorization model. The dual-model can confuse developers and auditors if the interaction between RBAC and ABAC layers is not clearly documented.",
-      "components": ["Role Assignment Engine (RBAC layer)", "Attribute Evaluation Engine (ABAC layer)", "Policy Decision Point (combining both)", "Policy Enforcement Point", "Role Store", "Attribute Repository / PIP", "Policy Administration Console", "Effective Permission Calculator"],
+      "components": [
+        "Role Assignment Engine (RBAC layer)",
+        "Attribute Evaluation Engine (ABAC layer)",
+        "Policy Decision Point (combining both)",
+        "Policy Enforcement Point",
+        "Role Store",
+        "Attribute Repository / PIP",
+        "Policy Administration Console",
+        "Effective Permission Calculator"
+      ],
       "data_flow": "1. User authenticates and role assignments are retrieved (RBAC). 2. User requests access to a resource; PEP intercepts. 3. PDP first evaluates RBAC: does the user's role include the base permission? 4. If RBAC grants the base permission, ABAC policies are evaluated as additional constraints. 5. PDP queries PIPs for contextual attributes (time, device posture, resource metadata). 6. Final decision combines RBAC grant with ABAC constraint evaluation. 7. Access granted only if both RBAC and ABAC layers approve.",
       "strengths": "Best of both worlds: RBAC simplicity for coarse access with ABAC flexibility for fine-grained control. Incremental adoption path - start with RBAC, add ABAC constraints gradually. Avoids role explosion by using attributes for the fine-grained dimension. Familiar to auditors (roles) while enabling sophisticated risk-adaptive policies. NIST-recommended approach for enterprise environments. Supported by major platforms (Azure Conditional Access + roles, AWS IAM + conditions).",
       "weaknesses": "Two models to maintain, document, and audit increases operational complexity. Interaction between RBAC and ABAC layers can create unexpected access decisions. Developers must understand both models to implement correctly. Policy debugging requires tracing through both layers. No single standard defines the hybrid model - each implementation combines them differently. Risk of 'worst of both worlds' if poorly implemented: role explosion plus complex attribute policies.",
-      "compliance_mappings": ["NIST-800-53-AC-3", "NIST-800-53-AC-3(7)", "NIST-800-53-AC-3(13)", "NIST-800-53-AC-16", "NIST-800-207-PDP-PEP", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.3", "OWASP-ASVS-V4.1", "OWASP-ASVS-V4.2"],
-      "related_patterns": ["rbac", "abac", "pbac", "claims-based", "zt-identity-centric"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-3(7)",
+        "NIST-800-53-AC-3(13)",
+        "NIST-800-53-AC-16",
+        "NIST-800-207-PDP-PEP",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3",
+        "OWASP-ASVS-V4.1",
+        "OWASP-ASVS-V4.2"
+      ],
+      "related_patterns": [
+        "rbac",
+        "abac",
+        "pbac",
+        "claims-based",
+        "zt-identity-centric"
+      ]
     },
     {
       "id": "claims-based",
@@ -133,12 +334,35 @@
       "description": "Claims-Based Access Control makes authorization decisions based on claims (key-value assertions) embedded in security tokens (JWTs, SAML assertions) issued by a trusted identity provider. Rather than the application querying a directory for user attributes or role memberships at request time, the IdP pre-packages the relevant authorization data as claims in the token at authentication time. Common claims include roles, group memberships, department, clearance level, and custom application-specific attributes. The relying party validates the token signature, checks the issuer trust, and evaluates claims locally without needing real-time connectivity to the IdP. This model is the foundation of modern federation protocols (OIDC, SAML) and is the default authorization approach in Azure AD (Entra ID), Auth0, and Okta-based architectures.",
       "when_to_use": "- Federated environments where users authenticate at an external IdP and access resources at a relying party\n- Microservices architectures using JWT tokens for inter-service authorization\n- Applications that need to make authorization decisions without querying a central directory on every request\n- Azure AD / Entra ID environments leveraging token-based claims for application authorization\n- Cross-organization scenarios where the resource provider trusts claims from the user's home IdP",
       "when_not_to_use": "Not suitable when authorization data changes frequently and stale claims in tokens could grant inappropriate access (token lifetime creates a staleness window). Avoid when claims would contain sensitive data that should not be visible in tokens (JWTs are base64-encoded, not encrypted by default). Problematic when the number of claims is very large, causing token bloat that exceeds HTTP header limits. Not appropriate when real-time access revocation is critical and eventual consistency of token expiry is insufficient.",
-      "components": ["Identity Provider / Security Token Service (STS)", "Claims Issuance Pipeline", "Token Signing and Validation Keys", "Claims Transformation Engine", "Relying Party Token Validator", "Claims-Based Authorization Middleware", "Token Refresh and Revocation Service"],
+      "components": [
+        "Identity Provider / Security Token Service (STS)",
+        "Claims Issuance Pipeline",
+        "Token Signing and Validation Keys",
+        "Claims Transformation Engine",
+        "Relying Party Token Validator",
+        "Claims-Based Authorization Middleware",
+        "Token Refresh and Revocation Service"
+      ],
       "data_flow": "1. User authenticates to the IdP (Azure AD, Okta, Auth0). 2. IdP evaluates claims issuance policies and populates the token with claims from the directory, attribute stores, and custom rules. 3. Token (JWT or SAML assertion) is signed with IdP's private key and issued to the client. 4. Client presents the token to the relying party (resource server). 5. Relying party validates signature, issuer, audience, and expiration. 6. Authorization middleware evaluates claims in the validated token against access policies. 7. Access granted based on claim evaluation without querying the IdP.",
       "strengths": "Enables offline authorization decisions without real-time IdP connectivity. Natural fit for federation and cross-organization scenarios. Token-based model integrates seamlessly with modern web protocols (OIDC, OAuth 2.0). Claims can carry rich authorization context beyond simple roles. Reduces latency by avoiding per-request directory lookups. Well-supported by all major IdP vendors and application frameworks.",
       "weaknesses": "Token staleness - claims reflect the state at issuance time and may be outdated. JWT token bloat when many claims are included (HTTP header size limits). Base64-encoded JWTs expose claims to anyone with the token (privacy concern). Token revocation is impractical before expiry without additional infrastructure (revocation lists). Claims issuance policies are IdP-specific and not portable across vendors. Application must trust the IdP's claim values without independent verification.",
-      "compliance_mappings": ["NIST-800-53-AC-3", "NIST-800-53-IA-8", "NIST-800-63C-ASSERTION-PROTECTION", "NIST-800-63C-ATTRIBUTE-DISCLOSURE", "ISO-27001-A.5.15", "ISO-27001-A.5.17", "SOC2-CC6.1", "OWASP-ASVS-V3.5"],
-      "related_patterns": ["rbac", "abac", "hybrid-rbac-abac", "oidc-federation", "saml-federation"]
+      "compliance_mappings": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-IA-8",
+        "NIST-800-63C-ASSERTION-PROTECTION",
+        "NIST-800-63C-ATTRIBUTE-DISCLOSURE",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.5.17",
+        "SOC2-CC6.1",
+        "OWASP-ASVS-V3.5"
+      ],
+      "related_patterns": [
+        "rbac",
+        "abac",
+        "hybrid-rbac-abac",
+        "oidc-federation",
+        "saml-federation"
+      ]
     }
   ]
 }

@@ -48,11 +48,11 @@ export function getAbout(db: InstanceType<typeof Database>, context: AboutContex
     },
     data_sources: {
       summary:
-        'NIST (800-53/63/207), MITRE (ATT&CK/CWE/CAPEC), OWASP ASVS, CIS Controls, ' +
+        'NIST (800-53/63/207), MITRE (ATT&CK/CWE/CAPEC), OWASP ASVS, ' +
         'CISA ZTMM, IETF RFCs (OAuth/OIDC/SAML/SCIM), W3C (FIDO2/DIDs/VCs), ' +
         'vendor documentation (Azure/AWS/GCP/Okta/Ping/CyberArk/SailPoint), ' +
         'ISO 27001/27002, SOC 2 TSC',
-      count: 22,
+      count: 21,
       details: 'Use list_sources tool for full provenance metadata.',
     },
   };

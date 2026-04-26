@@ -70,15 +70,6 @@ jobs:
           echo "CAPEC last modified: $CAPEC_VERSION"
         continue-on-error: true
 
-      - name: Check CIS Controls version
-        id: cis
-        run: |
-          CIS_VERSION=$(curl -s 'https://www.cisecurity.org/controls' \
-            | grep -o 'Version [0-9.]*' | head -1 || echo "unknown")
-          echo "cis_version=$CIS_VERSION" >> "$GITHUB_OUTPUT"
-          echo "CIS Controls: $CIS_VERSION"
-        continue-on-error: true
-
       - name: Check OWASP ASVS version
         id: owasp
         run: |
@@ -109,7 +100,6 @@ jobs:
               '- MITRE ATT&CK',
               '- CWE (Common Weakness Enumeration)',
               '- CAPEC (Common Attack Pattern Enumeration)',
-              '- CIS Controls',
               '- OWASP ASVS',
               '',
               '### Action Required',

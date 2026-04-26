@@ -142,7 +142,7 @@ const CHECK_IAM_COMPLIANCE_TOOL: Tool = {
     'Given a list of implemented control IDs and a target framework, returns a compliance gap analysis: ' +
     'which controls are met, which are missing, and the overall coverage percentage. ' +
     'Use this during compliance assessments to identify IAM control gaps against NIST 800-53, ' +
-    'OWASP ASVS, CIS Controls, ISO 27001, or CISA ZTMM. ' +
+    'OWASP ASVS, ISO 27001, or CISA ZTMM. ' +
     'Example: check_iam_compliance({implemented: ["nist-800-53-ac-2", "nist-800-53-ac-3"], framework: "nist-800-53"}).',
   inputSchema: {
     type: 'object',
@@ -154,7 +154,7 @@ const CHECK_IAM_COMPLIANCE_TOOL: Tool = {
       },
       framework: {
         type: 'string',
-        description: 'Target framework to check against (e.g., "nist-800-53", "owasp-asvs", "cis-v8").',
+        description: 'Target framework to check against (e.g., "nist-800-53", "owasp-asvs", "iso-27001").',
       },
     },
     required: ['implemented', 'framework'],
@@ -167,7 +167,7 @@ const MAP_FRAMEWORKS_TOOL: Tool = {
     'Cross-map a specific control between compliance frameworks. Given a control ID and its source framework, ' +
     'returns equivalent controls in other frameworks (or a specific target framework). ' +
     'Supports bidirectional lookup. Use this to translate requirements between NIST 800-53, ISO 27001, ' +
-    'OWASP ASVS, CIS Controls, SOC 2, and CISA ZTMM. ' +
+    'OWASP ASVS, SOC 2, and CISA ZTMM. ' +
     'Example: map_frameworks({control: "AC-2", from: "nist-800-53", to: "iso-27001"}).',
   inputSchema: {
     type: 'object',

@@ -8,13 +8,41 @@
       "description": "GCP IAM roles define collections of permissions that can be granted to principals (users, service accounts, groups) on resources. Three role types exist: Basic roles (Owner, Editor, Viewer) are legacy, broad roles that grant thousands of permissions and should be avoided in production; Predefined roles are Google-maintained, service-specific roles with curated permission sets (e.g., roles/storage.objectViewer, roles/compute.networkAdmin); Custom roles allow organizations to create roles with exactly the permissions needed, achieving true least privilege. Roles are granted via IAM policy bindings on resources at various levels (organization, folder, project, resource), with inheritance flowing downward. The hierarchical resource model means a role granted at the project level applies to all resources in that project.",
       "best_practices": "1. Never use basic roles (Owner, Editor, Viewer) in production; use predefined or custom roles exclusively. 2. Create custom roles for workloads requiring fewer permissions than any predefined role. 3. Grant roles at the most specific resource level possible (resource > project > folder > organization). 4. Use IAM Recommender to identify and remove unused permissions from role bindings. 5. Prefer predefined roles over custom roles when they match the required permission set (Google maintains them). 6. Audit basic role usage with Policy Analyzer and create a remediation plan for migration. 7. Use deny policies to create guardrails that override allow policies for sensitive permissions.",
       "common_misconfigurations": [
-        {"issue": "Basic roles (Editor, Owner) used for production service accounts and users", "impact": "Thousands of unnecessary permissions granted; compromised principal has broad project-wide access", "severity": "critical"},
-        {"issue": "Roles granted at organization level when project-level would suffice", "impact": "Permissions apply to all projects in the organization instead of the specific project needed", "severity": "high"},
-        {"issue": "Custom roles not updated when new predefined roles become available", "impact": "Maintaining custom roles with permissions that now match a Google-managed predefined role adds overhead", "severity": "low"},
-        {"issue": "No IAM deny policies for sensitive permissions", "impact": "Allow policies at any level can grant sensitive permissions without upper-bound restrictions", "severity": "medium"}
+        {
+          "issue": "Basic roles (Editor, Owner) used for production service accounts and users",
+          "impact": "Thousands of unnecessary permissions granted; compromised principal has broad project-wide access",
+          "severity": "critical"
+        },
+        {
+          "issue": "Roles granted at organization level when project-level would suffice",
+          "impact": "Permissions apply to all projects in the organization instead of the specific project needed",
+          "severity": "high"
+        },
+        {
+          "issue": "Custom roles not updated when new predefined roles become available",
+          "impact": "Maintaining custom roles with permissions that now match a Google-managed predefined role adds overhead",
+          "severity": "low"
+        },
+        {
+          "issue": "No IAM deny policies for sensitive permissions",
+          "impact": "Allow policies at any level can grant sensitive permissions without upper-bound restrictions",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1", "SOC2-CC6.3"],
-      "equivalent_in": {"azure-entra": "Entra ID Roles + Azure RBAC Built-In Roles + Custom Roles", "aws-iam": "IAM Managed Policies + Customer Managed Policies", "okta": "Admin Roles + Custom Admin Roles"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-6(1)",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.8.3",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Roles + Azure RBAC Built-In Roles + Custom Roles",
+        "aws-iam": "IAM Managed Policies + Customer Managed Policies",
+        "okta": "Admin Roles + Custom Admin Roles"
+      }
     },
     {
       "id": "gcp-service-accounts",
@@ -24,14 +52,47 @@
       "description": "GCP Service Accounts are special identity principals used by applications, VMs, and services to authenticate to GCP APIs. Each service account has a unique email address (SA_NAME@PROJECT_ID.iam.gserviceaccount.com) and can authenticate using service account keys (JSON key files), workload identity federation (external IdP tokens), or attached service accounts (Compute Engine, GKE, Cloud Run). Service account keys are the primary security concern: they are long-lived credentials that do not expire by default, are frequently leaked in code repositories, and provide direct API access without MFA. Google-managed keys (used by attached service accounts) are automatically rotated and never exposed to users, making them the preferred authentication method.",
       "best_practices": "1. Avoid creating user-managed service account keys; use attached service accounts or Workload Identity instead. 2. Set an organization policy to disable service account key creation (iam.disableServiceAccountKeyCreation). 3. If keys are required, rotate them every 90 days and monitor key age. 4. Grant service accounts the minimum IAM roles needed (never Editor or Owner). 5. Use separate service accounts per application workload; never share service accounts across projects. 6. Disable unused service accounts rather than deleting (preserve for audit). 7. Monitor service account key usage via Cloud Audit Logs for anomalous access patterns. 8. Use IAM Conditions to restrict service account impersonation to specific principals.",
       "common_misconfigurations": [
-        {"issue": "User-managed service account keys not rotated (no expiration by default)", "impact": "Leaked keys provide perpetual access; keys found in repos or logs remain valid indefinitely", "severity": "critical"},
-        {"issue": "Service accounts with Editor or Owner basic roles", "impact": "Compromised service account gains broad project-wide access to all resources", "severity": "critical"},
-        {"issue": "Service account keys committed to code repositories", "impact": "Keys exposed in version control accessible to all repository contributors and potentially public", "severity": "critical"},
-        {"issue": "Default Compute Engine service account used without customization", "impact": "Default SA has Editor role; all VMs inherit broad permissions unless SA is changed", "severity": "high"},
-        {"issue": "Service account shared across multiple projects or workloads", "impact": "Compromise of any workload grants access to all resources the shared SA can access", "severity": "high"}
+        {
+          "issue": "User-managed service account keys not rotated (no expiration by default)",
+          "impact": "Leaked keys provide perpetual access; keys found in repos or logs remain valid indefinitely",
+          "severity": "critical"
+        },
+        {
+          "issue": "Service accounts with Editor or Owner basic roles",
+          "impact": "Compromised service account gains broad project-wide access to all resources",
+          "severity": "critical"
+        },
+        {
+          "issue": "Service account keys committed to code repositories",
+          "impact": "Keys exposed in version control accessible to all repository contributors and potentially public",
+          "severity": "critical"
+        },
+        {
+          "issue": "Default Compute Engine service account used without customization",
+          "impact": "Default SA has Editor role; all VMs inherit broad permissions unless SA is changed",
+          "severity": "high"
+        },
+        {
+          "issue": "Service account shared across multiple projects or workloads",
+          "impact": "Compromise of any workload grants access to all resources the shared SA can access",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-IA-5(1)", "NIST-800-53-AC-6", "NIST-800-53-SC-12", "ISO-27001-A.5.17", "ISO-27001-A.8.9", "SOC2-CC6.1", "SOC2-CC6.7"],
-      "equivalent_in": {"azure-entra": "Managed Identities + App Registrations (Service Principals)", "aws-iam": "IAM Roles (Instance Profiles, Lambda Execution Roles)", "okta": "OAuth 2.0 Service Applications"}
+      "compliance_controls": [
+        "NIST-800-53-IA-5",
+        "NIST-800-53-IA-5(1)",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-SC-12",
+        "ISO-27001-A.5.17",
+        "ISO-27001-A.8.9",
+        "SOC2-CC6.1",
+        "SOC2-CC6.7"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Managed Identities + App Registrations (Service Principals)",
+        "aws-iam": "IAM Roles (Instance Profiles, Lambda Execution Roles)",
+        "okta": "OAuth 2.0 Service Applications"
+      }
     },
     {
       "id": "gcp-workload-identity-federation",
@@ -41,13 +102,41 @@
       "description": "Workload Identity Federation enables external workloads (AWS, Azure, GitHub Actions, GitLab CI, Kubernetes, OIDC/SAML providers) to access GCP resources without using service account keys. An external identity pool and provider configuration establishes trust with the external IdP. External workloads present their native tokens, which are validated and mapped to a GCP principal that can impersonate a service account. Attribute conditions restrict which external identities can assume the service account (e.g., specific GitHub repository and branch). This eliminates the need to export, store, and rotate service account keys in CI/CD systems or multi-cloud environments, aligning with the secretless authentication model that reduces credential management burden and eliminates key leakage risk.",
       "best_practices": "1. Use Workload Identity Federation for all CI/CD pipelines instead of service account keys. 2. Configure attribute conditions to restrict federation to specific external identities (repo, branch, environment). 3. Use dedicated service accounts per federated workload with minimal IAM roles. 4. Audit workload identity pool configurations quarterly for stale or overly broad trust relationships. 5. Monitor service account impersonation events in Cloud Audit Logs. 6. Use workload identity pools per trust boundary (e.g., separate pools for GitHub and AWS). 7. Test attribute condition expressions with the token debugger before production deployment.",
       "common_misconfigurations": [
-        {"issue": "Attribute conditions too broad (e.g., any branch in repository can federate)", "impact": "Unreviewed code in feature branches obtains production GCP credentials", "severity": "high"},
-        {"issue": "Federated identity granted roles directly instead of impersonating a scoped service account", "impact": "External workload identity inherits broad IAM roles without service account boundary", "severity": "high"},
-        {"issue": "Service account keys still used alongside Workload Identity Federation", "impact": "Maintaining both mechanisms doubles the attack surface and complicates credential management", "severity": "medium"},
-        {"issue": "Stale workload identity pool providers for decommissioned external systems", "impact": "Decommissioned external systems retain trusted federation path to GCP resources", "severity": "medium"}
+        {
+          "issue": "Attribute conditions too broad (e.g., any branch in repository can federate)",
+          "impact": "Unreviewed code in feature branches obtains production GCP credentials",
+          "severity": "high"
+        },
+        {
+          "issue": "Federated identity granted roles directly instead of impersonating a scoped service account",
+          "impact": "External workload identity inherits broad IAM roles without service account boundary",
+          "severity": "high"
+        },
+        {
+          "issue": "Service account keys still used alongside Workload Identity Federation",
+          "impact": "Maintaining both mechanisms doubles the attack surface and complicates credential management",
+          "severity": "medium"
+        },
+        {
+          "issue": "Stale workload identity pool providers for decommissioned external systems",
+          "impact": "Decommissioned external systems retain trusted federation path to GCP resources",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-IA-5", "NIST-800-53-IA-8", "NIST-800-53-AC-6", "NIST-800-63C-FAL2", "ISO-27001-A.5.17", "ISO-27001-A.5.19", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Workload Identity Federation (Federated Credentials)", "aws-iam": "OIDC Identity Providers for IAM Roles", "okta": "OAuth 2.0 Token Exchange"}
+      "compliance_controls": [
+        "NIST-800-53-IA-5",
+        "NIST-800-53-IA-8",
+        "NIST-800-53-AC-6",
+        "NIST-800-63C-FAL2",
+        "ISO-27001-A.5.17",
+        "ISO-27001-A.5.19",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Workload Identity Federation (Federated Credentials)",
+        "aws-iam": "OIDC Identity Providers for IAM Roles",
+        "okta": "OAuth 2.0 Token Exchange"
+      }
     },
     {
       "id": "gcp-organization-policies",
@@ -57,13 +146,41 @@
       "description": "Organization Policy constraints are centralized guardrails that restrict resource configurations across all projects in a GCP organization. Unlike IAM policies (which control who can do what), Organization Policies control what can be done regardless of who has permission. Key IAM-relevant constraints include: restricting domain sharing (only allow IAM bindings to specific domains), disabling service account key creation, requiring OS Login for VMs, restricting VM external IPs, enforcing uniform bucket-level access, and restricting resource locations. Custom organization policies allow defining constraints specific to organizational requirements. Organization Policies are hierarchical and can be overridden at folder or project level (unless set to enforced mode). They are the GCP equivalent of AWS SCPs for preventive governance.",
       "best_practices": "1. Enable domain-restricted sharing to prevent IAM bindings to external identities. 2. Disable service account key creation organization-wide (iam.disableServiceAccountKeyCreation). 3. Restrict VM external IP addresses to prevent public exposure (compute.vmExternalIpAccess). 4. Enforce uniform bucket-level access to disable legacy ACLs on Cloud Storage. 5. Require OS Login for Compute Engine VMs to eliminate SSH key management. 6. Apply constraints at the organization level and override at project level only with documented exceptions. 7. Use custom organization policies for organization-specific requirements not covered by built-in constraints. 8. Monitor organization policy changes in Cloud Audit Logs.",
       "common_misconfigurations": [
-        {"issue": "No domain-restricted sharing constraint; IAM roles can be granted to any Google account", "impact": "External Gmail accounts or unauthorized domains granted access to organization resources", "severity": "critical"},
-        {"issue": "Service account key creation not restricted", "impact": "Developers create long-lived service account keys instead of using Workload Identity", "severity": "high"},
-        {"issue": "Organization policies overridden at project level without governance", "impact": "Individual projects bypass organization guardrails without review or documentation", "severity": "high"},
-        {"issue": "No constraint on VM external IP addresses", "impact": "VMs deployed with public IPs exposing services directly to the internet", "severity": "high"}
+        {
+          "issue": "No domain-restricted sharing constraint; IAM roles can be granted to any Google account",
+          "impact": "External Gmail accounts or unauthorized domains granted access to organization resources",
+          "severity": "critical"
+        },
+        {
+          "issue": "Service account key creation not restricted",
+          "impact": "Developers create long-lived service account keys instead of using Workload Identity",
+          "severity": "high"
+        },
+        {
+          "issue": "Organization policies overridden at project level without governance",
+          "impact": "Individual projects bypass organization guardrails without review or documentation",
+          "severity": "high"
+        },
+        {
+          "issue": "No constraint on VM external IP addresses",
+          "impact": "VMs deployed with public IPs exposing services directly to the internet",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6(7)", "NIST-800-53-AC-6(9)", "ISO-27001-A.5.1", "ISO-27001-A.8.3", "SOC2-CC5.2", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure Policy (preventive mode)", "aws-iam": "Organizations Service Control Policies (SCPs)", "okta": "N/A (cloud-provider specific)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6(7)",
+        "NIST-800-53-AC-6(9)",
+        "ISO-27001-A.5.1",
+        "ISO-27001-A.8.3",
+        "SOC2-CC5.2",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Policy (preventive mode)",
+        "aws-iam": "Organizations Service Control Policies (SCPs)",
+        "okta": "N/A (cloud-provider specific)"
+      }
     },
     {
       "id": "gcp-vpc-service-controls",
@@ -73,13 +190,41 @@
       "description": "VPC Service Controls create security perimeters around GCP resources to prevent data exfiltration, even by users and service accounts with valid IAM permissions. A service perimeter defines a set of projects and services within which API access is allowed; access from outside the perimeter (other projects, the internet, different organizations) is blocked regardless of IAM permissions. Ingress and egress rules define exceptions for authorized cross-perimeter access. Access levels (based on IP, device attributes, identity) can be required for perimeter access. This addresses the fundamental IAM limitation where a legitimate user with data access permissions could exfiltrate data to an external project they also control. VPC Service Controls add a data boundary that IAM alone cannot enforce.",
       "best_practices": "1. Create service perimeters around all projects containing sensitive data (PII, financial, healthcare). 2. Use dry-run mode first to identify legitimate cross-perimeter access patterns before enforcement. 3. Define access levels that require corporate network or managed device for perimeter access. 4. Minimize ingress and egress rules; each exception weakens the perimeter. 5. Monitor VPC Service Controls violations in Cloud Audit Logs for attempted exfiltration. 6. Place all projects in a perimeter or bridge between perimeters to prevent gaps. 7. Test perimeter changes in dry-run mode before switching to enforced mode. 8. Use access context manager for identity and device-based access levels.",
       "common_misconfigurations": [
-        {"issue": "Sensitive data projects not protected by a service perimeter", "impact": "Authorized users can exfiltrate data to personal projects using their valid IAM credentials", "severity": "critical"},
-        {"issue": "Perimeter in dry-run mode indefinitely without transitioning to enforcement", "impact": "Perimeter provides visibility only; data exfiltration is logged but not prevented", "severity": "high"},
-        {"issue": "Overly broad ingress/egress rules that negate perimeter protection", "impact": "Perimeter effectively allows all traffic through exceptions, providing false sense of security", "severity": "high"},
-        {"issue": "Access levels not configured; perimeter relies solely on project membership", "impact": "Any network location can access perimeter resources if IAM permissions exist", "severity": "medium"}
+        {
+          "issue": "Sensitive data projects not protected by a service perimeter",
+          "impact": "Authorized users can exfiltrate data to personal projects using their valid IAM credentials",
+          "severity": "critical"
+        },
+        {
+          "issue": "Perimeter in dry-run mode indefinitely without transitioning to enforcement",
+          "impact": "Perimeter provides visibility only; data exfiltration is logged but not prevented",
+          "severity": "high"
+        },
+        {
+          "issue": "Overly broad ingress/egress rules that negate perimeter protection",
+          "impact": "Perimeter effectively allows all traffic through exceptions, providing false sense of security",
+          "severity": "high"
+        },
+        {
+          "issue": "Access levels not configured; perimeter relies solely on project membership",
+          "impact": "Any network location can access perimeter resources if IAM permissions exist",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-4", "NIST-800-53-AC-4(1)", "NIST-800-53-AC-3(4)", "ISO-27001-A.8.3", "ISO-27001-A.8.4", "SOC2-CC6.1", "SOC2-CC6.7"],
-      "equivalent_in": {"azure-entra": "Azure Private Endpoints + Tenant Restrictions v2", "aws-iam": "VPC Endpoints + S3 VPC Endpoint Policies", "okta": "N/A (cloud-provider specific)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-4",
+        "NIST-800-53-AC-4(1)",
+        "NIST-800-53-AC-3(4)",
+        "ISO-27001-A.8.3",
+        "ISO-27001-A.8.4",
+        "SOC2-CC6.1",
+        "SOC2-CC6.7"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Private Endpoints + Tenant Restrictions v2",
+        "aws-iam": "VPC Endpoints + S3 VPC Endpoint Policies",
+        "okta": "N/A (cloud-provider specific)"
+      }
     },
     {
       "id": "gcp-beyondcorp-enterprise",
@@ -89,13 +234,42 @@
       "description": "BeyondCorp Enterprise is Google's implementation of their pioneering zero trust access model, providing context-aware access to applications based on user identity, device security posture, and environmental signals without requiring a VPN. It consists of Identity-Aware Proxy (IAP) for application-level access control, Endpoint Verification for device posture assessment, Access Context Manager for defining access levels based on multiple signals, and BeyondCorp Enterprise licensing for advanced threat and data protection features. BeyondCorp evaluates access continuously, not just at authentication time, and can enforce different access levels for the same user based on their current context (managed vs unmanaged device, corporate vs personal network, risk signals). This is the original zero trust implementation that inspired the industry model.",
       "best_practices": "1. Deploy Identity-Aware Proxy in front of all internal web applications as the access enforcement point. 2. Use Endpoint Verification to collect device security posture signals (encryption, OS version, screen lock). 3. Create access levels in Access Context Manager combining identity, device, and network signals. 4. Require managed devices for accessing sensitive applications; allow limited access from personal devices. 5. Enable BeyondCorp Enterprise threat and data protection for real-time content inspection. 6. Replace VPN with BeyondCorp for all remote access scenarios. 7. Monitor access context changes and policy evaluation results for security analytics.",
       "common_misconfigurations": [
-        {"issue": "IAP not enabled for internal web applications; relying on VPN for access control", "impact": "VPN grants broad network access instead of application-specific zero trust access", "severity": "high"},
-        {"issue": "No device posture requirements in access levels", "impact": "Unmanaged, unpatched, or unencrypted devices access sensitive applications", "severity": "high"},
-        {"issue": "BeyondCorp access levels too permissive (any Google account accepted)", "impact": "External users with valid Google accounts can access applications without device trust", "severity": "high"},
-        {"issue": "Endpoint Verification not deployed on managed devices", "impact": "No device security posture data available for access decisions; BeyondCorp operates in identity-only mode", "severity": "medium"}
+        {
+          "issue": "IAP not enabled for internal web applications; relying on VPN for access control",
+          "impact": "VPN grants broad network access instead of application-specific zero trust access",
+          "severity": "high"
+        },
+        {
+          "issue": "No device posture requirements in access levels",
+          "impact": "Unmanaged, unpatched, or unencrypted devices access sensitive applications",
+          "severity": "high"
+        },
+        {
+          "issue": "BeyondCorp access levels too permissive (any Google account accepted)",
+          "impact": "External users with valid Google accounts can access applications without device trust",
+          "severity": "high"
+        },
+        {
+          "issue": "Endpoint Verification not deployed on managed devices",
+          "impact": "No device security posture data available for access decisions; BeyondCorp operates in identity-only mode",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-207-TENET-1", "NIST-800-207-TENET-3", "NIST-800-207-PDP-PEP", "NIST-800-53-AC-3", "NIST-800-53-AC-17", "CISA-ZTMM-ID-ADVANCED", "ISO-27001-A.8.5", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Conditional Access + Global Secure Access", "aws-iam": "AWS Verified Access", "okta": "Okta Device Trust + Adaptive MFA + Advanced Server Access"}
+      "compliance_controls": [
+        "NIST-800-207-TENET-1",
+        "NIST-800-207-TENET-3",
+        "NIST-800-207-PDP-PEP",
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-17",
+        "CISA-ZTMM-ID-ADVANCED",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Conditional Access + Global Secure Access",
+        "aws-iam": "AWS Verified Access",
+        "okta": "Okta Device Trust + Adaptive MFA + Advanced Server Access"
+      }
     },
     {
       "id": "gcp-context-aware-access",
@@ -105,13 +279,40 @@
       "description": "Access Context Manager defines access levels that specify conditions under which access to GCP resources and Google Workspace applications is permitted. Access levels evaluate multiple signal dimensions: IP address ranges (corporate network identification), device attributes via Endpoint Verification (OS, encryption, screen lock, company-owned), geographic location, and identity attributes. Access levels can be combined in Boolean expressions (e.g., corporate network OR managed device with encryption). They are consumed by VPC Service Controls (as perimeter conditions), Identity-Aware Proxy (as application access requirements), and Google Workspace context-aware access policies. This enables adaptive access control where the same user gets different access depending on their current security context.",
       "best_practices": "1. Define access levels for common scenarios: corporate-managed-device, byod-with-encryption, corporate-network. 2. Use access levels in both IAP and VPC Service Controls for consistent enforcement. 3. Combine IP-based and device-based conditions for defense-in-depth (neither alone is sufficient). 4. Test access level expressions thoroughly before applying to production resources. 5. Create a baseline access level required for all Google Workspace access. 6. Update access levels when network infrastructure changes (new offices, VPN endpoints). 7. Monitor access level evaluation failures in Cloud Audit Logs for troubleshooting.",
       "common_misconfigurations": [
-        {"issue": "Access levels based solely on IP address without device posture", "impact": "Any device on the corporate network (including compromised or personal devices) passes the access check", "severity": "medium"},
-        {"issue": "Access levels not applied to Google Workspace applications", "impact": "Corporate data in Gmail, Drive, and Docs accessible from unmanaged personal devices", "severity": "high"},
-        {"issue": "Access level conditions not updated when corporate network infrastructure changes", "impact": "New offices or VPN endpoints not included in trusted IP ranges; users incorrectly blocked", "severity": "medium"},
-        {"issue": "Overly permissive access levels that most devices satisfy", "impact": "Access levels provide no meaningful security gate; all devices pass regardless of posture", "severity": "medium"}
+        {
+          "issue": "Access levels based solely on IP address without device posture",
+          "impact": "Any device on the corporate network (including compromised or personal devices) passes the access check",
+          "severity": "medium"
+        },
+        {
+          "issue": "Access levels not applied to Google Workspace applications",
+          "impact": "Corporate data in Gmail, Drive, and Docs accessible from unmanaged personal devices",
+          "severity": "high"
+        },
+        {
+          "issue": "Access level conditions not updated when corporate network infrastructure changes",
+          "impact": "New offices or VPN endpoints not included in trusted IP ranges; users incorrectly blocked",
+          "severity": "medium"
+        },
+        {
+          "issue": "Overly permissive access levels that most devices satisfy",
+          "impact": "Access levels provide no meaningful security gate; all devices pass regardless of posture",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-207-TRUST-ALGO", "NIST-800-53-AC-3", "NIST-800-53-AC-17(1)", "CISA-ZTMM-DEVICE-ID", "ISO-27001-A.8.5", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Conditional Access Conditions (device, location, risk)", "aws-iam": "IAM Policy Conditions (aws:SourceIp, aws:SourceVpce)", "okta": "Network Zones + Device Trust + Adaptive MFA signals"}
+      "compliance_controls": [
+        "NIST-800-207-TRUST-ALGO",
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-17(1)",
+        "CISA-ZTMM-DEVICE-ID",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Conditional Access Conditions (device, location, risk)",
+        "aws-iam": "IAM Policy Conditions (aws:SourceIp, aws:SourceVpce)",
+        "okta": "Network Zones + Device Trust + Adaptive MFA signals"
+      }
     },
     {
       "id": "gcp-iam-conditions",
@@ -121,13 +322,40 @@
       "description": "IAM Conditions add attribute-based access control to GCP IAM role bindings by specifying Common Expression Language (CEL) conditions that must evaluate to true for the binding to grant access. Conditions can reference: resource attributes (resource.name, resource.type, resource.service), request time (request.time for time-based access windows), access levels (Access Context Manager), and custom attributes. Key use cases include: granting temporary access with time-based conditions, restricting access to specific resource name prefixes, implementing tag-based ABAC, and requiring specific access levels for role activation. Conditional bindings enable granular, dynamic authorization without creating separate roles for each scenario, reducing role sprawl while improving least privilege.",
       "best_practices": "1. Use time-based conditions for temporary access grants instead of manual role removal (self-expiring). 2. Use resource.name conditions to restrict access to specific resource subsets within a project. 3. Combine IAM conditions with access levels from Access Context Manager for context-aware authorization. 4. Test CEL expressions using the IAM Policy Troubleshooter before applying to production. 5. Document the business purpose of each conditional binding for audit and governance. 6. Use conditional bindings for JIT privileged access patterns (time-limited elevated roles). 7. Prefer conditions over creating multiple fine-grained custom roles to reduce role management overhead.",
       "common_misconfigurations": [
-        {"issue": "Time-based conditions not used for temporary access; manual cleanup relied upon", "impact": "Temporary access grants not removed after the need expires; standing privileges accumulate", "severity": "medium"},
-        {"issue": "CEL expressions not tested before production deployment", "impact": "Syntax errors or logic mistakes result in overly broad or overly restrictive access", "severity": "medium"},
-        {"issue": "Conditions not visible in standard IAM policy views, leading to confusion", "impact": "Administrators may not realize bindings are conditional and create duplicate unconditional bindings", "severity": "low"},
-        {"issue": "No conditions used despite ABAC requirements (all bindings unconditional)", "impact": "Fine-grained access requires creating many roles and bindings instead of using conditional ABAC", "severity": "medium"}
+        {
+          "issue": "Time-based conditions not used for temporary access; manual cleanup relied upon",
+          "impact": "Temporary access grants not removed after the need expires; standing privileges accumulate",
+          "severity": "medium"
+        },
+        {
+          "issue": "CEL expressions not tested before production deployment",
+          "impact": "Syntax errors or logic mistakes result in overly broad or overly restrictive access",
+          "severity": "medium"
+        },
+        {
+          "issue": "Conditions not visible in standard IAM policy views, leading to confusion",
+          "impact": "Administrators may not realize bindings are conditional and create duplicate unconditional bindings",
+          "severity": "low"
+        },
+        {
+          "issue": "No conditions used despite ABAC requirements (all bindings unconditional)",
+          "impact": "Fine-grained access requires creating many roles and bindings instead of using conditional ABAC",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3(7)", "NIST-800-53-AC-3(13)", "NIST-800-53-AC-2(2)", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.3"],
-      "equivalent_in": {"azure-entra": "Azure RBAC Conditions (ABAC)", "aws-iam": "IAM Policy Conditions (Condition block)", "okta": "Contextual Access Management Policies"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3(7)",
+        "NIST-800-53-AC-3(13)",
+        "NIST-800-53-AC-2(2)",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1",
+        "SOC2-CC6.3"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure RBAC Conditions (ABAC)",
+        "aws-iam": "IAM Policy Conditions (Condition block)",
+        "okta": "Contextual Access Management Policies"
+      }
     },
     {
       "id": "gcp-policy-intelligence",
@@ -137,13 +365,40 @@
       "description": "GCP Policy Intelligence is a suite of tools for understanding, optimizing, and troubleshooting IAM policies. IAM Recommender analyzes 90 days of access patterns and generates machine-learning-based recommendations to remove unused permissions and right-size roles (e.g., replace Editor with a specific predefined role). Policy Analyzer enables complex queries about who has access to what across the resource hierarchy, answering questions like 'who can read this bucket' or 'what resources can this user access.' Policy Troubleshooter diagnoses why a specific access attempt was allowed or denied, showing which binding granted/denied access and which conditions were evaluated. Together, these tools enable continuous improvement toward least privilege without the manual effort of analyzing thousands of role bindings.",
       "best_practices": "1. Review IAM Recommender findings weekly and apply recommendations for low-risk permission removals. 2. Use Policy Analyzer for quarterly access reviews to understand effective permissions across the organization. 3. Use Policy Troubleshooter as the first step for access-denied debugging before modifying permissions. 4. Integrate Recommender with Cloud Asset Inventory for organizational-wide permission visibility. 5. Track recommendation adoption rate as a KPI for IAM security posture improvement. 6. Apply recommendations in non-production environments first to validate they do not break functionality. 7. Export Policy Analyzer results for compliance reporting and audit evidence.",
       "common_misconfigurations": [
-        {"issue": "IAM Recommender findings never reviewed or applied", "impact": "Data-driven least privilege recommendations ignored; overprivileged bindings persist", "severity": "medium"},
-        {"issue": "Policy Troubleshooter not used; permissions added without understanding deny reasons", "impact": "Permissions accumulated through troubleshooting by adding more roles instead of understanding policy evaluation", "severity": "medium"},
-        {"issue": "Recommender applied automatically without review in production", "impact": "Machine-learned recommendations may remove permissions needed for infrequent but critical operations", "severity": "medium"},
-        {"issue": "Policy Analyzer not used for access reviews; manual permission auditing performed", "impact": "Manual audits miss indirect access via group memberships, inheritance, and conditional bindings", "severity": "medium"}
+        {
+          "issue": "IAM Recommender findings never reviewed or applied",
+          "impact": "Data-driven least privilege recommendations ignored; overprivileged bindings persist",
+          "severity": "medium"
+        },
+        {
+          "issue": "Policy Troubleshooter not used; permissions added without understanding deny reasons",
+          "impact": "Permissions accumulated through troubleshooting by adding more roles instead of understanding policy evaluation",
+          "severity": "medium"
+        },
+        {
+          "issue": "Recommender applied automatically without review in production",
+          "impact": "Machine-learned recommendations may remove permissions needed for infrequent but critical operations",
+          "severity": "medium"
+        },
+        {
+          "issue": "Policy Analyzer not used for access reviews; manual permission auditing performed",
+          "impact": "Manual audits miss indirect access via group memberships, inheritance, and conditional bindings",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-2(4)", "ISO-27001-A.5.15", "ISO-27001-A.5.18", "SOC2-CC6.3", "SOC2-CC5.2"],
-      "equivalent_in": {"azure-entra": "Entra Permissions Management + Access Reviews", "aws-iam": "IAM Access Analyzer + Access Advisor", "sailpoint": "AI-Driven Recommendations + Role Mining"}
+      "compliance_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-2(4)",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.5.18",
+        "SOC2-CC6.3",
+        "SOC2-CC5.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra Permissions Management + Access Reviews",
+        "aws-iam": "IAM Access Analyzer + Access Advisor",
+        "sailpoint": "AI-Driven Recommendations + Role Mining"
+      }
     },
     {
       "id": "gcp-cloud-identity",
@@ -153,13 +408,41 @@
       "description": "Cloud Identity is Google's standalone identity-as-a-service platform that provides directory services, multi-factor authentication, device management, and SSO for GCP and Google Workspace. Cloud Identity manages user and group lifecycle, supports SAML/OIDC federation with external identity providers, and synchronizes with on-premises Active Directory via Google Cloud Directory Sync (GCDS). Cloud Identity Premium adds advanced features: context-aware access, endpoint management, and security investigation tools. Groups in Cloud Identity serve as the primary authorization mechanism in GCP IAM (role bindings to groups rather than individual users). Cloud Identity is separate from Google consumer accounts, providing organizational governance over user identities.",
       "best_practices": "1. Use Cloud Identity groups as the primary principal type for IAM role bindings instead of individual users. 2. Integrate with existing IdP (Entra ID, Okta) via SAML federation for centralized authentication. 3. Enable 2-Step Verification (MFA) for all Cloud Identity users with enforcement. 4. Use Google Cloud Directory Sync (GCDS) to synchronize users and groups from on-premises AD. 5. Implement automated user provisioning/deprovisioning via SCIM or GCDS. 6. Configure security investigation tools for admin activity monitoring. 7. Use dynamic groups based on user attributes for automated group membership.",
       "common_misconfigurations": [
-        {"issue": "IAM bindings to individual user emails instead of Cloud Identity groups", "impact": "Individual user management does not scale; access reviews and removal require per-user operations", "severity": "medium"},
-        {"issue": "No MFA enforcement for Cloud Identity users", "impact": "Password-only authentication to GCP console and all Google services", "severity": "critical"},
-        {"issue": "User deprovisioning not automated; manual process for offboarding", "impact": "Terminated users retain Cloud Identity accounts and GCP access until manually removed", "severity": "high"},
-        {"issue": "Consumer Gmail accounts used instead of Cloud Identity for GCP access", "impact": "No organizational control over user accounts; cannot enforce MFA, cannot revoke access centrally", "severity": "critical"}
+        {
+          "issue": "IAM bindings to individual user emails instead of Cloud Identity groups",
+          "impact": "Individual user management does not scale; access reviews and removal require per-user operations",
+          "severity": "medium"
+        },
+        {
+          "issue": "No MFA enforcement for Cloud Identity users",
+          "impact": "Password-only authentication to GCP console and all Google services",
+          "severity": "critical"
+        },
+        {
+          "issue": "User deprovisioning not automated; manual process for offboarding",
+          "impact": "Terminated users retain Cloud Identity accounts and GCP access until manually removed",
+          "severity": "high"
+        },
+        {
+          "issue": "Consumer Gmail accounts used instead of Cloud Identity for GCP access",
+          "impact": "No organizational control over user accounts; cannot enforce MFA, cannot revoke access centrally",
+          "severity": "critical"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-2(1)", "NIST-800-53-IA-2(1)", "ISO-27001-A.5.16", "ISO-27001-A.5.18", "SOC2-CC6.1", "SOC2-CC6.2"],
-      "equivalent_in": {"azure-entra": "Microsoft Entra ID (Directory + Lifecycle)", "aws-iam": "IAM Identity Center + AWS Managed AD", "okta": "Okta Universal Directory + Lifecycle Management"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-2(1)",
+        "NIST-800-53-IA-2(1)",
+        "ISO-27001-A.5.16",
+        "ISO-27001-A.5.18",
+        "SOC2-CC6.1",
+        "SOC2-CC6.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Microsoft Entra ID (Directory + Lifecycle)",
+        "aws-iam": "IAM Identity Center + AWS Managed AD",
+        "okta": "Okta Universal Directory + Lifecycle Management"
+      }
     },
     {
       "id": "gcp-identity-aware-proxy",
@@ -169,13 +452,42 @@
       "description": "Identity-Aware Proxy (IAP) provides application-level access control for web applications and VMs running on GCP without requiring a VPN. IAP intercepts all requests to protected resources, verifies user identity via Google sign-in (OAuth 2.0), checks IAM permissions (roles/iap.httpsResourceAccessor), and evaluates access context (access levels from Access Context Manager) before forwarding the request to the backend. IAP injects verified identity headers (x-goog-authenticated-user-id, x-goog-authenticated-user-email) into forwarded requests, providing cryptographically verified identity information to applications without requiring them to implement authentication. For non-web access, IAP TCP forwarding provides secure access to VM SSH and RDP ports without public IP addresses.",
       "best_practices": "1. Enable IAP for all internal web applications deployed on GCP (App Engine, GKE, Compute Engine). 2. Use IAP TCP forwarding instead of public IP addresses for SSH/RDP access to VMs. 3. Configure access levels in Access Context Manager for context-aware access decisions. 4. Verify IAP identity headers are correctly consumed and validated in backend applications. 5. Use signed IAP headers (JWT assertion) for cryptographic verification, not just email headers. 6. Deploy IAP in front of all Cloud Run services that should not be publicly accessible. 7. Monitor IAP access logs for unauthorized access attempts.",
       "common_misconfigurations": [
-        {"issue": "Backend application trusts IAP headers without validating the JWT signature", "impact": "Attackers bypass IAP (direct backend access) and forge identity headers for impersonation", "severity": "critical"},
-        {"issue": "IAP not enabled; internal apps rely on VPN for access control", "impact": "VPN provides broad network access; compromised VPN credentials grant access to all internal apps", "severity": "high"},
-        {"issue": "IAP role (iap.httpsResourceAccessor) granted to allUsers or allAuthenticatedUsers", "impact": "Any Google account can access the application through IAP, defeating the access control purpose", "severity": "critical"},
-        {"issue": "Backend firewall allows direct access bypassing IAP", "impact": "Requests that bypass IAP (via IP or internal network) reach the application without identity verification", "severity": "high"}
+        {
+          "issue": "Backend application trusts IAP headers without validating the JWT signature",
+          "impact": "Attackers bypass IAP (direct backend access) and forge identity headers for impersonation",
+          "severity": "critical"
+        },
+        {
+          "issue": "IAP not enabled; internal apps rely on VPN for access control",
+          "impact": "VPN provides broad network access; compromised VPN credentials grant access to all internal apps",
+          "severity": "high"
+        },
+        {
+          "issue": "IAP role (iap.httpsResourceAccessor) granted to allUsers or allAuthenticatedUsers",
+          "impact": "Any Google account can access the application through IAP, defeating the access control purpose",
+          "severity": "critical"
+        },
+        {
+          "issue": "Backend firewall allows direct access bypassing IAP",
+          "impact": "Requests that bypass IAP (via IP or internal network) reach the application without identity verification",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-207-DEPLOYMENT-SDP", "NIST-800-207-PDP-PEP", "NIST-800-53-AC-3", "NIST-800-53-AC-17", "ISO-27001-A.8.5", "ISO-27001-A.8.20", "SOC2-CC6.1", "SOC2-CC6.6"],
-      "equivalent_in": {"azure-entra": "Azure AD Application Proxy + Conditional Access", "aws-iam": "AWS Verified Access + ALB Authentication", "okta": "Okta Advanced Server Access + Access Gateway"}
+      "compliance_controls": [
+        "NIST-800-207-DEPLOYMENT-SDP",
+        "NIST-800-207-PDP-PEP",
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-17",
+        "ISO-27001-A.8.5",
+        "ISO-27001-A.8.20",
+        "SOC2-CC6.1",
+        "SOC2-CC6.6"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD Application Proxy + Conditional Access",
+        "aws-iam": "AWS Verified Access + ALB Authentication",
+        "okta": "Okta Advanced Server Access + Access Gateway"
+      }
     },
     {
       "id": "gcp-cloud-audit-logs",
@@ -185,13 +497,42 @@
       "description": "GCP Cloud Audit Logs provide a comprehensive audit trail for all activity across GCP services. Four log types exist: Admin Activity logs (always on, no charge, records resource configuration changes like IAM policy modifications), Data Access logs (configurable, records data read/write operations, can generate high volume), System Event logs (Google-initiated system events), and Policy Denied audit logs (records access denied by VPC Service Controls or Organization Policies). For IAM security, Admin Activity logs capture all IAM policy changes (SetIamPolicy), role assignments, service account modifications, and organization policy changes. Data Access logs capture authentication events, token generation, and sensitive data access. All logs flow to Cloud Logging and can be exported to BigQuery, Cloud Storage, or Pub/Sub for long-term retention and SIEM integration.",
       "best_practices": "1. Enable Data Access logs for all IAM-sensitive services (IAM, Resource Manager, Cloud KMS). 2. Export audit logs to a centralized project with restricted access for tamper-proof retention. 3. Create log-based metrics and alerts for critical IAM events (SetIamPolicy, CreateServiceAccountKey). 4. Retain audit logs for minimum 1 year (3+ years recommended for compliance). 5. Use BigQuery log analytics for complex audit queries across projects and time periods. 6. Correlate Admin Activity and Data Access logs for complete IAM event context. 7. Monitor Policy Denied logs from VPC Service Controls for data exfiltration attempts. 8. Integrate with Chronicle SIEM or Security Command Center for automated threat detection.",
       "common_misconfigurations": [
-        {"issue": "Data Access audit logs not enabled for IAM and security services", "impact": "Authentication events, token generation, and service account key usage not logged", "severity": "high"},
-        {"issue": "Audit logs not exported to a centralized, restricted project", "impact": "Project admins can modify or delete audit logs within their own project, destroying evidence", "severity": "high"},
-        {"issue": "No alerts configured for critical IAM events", "impact": "IAM policy changes, new role assignments, and service account key creation occur without notification", "severity": "high"},
-        {"issue": "Default 30-day retention used without log export for long-term storage", "impact": "Audit evidence unavailable for incident investigation beyond 30 days; compliance audit failure", "severity": "high"}
+        {
+          "issue": "Data Access audit logs not enabled for IAM and security services",
+          "impact": "Authentication events, token generation, and service account key usage not logged",
+          "severity": "high"
+        },
+        {
+          "issue": "Audit logs not exported to a centralized, restricted project",
+          "impact": "Project admins can modify or delete audit logs within their own project, destroying evidence",
+          "severity": "high"
+        },
+        {
+          "issue": "No alerts configured for critical IAM events",
+          "impact": "IAM policy changes, new role assignments, and service account key creation occur without notification",
+          "severity": "high"
+        },
+        {
+          "issue": "Default 30-day retention used without log export for long-term storage",
+          "impact": "Audit evidence unavailable for incident investigation beyond 30 days; compliance audit failure",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(12)", "NIST-800-53-AC-6(9)", "ISO-27001-A.8.15", "ISO-27001-A.8.16", "SOC2-CC7.2", "SOC2-CC5.2", "CISA-ZTMM-VISIBILITY"],
-      "equivalent_in": {"azure-entra": "Entra ID Diagnostic Logs + Azure Activity Log", "aws-iam": "CloudTrail (Management Events + Data Events)", "okta": "System Log + Log Streaming"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-2(12)",
+        "NIST-800-53-AC-6(9)",
+        "ISO-27001-A.8.15",
+        "ISO-27001-A.8.16",
+        "SOC2-CC7.2",
+        "SOC2-CC5.2",
+        "CISA-ZTMM-VISIBILITY"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Diagnostic Logs + Azure Activity Log",
+        "aws-iam": "CloudTrail (Management Events + Data Events)",
+        "okta": "System Log + Log Streaming"
+      }
     },
     {
       "id": "gcp-os-login",
@@ -201,13 +542,40 @@
       "description": "OS Login links a user's Google identity to their Linux user account on Compute Engine VMs, replacing the legacy SSH key metadata approach. When OS Login is enabled, users authenticate via their Cloud Identity credentials, and access is controlled through IAM roles (roles/compute.osLogin for standard access, roles/compute.osAdminLogin for sudo access). OS Login supports 2-Step Verification enforcement, eliminating the security risks of managing SSH keys in project or instance metadata. It supports both organization-wide enforcement via Organization Policy and per-project/instance enablement. OS Login with 2FA provides the strongest VM access authentication available on GCP, combining identity-based access control with centralized key management and MFA.",
       "best_practices": "1. Enable OS Login as an organization policy for all Compute Engine instances. 2. Enforce 2-Step Verification for OS Login sessions (roles/compute.osLogin2FA). 3. Use OS Login instead of SSH keys in project metadata to eliminate key management burden. 4. Grant roles/compute.osAdminLogin (sudo) only to administrators who require privileged access. 5. Remove existing SSH keys from project and instance metadata after enabling OS Login. 6. Monitor OS Login authentication events in Cloud Audit Logs. 7. Use IAP TCP forwarding in combination with OS Login for zero-trust VM access.",
       "common_misconfigurations": [
-        {"issue": "OS Login not enabled; SSH keys managed in project metadata", "impact": "SSH keys persist in metadata, are not subject to IAM controls, and cannot be centrally revoked", "severity": "high"},
-        {"issue": "2-Step Verification not required for OS Login sessions", "impact": "Compromised Google account credentials provide direct SSH access without MFA", "severity": "high"},
-        {"issue": "Legacy SSH keys not removed from metadata after enabling OS Login", "impact": "Both OS Login and legacy SSH key access work simultaneously, creating dual access paths", "severity": "medium"},
-        {"issue": "OS Admin Login (sudo) granted broadly instead of to specific administrators", "impact": "All users with OS Login have root access, violating privilege separation", "severity": "high"}
+        {
+          "issue": "OS Login not enabled; SSH keys managed in project metadata",
+          "impact": "SSH keys persist in metadata, are not subject to IAM controls, and cannot be centrally revoked",
+          "severity": "high"
+        },
+        {
+          "issue": "2-Step Verification not required for OS Login sessions",
+          "impact": "Compromised Google account credentials provide direct SSH access without MFA",
+          "severity": "high"
+        },
+        {
+          "issue": "Legacy SSH keys not removed from metadata after enabling OS Login",
+          "impact": "Both OS Login and legacy SSH key access work simultaneously, creating dual access paths",
+          "severity": "medium"
+        },
+        {
+          "issue": "OS Admin Login (sudo) granted broadly instead of to specific administrators",
+          "impact": "All users with OS Login have root access, violating privilege separation",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-17", "NIST-800-53-AC-17(2)", "NIST-800-53-IA-2(1)", "ISO-27001-A.8.5", "ISO-27001-A.5.17", "SOC2-CC6.1", "CIS-5.6"],
-      "equivalent_in": {"azure-entra": "Azure AD Login for Linux VMs (Entra ID authentication)", "aws-iam": "EC2 Instance Connect + SSM Session Manager", "okta": "Okta Advanced Server Access (OASA)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-17",
+        "NIST-800-53-AC-17(2)",
+        "NIST-800-53-IA-2(1)",
+        "ISO-27001-A.8.5",
+        "ISO-27001-A.5.17",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD Login for Linux VMs (Entra ID authentication)",
+        "aws-iam": "EC2 Instance Connect + SSM Session Manager",
+        "okta": "Okta Advanced Server Access (OASA)"
+      }
     },
     {
       "id": "gcp-binary-authorization",
@@ -217,13 +585,39 @@
       "description": "Binary Authorization enforces deploy-time security policy for container workloads on GKE, Cloud Run, and Anthos by requiring container images to be cryptographically signed by trusted attestors before deployment. It implements the software supply chain security principle that only verified, approved container images should run in production. Policies define which attestors must sign an image and which container registries are trusted. Attestors use Cloud KMS keys or PGP keys to create attestations (cryptographic signatures) on container image digests. This prevents deployment of unauthorized, unscanned, or tampered container images even if a user has deployment permissions, adding an authorization layer that IAM alone cannot provide.",
       "best_practices": "1. Require attestations from both vulnerability scanning and code review attestors for production. 2. Use Cloud KMS keys (not PGP) for attestation signing for key management benefits. 3. Implement attestation in CI/CD pipeline: scan, review, attest, then deploy. 4. Create separate attestor keys per environment (dev, staging, production) with increasing requirements. 5. Enable dry-run mode first to identify images that would be blocked before enforcement. 6. Restrict who can create attestations using IAM (binaryauthorization.attestor.verifier). 7. Use allowlist patterns for trusted GCP-provided images and third-party base images.",
       "common_misconfigurations": [
-        {"issue": "Binary Authorization in enforce mode without adequate CI/CD attestation pipeline", "impact": "Legitimate deployments blocked because images are not attested in the build pipeline", "severity": "high"},
-        {"issue": "Global allowlist pattern too broad (allow all images from specific registry)", "impact": "Any image in the allowed registry can be deployed without attestation, including vulnerable images", "severity": "high"},
-        {"issue": "Same attestor key used across all environments", "impact": "Images attested for development can be deployed to production without production-specific review", "severity": "medium"},
-        {"issue": "No break-glass mechanism for emergency deployments", "impact": "Cannot deploy critical fixes when the attestation pipeline is unavailable", "severity": "medium"}
+        {
+          "issue": "Binary Authorization in enforce mode without adequate CI/CD attestation pipeline",
+          "impact": "Legitimate deployments blocked because images are not attested in the build pipeline",
+          "severity": "high"
+        },
+        {
+          "issue": "Global allowlist pattern too broad (allow all images from specific registry)",
+          "impact": "Any image in the allowed registry can be deployed without attestation, including vulnerable images",
+          "severity": "high"
+        },
+        {
+          "issue": "Same attestor key used across all environments",
+          "impact": "Images attested for development can be deployed to production without production-specific review",
+          "severity": "medium"
+        },
+        {
+          "issue": "No break-glass mechanism for emergency deployments",
+          "impact": "Cannot deploy critical fixes when the attestation pipeline is unavailable",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3(4)", "NIST-800-53-AC-6", "ISO-27001-A.8.25", "ISO-27001-A.8.9", "SOC2-CC8.1"],
-      "equivalent_in": {"azure-entra": "Azure Policy for AKS (image trust + Notary v2)", "aws-iam": "ECR Image Signing + ECS/EKS Admission Controllers", "okta": "N/A (cloud-provider specific)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3(4)",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.8.25",
+        "ISO-27001-A.8.9",
+        "SOC2-CC8.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Policy for AKS (image trust + Notary v2)",
+        "aws-iam": "ECR Image Signing + ECS/EKS Admission Controllers",
+        "okta": "N/A (cloud-provider specific)"
+      }
     },
     {
       "id": "gcp-security-command-center",
@@ -233,13 +627,40 @@
       "description": "Security Command Center (SCC) is GCP's centralized security and risk management platform that provides IAM-specific security findings across the organization. SCC Premium includes Event Threat Detection for IAM threats (anomalous service account usage, IAM policy changes by unauthorized actors, credential access from TOR exit nodes, brute force authentication attempts) and Security Health Analytics for IAM posture assessment (overprivileged service accounts, MFA not enabled, public resources, default service account usage). SCC aggregates findings from native GCP security services, Forseti (if deployed), and third-party tools. Organization-level SCC provides visibility across all projects, enabling centralized IAM security monitoring and compliance reporting.",
       "best_practices": "1. Enable SCC Premium at the organization level for comprehensive IAM threat detection. 2. Review Security Health Analytics IAM findings weekly and remediate high-severity posture issues. 3. Configure notification channels (Pub/Sub, email) for critical Event Threat Detection IAM findings. 4. Integrate SCC findings with Chronicle SIEM for correlation with other security signals. 5. Use SCC compliance reports (CIS, PCI-DSS, NIST) for automated compliance assessment. 6. Track IAM posture score trends over time as a KPI for security improvement. 7. Create custom SCC findings modules for organization-specific IAM security requirements.",
       "common_misconfigurations": [
-        {"issue": "SCC not enabled at organization level (only project-level or not at all)", "impact": "IAM security findings limited to individual projects; no cross-project visibility or aggregation", "severity": "high"},
-        {"issue": "Event Threat Detection IAM findings not monitored or notified", "impact": "Active IAM threats (credential abuse, privilege escalation) detected but not investigated", "severity": "high"},
-        {"issue": "Security Health Analytics remediation not prioritized", "impact": "Known IAM posture issues (overprivileged SAs, no MFA) persist despite detection", "severity": "medium"},
-        {"issue": "SCC findings not exported to SIEM for correlation", "impact": "IAM threats not correlated with network, endpoint, and application security signals", "severity": "medium"}
+        {
+          "issue": "SCC not enabled at organization level (only project-level or not at all)",
+          "impact": "IAM security findings limited to individual projects; no cross-project visibility or aggregation",
+          "severity": "high"
+        },
+        {
+          "issue": "Event Threat Detection IAM findings not monitored or notified",
+          "impact": "Active IAM threats (credential abuse, privilege escalation) detected but not investigated",
+          "severity": "high"
+        },
+        {
+          "issue": "Security Health Analytics remediation not prioritized",
+          "impact": "Known IAM posture issues (overprivileged SAs, no MFA) persist despite detection",
+          "severity": "medium"
+        },
+        {
+          "issue": "SCC findings not exported to SIEM for correlation",
+          "impact": "IAM threats not correlated with network, endpoint, and application security signals",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2(12)", "NIST-800-53-AC-7(2)", "ISO-27001-A.8.16", "ISO-27001-A.8.15", "SOC2-CC7.2", "CISA-ZTMM-VISIBILITY"],
-      "equivalent_in": {"azure-entra": "Microsoft Defender for Cloud + Entra ID Identity Protection", "aws-iam": "Security Hub + GuardDuty + IAM Access Analyzer", "okta": "ThreatInsight + HealthInsight"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2(12)",
+        "NIST-800-53-AC-7(2)",
+        "ISO-27001-A.8.16",
+        "ISO-27001-A.8.15",
+        "SOC2-CC7.2",
+        "CISA-ZTMM-VISIBILITY"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Microsoft Defender for Cloud + Entra ID Identity Protection",
+        "aws-iam": "Security Hub + GuardDuty + IAM Access Analyzer",
+        "okta": "ThreatInsight + HealthInsight"
+      }
     },
     {
       "id": "gcp-iam-deny-policies",
@@ -249,13 +670,40 @@
       "description": "GCP IAM Deny Policies establish guardrails that override allow policies, preventing specific principals from using specific permissions regardless of their role bindings. Deny policies are evaluated before allow policies in the IAM policy evaluation order, and an explicit deny always wins. Deny rules can target: specific principals (users, groups, service accounts), specific permissions (iam.roles.create, resourcemanager.projects.delete), and exception principals who are exempt from the deny rule. Deny policies are attached at the organization, folder, or project level with hierarchical inheritance. This enables preventive controls similar to AWS SCPs: preventing any user from deleting production projects, preventing anyone except security admins from modifying IAM policies, or preventing service accounts from accessing specific sensitive APIs.",
       "best_practices": "1. Use deny policies for organization-wide guardrails that no one should bypass (except designated exceptions). 2. Deny dangerous permissions at the organization level: iam.serviceAccountKeys.create, resourcemanager.projects.delete. 3. Define exception principals narrowly for break-glass accounts only. 4. Test deny policies in a sandbox folder before applying to production organization hierarchy. 5. Document deny policy purpose and exception rationale for audit evidence. 6. Monitor deny policy evaluation in Cloud Audit Logs for blocked operations. 7. Combine deny policies with Organization Policy constraints for comprehensive preventive controls.",
       "common_misconfigurations": [
-        {"issue": "No deny policies configured; relying solely on allow policies for access control", "impact": "No upper bound on permissions; any role binding can grant any permission including dangerous ones", "severity": "medium"},
-        {"issue": "Exception principals too broad (entire admin group exempted)", "impact": "Deny policy is effectively bypassed for a large group of users", "severity": "high"},
-        {"issue": "Deny policies not tested in sandbox before production deployment", "impact": "Overly restrictive deny rule blocks legitimate operations across the organization", "severity": "high"},
-        {"issue": "Deny policies and Organization Policies not coordinated", "impact": "Overlapping or conflicting guardrails create confusion about which mechanism controls which behavior", "severity": "low"}
+        {
+          "issue": "No deny policies configured; relying solely on allow policies for access control",
+          "impact": "No upper bound on permissions; any role binding can grant any permission including dangerous ones",
+          "severity": "medium"
+        },
+        {
+          "issue": "Exception principals too broad (entire admin group exempted)",
+          "impact": "Deny policy is effectively bypassed for a large group of users",
+          "severity": "high"
+        },
+        {
+          "issue": "Deny policies not tested in sandbox before production deployment",
+          "impact": "Overly restrictive deny rule blocks legitimate operations across the organization",
+          "severity": "high"
+        },
+        {
+          "issue": "Deny policies and Organization Policies not coordinated",
+          "impact": "Overlapping or conflicting guardrails create confusion about which mechanism controls which behavior",
+          "severity": "low"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-3", "NIST-800-53-AC-6(7)", "NIST-800-53-AC-6(9)", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure Deny Assignments", "aws-iam": "Service Control Policies (SCPs)", "okta": "N/A (cloud-provider specific)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6(7)",
+        "NIST-800-53-AC-6(9)",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.8.3",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Deny Assignments",
+        "aws-iam": "Service Control Policies (SCPs)",
+        "okta": "N/A (cloud-provider specific)"
+      }
     },
     {
       "id": "gcp-privileged-access-manager",
@@ -265,13 +713,41 @@
       "description": "GCP Privileged Access Manager provides just-in-time (JIT) privileged access to GCP resources by enabling temporary, time-bound role grants with approval workflows. Instead of permanently assigning sensitive roles (Owner, Editor, Security Admin), administrators create entitlements that define: which IAM roles can be requested, which principals can request them, maximum grant duration, required approvers, and justification requirements. When a user needs elevated access, they request an entitlement grant, provide business justification, and await approval. Once approved, the IAM role binding is automatically created with a time-based condition and automatically removed when the grant expires. All grant requests, approvals, and activations are logged for audit purposes.",
       "best_practices": "1. Use PAM for all sensitive role assignments instead of permanent bindings. 2. Configure maximum grant duration appropriate to the task (2-8 hours, not 24). 3. Require approval from designated approvers for high-sensitivity entitlements. 4. Require business justification for all entitlement grant requests. 5. Integrate PAM audit logs with Cloud Audit Logs and SIEM for monitoring. 6. Review entitlement configurations quarterly and remove unused entitlements. 7. Combine PAM with IAM Recommender to identify permanently bound roles that should migrate to JIT.",
       "common_misconfigurations": [
-        {"issue": "Sensitive roles permanently bound instead of using PAM entitlements", "impact": "Standing privilege for sensitive roles creates persistent attack surface", "severity": "high"},
-        {"issue": "Maximum grant duration set to 24 hours or more", "impact": "Extended activation period defeats the purpose of just-in-time access", "severity": "medium"},
-        {"issue": "No approval workflow configured; self-approval for sensitive entitlements", "impact": "Users grant themselves elevated access without oversight", "severity": "high"},
-        {"issue": "PAM audit logs not monitored", "impact": "Grant requests and privilege activations not visible to security operations", "severity": "medium"}
+        {
+          "issue": "Sensitive roles permanently bound instead of using PAM entitlements",
+          "impact": "Standing privilege for sensitive roles creates persistent attack surface",
+          "severity": "high"
+        },
+        {
+          "issue": "Maximum grant duration set to 24 hours or more",
+          "impact": "Extended activation period defeats the purpose of just-in-time access",
+          "severity": "medium"
+        },
+        {
+          "issue": "No approval workflow configured; self-approval for sensitive entitlements",
+          "impact": "Users grant themselves elevated access without oversight",
+          "severity": "high"
+        },
+        {
+          "issue": "PAM audit logs not monitored",
+          "impact": "Grant requests and privilege activations not visible to security operations",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-6(2)", "NIST-800-53-AC-6(5)", "NIST-800-53-AC-2(7)", "ISO-27001-A.8.2", "SOC2-CC6.3", "CISA-ZTMM-ID-PAM-MATURITY"],
-      "equivalent_in": {"azure-entra": "Privileged Identity Management (PIM)", "aws-iam": "IAM Roles with STS + Approval Workflows", "cyberark": "CyberArk Privileged Access Manager"}
+      "compliance_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-6(2)",
+        "NIST-800-53-AC-6(5)",
+        "NIST-800-53-AC-2(7)",
+        "ISO-27001-A.8.2",
+        "SOC2-CC6.3",
+        "CISA-ZTMM-ID-PAM-MATURITY"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Privileged Identity Management (PIM)",
+        "aws-iam": "IAM Roles with STS + Approval Workflows",
+        "cyberark": "CyberArk Privileged Access Manager"
+      }
     },
     {
       "id": "gcp-workforce-identity-federation",
@@ -281,13 +757,40 @@
       "description": "Workforce Identity Federation enables employees and contractors to access GCP resources using their existing corporate identity provider (Entra ID, Okta, Ping, ADFS) without creating Google accounts. Unlike Workload Identity Federation (for machine identities), Workforce Identity Federation handles human user authentication for GCP console, gcloud CLI, and API access. Users authenticate through their corporate IdP via SAML or OIDC, and the resulting identity is mapped to GCP IAM permissions through workforce identity pool configurations. Attribute conditions restrict which IdP users can access GCP (e.g., only users in specific groups or with specific attributes). This eliminates the need for separate Google/Cloud Identity accounts for workforce users who already have corporate identity credentials.",
       "best_practices": "1. Use Workforce Identity Federation for organizations that already have a corporate IdP (Entra ID, Okta). 2. Configure attribute conditions to restrict GCP access to specific IdP groups or user attributes. 3. Map IdP group claims to GCP IAM role bindings for group-based authorization. 4. Use workforce identity pool providers per trust boundary (separate pools for employees vs contractors). 5. Test attribute mapping and condition expressions with the token debugger before production. 6. Monitor workforce identity authentication events in Cloud Audit Logs. 7. Implement MFA requirements in the corporate IdP for users accessing GCP.",
       "common_misconfigurations": [
-        {"issue": "No attribute conditions on workforce identity pool; any IdP user can access GCP", "impact": "All authenticated corporate users have implicit access to GCP without role-based restriction at the federation layer", "severity": "high"},
-        {"issue": "IdP group claims not mapped to GCP IAM roles", "impact": "Fine-grained authorization requires per-user role bindings instead of scalable group-based access", "severity": "medium"},
-        {"issue": "MFA not enforced in the corporate IdP for GCP access", "impact": "Password-only authentication to GCP via workforce federation", "severity": "high"},
-        {"issue": "Same workforce identity pool for employees and contractors without differentiation", "impact": "Cannot apply different access policies or conditions to employees vs contractors", "severity": "medium"}
+        {
+          "issue": "No attribute conditions on workforce identity pool; any IdP user can access GCP",
+          "impact": "All authenticated corporate users have implicit access to GCP without role-based restriction at the federation layer",
+          "severity": "high"
+        },
+        {
+          "issue": "IdP group claims not mapped to GCP IAM roles",
+          "impact": "Fine-grained authorization requires per-user role bindings instead of scalable group-based access",
+          "severity": "medium"
+        },
+        {
+          "issue": "MFA not enforced in the corporate IdP for GCP access",
+          "impact": "Password-only authentication to GCP via workforce federation",
+          "severity": "high"
+        },
+        {
+          "issue": "Same workforce identity pool for employees and contractors without differentiation",
+          "impact": "Cannot apply different access policies or conditions to employees vs contractors",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-IA-8", "NIST-800-63C-FAL2", "NIST-800-53-AC-2", "ISO-27001-A.5.16", "ISO-27001-A.5.19", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Entra ID (native, not federation needed)", "aws-iam": "IAM Identity Center with External IdP", "okta": "Okta + GCP SSO Integration"}
+      "compliance_controls": [
+        "NIST-800-53-IA-8",
+        "NIST-800-63C-FAL2",
+        "NIST-800-53-AC-2",
+        "ISO-27001-A.5.16",
+        "ISO-27001-A.5.19",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID (native, not federation needed)",
+        "aws-iam": "IAM Identity Center with External IdP",
+        "okta": "Okta + GCP SSO Integration"
+      }
     },
     {
       "id": "gcp-access-approval",
@@ -297,12 +800,34 @@
       "description": "GCP Access Approval requires Google personnel (support engineers, SREs) to obtain explicit customer approval before accessing customer data or resources. When Google support needs to access your project data to resolve a support request, an approval request is sent to designated customer approvers who must explicitly approve the access. Access Approval provides cryptographic evidence that Google personnel access was authorized. This addresses the concern about cloud provider insider access to customer data, providing a governance control that is unique to cloud environments. Access Transparency (a prerequisite) provides near-real-time logs of all Google staff access to customer data, while Access Approval adds the authorization gate before that access.",
       "best_practices": "1. Enable Access Approval for all projects containing sensitive customer data. 2. Designate appropriate approvers who understand the project context and can evaluate requests. 3. Configure approval notification channels to ensure timely response (email, Pub/Sub). 4. Set auto-dismissal timeout appropriate to SLA requirements (requests not approved within timeout are dismissed). 5. Review Access Transparency logs regularly even when no approval requests are generated. 6. Use Access Approval as evidence for compliance audits demonstrating control over cloud provider access.",
       "common_misconfigurations": [
-        {"issue": "Access Approval not enabled for projects with sensitive data", "impact": "Google support personnel can access customer data without explicit customer authorization", "severity": "medium"},
-        {"issue": "Approvers not configured or unreachable", "impact": "Approval requests go unanswered; Google support unable to assist with critical issues", "severity": "medium"},
-        {"issue": "Access Transparency logs not reviewed", "impact": "Google personnel access to customer data not monitored or audited by the customer", "severity": "low"}
+        {
+          "issue": "Access Approval not enabled for projects with sensitive data",
+          "impact": "Google support personnel can access customer data without explicit customer authorization",
+          "severity": "medium"
+        },
+        {
+          "issue": "Approvers not configured or unreachable",
+          "impact": "Approval requests go unanswered; Google support unable to assist with critical issues",
+          "severity": "medium"
+        },
+        {
+          "issue": "Access Transparency logs not reviewed",
+          "impact": "Google personnel access to customer data not monitored or audited by the customer",
+          "severity": "low"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-6(1)", "NIST-800-53-AC-2(4)", "ISO-27001-A.5.15", "ISO-27001-A.5.20", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure Customer Lockbox", "aws-iam": "N/A (AWS support access not customer-approved)", "okta": "N/A (SaaS provider access not customer-approved)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-AC-2(4)",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.5.20",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Customer Lockbox",
+        "aws-iam": "N/A (AWS support access not customer-approved)",
+        "okta": "N/A (SaaS provider access not customer-approved)"
+      }
     },
     {
       "id": "gcp-assured-workloads",
@@ -312,13 +837,39 @@
       "description": "Assured Workloads enforces compliance requirements for regulated workloads on GCP by applying automated guardrails for data residency, personnel access, encryption, and organizational policies. For IAM, Assured Workloads restricts: which personnel can access data (US-only support for FedRAMP, EU-only for GDPR), which regions resources can be deployed in, which encryption keys are used, and which organization policies are enforced. Assured Workloads supports compliance regimes including FedRAMP High, IL4/IL5, CJIS, ITAR, EU Regions with Sovereignty Controls, and Australia Regions. When a folder is designated as an Assured Workload, the compliance controls are automatically applied and enforced, preventing accidental non-compliance through human error.",
       "best_practices": "1. Use Assured Workloads for all projects subject to regulatory compliance requirements. 2. Place regulated projects in dedicated Assured Workload folders, not mixed with unregulated projects. 3. Configure the appropriate compliance regime for each workload folder (FedRAMP, IL4, EU Sovereignty). 4. Monitor Assured Workloads compliance violations in Monitoring Dashboard. 5. Verify that IAM role assignments in Assured Workload folders comply with personnel access restrictions. 6. Use Assured Workloads compliance reports for audit evidence. 7. Test workload deployment in Assured Workload folders before migrating production.",
       "common_misconfigurations": [
-        {"issue": "Regulated workloads deployed outside Assured Workload folders", "impact": "No automated compliance guardrails; relying on manual compliance controls for regulated data", "severity": "high"},
-        {"issue": "Wrong compliance regime selected for the workload", "impact": "Insufficient controls applied; compliance violations possible under the actual regulatory requirement", "severity": "high"},
-        {"issue": "IAM role assignments granting access to non-compliant personnel", "impact": "Personnel without required clearance or nationality accessing regulated data", "severity": "critical"},
-        {"issue": "Compliance monitoring not configured or reviewed", "impact": "Compliance violations not detected until audit, risking regulatory penalties", "severity": "medium"}
+        {
+          "issue": "Regulated workloads deployed outside Assured Workload folders",
+          "impact": "No automated compliance guardrails; relying on manual compliance controls for regulated data",
+          "severity": "high"
+        },
+        {
+          "issue": "Wrong compliance regime selected for the workload",
+          "impact": "Insufficient controls applied; compliance violations possible under the actual regulatory requirement",
+          "severity": "high"
+        },
+        {
+          "issue": "IAM role assignments granting access to non-compliant personnel",
+          "impact": "Personnel without required clearance or nationality accessing regulated data",
+          "severity": "critical"
+        },
+        {
+          "issue": "Compliance monitoring not configured or reviewed",
+          "impact": "Compliance violations not detected until audit, risking regulatory penalties",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-1", "NIST-800-53-AC-6", "ISO-27001-A.5.1", "ISO-27001-A.5.36", "SOC2-CC5.2"],
-      "equivalent_in": {"azure-entra": "Azure Confidential Computing + Azure Policy Compliance", "aws-iam": "Control Tower + GovCloud", "okta": "N/A (cloud-provider specific)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-1",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.5.1",
+        "ISO-27001-A.5.36",
+        "SOC2-CC5.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Confidential Computing + Azure Policy Compliance",
+        "aws-iam": "Control Tower + GovCloud",
+        "okta": "N/A (cloud-provider specific)"
+      }
     },
     {
       "id": "gcp-gke-workload-identity",
@@ -328,13 +879,40 @@
       "description": "GKE Workload Identity binds Kubernetes service accounts to GCP service accounts, enabling pods to authenticate to GCP APIs using the GCP service account identity without managing service account keys. When a pod runs with a Kubernetes service account that is annotated with a GCP service account, the GKE metadata server intercepts credential requests and returns tokens for the associated GCP service account. This eliminates the need to create and distribute service account keys to pods, which is the most common credential management anti-pattern in Kubernetes environments. Each workload can have its own GCP service account with specific IAM roles, implementing least privilege at the pod level. Workload Identity is the recommended approach for GKE workloads to authenticate to GCP services.",
       "best_practices": "1. Enable Workload Identity on all GKE clusters; use it as the exclusive method for pod GCP authentication. 2. Create dedicated GCP service accounts per application workload, not per cluster or namespace. 3. Grant the minimum IAM roles on the GCP service account that the workload needs. 4. Bind Kubernetes service accounts to GCP service accounts using IAM policy bindings (roles/iam.workloadIdentityUser). 5. Do not use node-level service accounts (they apply to all pods on the node). 6. Verify Workload Identity configuration using gcloud auth print-identity-token from within the pod. 7. Monitor GCP service account usage via Cloud Audit Logs for anomalous access patterns.",
       "common_misconfigurations": [
-        {"issue": "Node-level service account used instead of Workload Identity", "impact": "All pods on the node share the same GCP identity and permissions", "severity": "critical"},
-        {"issue": "Service account keys injected into pods as Kubernetes secrets", "impact": "Long-lived credentials in Kubernetes secrets; no automatic rotation; keys may leak via etcd backup", "severity": "critical"},
-        {"issue": "GCP service account shared across multiple unrelated workloads", "impact": "Compromise of any workload grants access to all GCP resources assigned to the shared service account", "severity": "high"},
-        {"issue": "GCP service account has overly broad IAM roles (Editor, Owner)", "impact": "Compromised pod gains broad project-level access through the overprivileged service account", "severity": "high"}
+        {
+          "issue": "Node-level service account used instead of Workload Identity",
+          "impact": "All pods on the node share the same GCP identity and permissions",
+          "severity": "critical"
+        },
+        {
+          "issue": "Service account keys injected into pods as Kubernetes secrets",
+          "impact": "Long-lived credentials in Kubernetes secrets; no automatic rotation; keys may leak via etcd backup",
+          "severity": "critical"
+        },
+        {
+          "issue": "GCP service account shared across multiple unrelated workloads",
+          "impact": "Compromise of any workload grants access to all GCP resources assigned to the shared service account",
+          "severity": "high"
+        },
+        {
+          "issue": "GCP service account has overly broad IAM roles (Editor, Owner)",
+          "impact": "Compromised pod gains broad project-level access through the overprivileged service account",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-6", "NIST-800-53-AC-6(1)", "NIST-800-53-IA-5", "ISO-27001-A.8.9", "ISO-27001-A.5.15", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure AD Workload Identity for AKS", "aws-iam": "EKS IRSA / EKS Pod Identity", "okta": "N/A (cloud-provider specific)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-6(1)",
+        "NIST-800-53-IA-5",
+        "ISO-27001-A.8.9",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure AD Workload Identity for AKS",
+        "aws-iam": "EKS IRSA / EKS Pod Identity",
+        "okta": "N/A (cloud-provider specific)"
+      }
     },
     {
       "id": "gcp-cloud-identity-groups",
@@ -344,13 +922,40 @@
       "description": "Groups in GCP IAM serve as the primary mechanism for scalable authorization. Instead of granting IAM roles to individual user email addresses, roles are bound to groups, and users receive permissions through group membership. Google Groups (from Google Workspace) and Security Groups (from Cloud Identity) can both be used as principals in IAM policy bindings. Dynamic groups automatically calculate membership based on user attributes (department, location, job title), eliminating manual group management. Group-based authorization is fundamental to GCP best practices because it enables: scalable permission management (add user to group instead of modifying multiple IAM bindings), consistent access reviews (review group membership rather than per-resource bindings), and attribute-driven access (dynamic groups update automatically when user attributes change).",
       "best_practices": "1. Use groups as the primary principal type in IAM bindings; avoid individual user email bindings. 2. Create security groups in Cloud Identity specifically for GCP access control (separate from collaboration groups). 3. Use dynamic groups based on HR attributes for automatic membership management. 4. Implement group naming conventions that indicate purpose (gcp-project-admin-{project}, gcp-viewer-{folder}). 5. Restrict who can add members to groups used for sensitive IAM bindings. 6. Review group memberships quarterly as part of access governance. 7. Use nested groups sparingly; keep group hierarchy simple for audit clarity.",
       "common_misconfigurations": [
-        {"issue": "IAM bindings to individual user emails instead of groups", "impact": "Each user's access requires individual IAM binding changes; does not scale beyond small teams", "severity": "medium"},
-        {"issue": "Collaboration groups (Google Groups) used for sensitive IAM bindings", "impact": "Group owners can add members to IAM-bound groups, potentially escalating others' privileges", "severity": "high"},
-        {"issue": "No group membership reviews for IAM-bound groups", "impact": "Stale members retain access through group membership after role changes or departures", "severity": "medium"},
-        {"issue": "Dynamic group rules not configured; manual membership management", "impact": "Group membership does not automatically reflect organizational changes", "severity": "medium"}
+        {
+          "issue": "IAM bindings to individual user emails instead of groups",
+          "impact": "Each user's access requires individual IAM binding changes; does not scale beyond small teams",
+          "severity": "medium"
+        },
+        {
+          "issue": "Collaboration groups (Google Groups) used for sensitive IAM bindings",
+          "impact": "Group owners can add members to IAM-bound groups, potentially escalating others' privileges",
+          "severity": "high"
+        },
+        {
+          "issue": "No group membership reviews for IAM-bound groups",
+          "impact": "Stale members retain access through group membership after role changes or departures",
+          "severity": "medium"
+        },
+        {
+          "issue": "Dynamic group rules not configured; manual membership management",
+          "impact": "Group membership does not automatically reflect organizational changes",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-2", "NIST-800-53-AC-3", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "SOC2-CC6.1", "SOC2-CC6.2"],
-      "equivalent_in": {"azure-entra": "Entra ID Security Groups + Role Assignments", "aws-iam": "IAM Groups + IAM Identity Center Groups", "okta": "Okta Groups + Group Rules"}
+      "compliance_controls": [
+        "NIST-800-53-AC-2",
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.5.15",
+        "SOC2-CC6.1",
+        "SOC2-CC6.2"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Security Groups + Role Assignments",
+        "aws-iam": "IAM Groups + IAM Identity Center Groups",
+        "okta": "Okta Groups + Group Rules"
+      }
     },
     {
       "id": "gcp-certificate-authority-service",
@@ -360,13 +965,40 @@
       "description": "Google Cloud Certificate Authority Service (CAS) provides a managed private certificate authority for issuing X.509 certificates for workload identity, mTLS, and infrastructure authentication. CAS supports creating CA hierarchies (root and subordinate CAs), issuing certificates via API or certificate templates, automatic certificate lifecycle management (renewal, revocation), and integration with GKE mesh (Istio/Anthos Service Mesh) for automatic mTLS certificate provisioning to workloads. For IAM, CAS enables certificate-based authentication for service-to-service communication, workload identity federation with X.509 certificates, and infrastructure authentication (SSH certificates, VPN certificates). CAS eliminates the operational burden of managing private PKI infrastructure while providing enterprise-grade certificate management.",
       "best_practices": "1. Use CAS for all internal certificate needs; do not operate self-managed OpenSSL CAs. 2. Create separate CA pools for different certificate use cases (mTLS, workload identity, infrastructure). 3. Configure certificate templates with appropriate key usage, validity periods, and SANs. 4. Enable certificate revocation (CRL) and publish CRL distribution points for consuming services. 5. Integrate CAS with Anthos Service Mesh for automatic mTLS certificate provisioning. 6. Monitor certificate issuance and expiration via Cloud Monitoring alerts. 7. Use IAM permissions to restrict who can request certificates from each CA pool.",
       "common_misconfigurations": [
-        {"issue": "Self-signed or manually managed CAs used instead of CAS", "impact": "No centralized certificate management, revocation, or audit trail for issued certificates", "severity": "medium"},
-        {"issue": "Certificates issued with overly long validity periods (years instead of months)", "impact": "Long-lived certificates remain valid for extended periods even if the workload is decommissioned", "severity": "medium"},
-        {"issue": "No CRL or OCSP configured for certificate revocation checking", "impact": "Revoked certificates continue to authenticate successfully", "severity": "high"},
-        {"issue": "CA pool IAM permissions too broad; any service account can request certificates", "impact": "Unauthorized workloads can obtain certificates from the CA, establishing trusted identity", "severity": "high"}
+        {
+          "issue": "Self-signed or manually managed CAs used instead of CAS",
+          "impact": "No centralized certificate management, revocation, or audit trail for issued certificates",
+          "severity": "medium"
+        },
+        {
+          "issue": "Certificates issued with overly long validity periods (years instead of months)",
+          "impact": "Long-lived certificates remain valid for extended periods even if the workload is decommissioned",
+          "severity": "medium"
+        },
+        {
+          "issue": "No CRL or OCSP configured for certificate revocation checking",
+          "impact": "Revoked certificates continue to authenticate successfully",
+          "severity": "high"
+        },
+        {
+          "issue": "CA pool IAM permissions too broad; any service account can request certificates",
+          "impact": "Unauthorized workloads can obtain certificates from the CA, establishing trusted identity",
+          "severity": "high"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-SC-12", "NIST-800-53-IA-5", "NIST-800-63B-AUTH-SF-CRYPTO", "ISO-27001-A.5.17", "ISO-27001-A.8.24", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Azure Key Vault Certificates + DigiCert/GlobalSign CA Integration", "aws-iam": "ACM Private CA", "cyberark": "Certificate Manager"}
+      "compliance_controls": [
+        "NIST-800-53-SC-12",
+        "NIST-800-53-IA-5",
+        "NIST-800-63B-AUTH-SF-CRYPTO",
+        "ISO-27001-A.5.17",
+        "ISO-27001-A.8.24",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Azure Key Vault Certificates + DigiCert/GlobalSign CA Integration",
+        "aws-iam": "ACM Private CA",
+        "cyberark": "Certificate Manager"
+      }
     },
     {
       "id": "gcp-recaptcha-enterprise",
@@ -376,13 +1008,40 @@
       "description": "reCAPTCHA Enterprise protects authentication endpoints from automated attacks including credential stuffing, bot-driven account creation, scraping, and abuse. It uses adaptive risk analysis based on signals from user behavior, device fingerprinting, browser characteristics, and historical patterns to generate a risk score (0.0 to 1.0) for each interaction. Unlike consumer reCAPTCHA, Enterprise provides: account defender (tracks user activity patterns to detect account takeover), password leak detection (checks passwords against Google's breach database during authentication), and multi-factor authentication integration. reCAPTCHA Enterprise is deployed on login pages, registration pages, and password reset pages, with scores consumed by the application to determine whether to allow, challenge, or block the interaction.",
       "best_practices": "1. Deploy reCAPTCHA Enterprise on all authentication endpoints (login, registration, password reset). 2. Configure score thresholds appropriate to the application risk (0.7+ allow, 0.3-0.7 challenge, <0.3 block). 3. Enable account defender for returning user analysis and session-level risk assessment. 4. Integrate password leak detection to alert users with compromised passwords. 5. Use reCAPTCHA in invisible mode for low-friction user experience on most interactions. 6. Monitor reCAPTCHA assessment scores and event volumes for attack detection. 7. Combine with Cloud Armor WAF for network-level rate limiting alongside application-level bot protection.",
       "common_misconfigurations": [
-        {"issue": "reCAPTCHA not deployed on authentication endpoints", "impact": "Login and registration pages unprotected from automated credential stuffing and bot attacks", "severity": "high"},
-        {"issue": "Score thresholds too permissive (blocking only score 0.0)", "impact": "Most automated attacks receive scores above 0.0 and pass unblocked", "severity": "medium"},
-        {"issue": "reCAPTCHA scores not used for access decisions; deployed but not enforced", "impact": "Scores generated but application does not act on them; no protection despite deployment", "severity": "high"},
-        {"issue": "Password leak detection not enabled", "impact": "Users authenticate with known-compromised passwords without warning or forced change", "severity": "medium"}
+        {
+          "issue": "reCAPTCHA not deployed on authentication endpoints",
+          "impact": "Login and registration pages unprotected from automated credential stuffing and bot attacks",
+          "severity": "high"
+        },
+        {
+          "issue": "Score thresholds too permissive (blocking only score 0.0)",
+          "impact": "Most automated attacks receive scores above 0.0 and pass unblocked",
+          "severity": "medium"
+        },
+        {
+          "issue": "reCAPTCHA scores not used for access decisions; deployed but not enforced",
+          "impact": "Scores generated but application does not act on them; no protection despite deployment",
+          "severity": "high"
+        },
+        {
+          "issue": "Password leak detection not enabled",
+          "impact": "Users authenticate with known-compromised passwords without warning or forced change",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-53-AC-7", "NIST-800-53-AC-7(2)", "NIST-800-63B-THROTTLE", "ISO-27001-A.8.5", "SOC2-CC6.1"],
-      "equivalent_in": {"azure-entra": "Entra ID Smart Lockout + Identity Protection", "aws-iam": "WAF Bot Control + Cognito Advanced Security", "okta": "ThreatInsight", "auth0": "Attack Protection (Bot Detection)"}
+      "compliance_controls": [
+        "NIST-800-53-AC-7",
+        "NIST-800-53-AC-7(2)",
+        "NIST-800-63B-THROTTLE",
+        "ISO-27001-A.8.5",
+        "SOC2-CC6.1"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Entra ID Smart Lockout + Identity Protection",
+        "aws-iam": "WAF Bot Control + Cognito Advanced Security",
+        "okta": "ThreatInsight",
+        "auth0": "Attack Protection (Bot Detection)"
+      }
     },
     {
       "id": "gcp-access-context-manager-device",
@@ -392,13 +1051,40 @@
       "description": "Access Context Manager Device Policies define device security requirements that must be met for access to GCP resources and Google Workspace applications. Device policies evaluate signals from Endpoint Verification (installed on the device): OS version, disk encryption status, screen lock enabled, management status (company-owned, personal BYOD), password status, and approved applications. Device policies are referenced in access levels which are then consumed by Identity-Aware Proxy, VPC Service Controls, and Google Workspace context-aware access. Multiple device policies can be defined for different access scenarios: a strict policy for accessing production data (company-owned, encrypted, latest OS) and a relaxed policy for general access (any device with screen lock and encryption). This enables risk-proportionate device requirements across the organization.",
       "best_practices": "1. Define device policies for at least two tiers: managed corporate devices and BYOD with minimum security. 2. Require disk encryption in all device policies for data-at-rest protection. 3. Require screen lock for all device policies to prevent unauthorized physical access. 4. Set minimum OS version requirements and update them when new versions are released. 5. Deploy Endpoint Verification on all managed devices for device signal collection. 6. Combine device policies with IP-based conditions for defense-in-depth access levels. 7. Test device policy changes with a pilot group before organization-wide enforcement.",
       "common_misconfigurations": [
-        {"issue": "No device policies defined; access levels based solely on network location", "impact": "Any device on the corporate network accesses resources regardless of security posture", "severity": "high"},
-        {"issue": "Device policy does not require disk encryption", "impact": "Data on lost or stolen devices accessible without decryption", "severity": "medium"},
-        {"issue": "Endpoint Verification not deployed; no device signal data available", "impact": "Device policies cannot evaluate because no device posture information is collected", "severity": "high"},
-        {"issue": "Minimum OS version not updated; outdated versions still accepted", "impact": "Devices running unpatched, vulnerable OS versions pass device policy checks", "severity": "medium"}
+        {
+          "issue": "No device policies defined; access levels based solely on network location",
+          "impact": "Any device on the corporate network accesses resources regardless of security posture",
+          "severity": "high"
+        },
+        {
+          "issue": "Device policy does not require disk encryption",
+          "impact": "Data on lost or stolen devices accessible without decryption",
+          "severity": "medium"
+        },
+        {
+          "issue": "Endpoint Verification not deployed; no device signal data available",
+          "impact": "Device policies cannot evaluate because no device posture information is collected",
+          "severity": "high"
+        },
+        {
+          "issue": "Minimum OS version not updated; outdated versions still accepted",
+          "impact": "Devices running unpatched, vulnerable OS versions pass device policy checks",
+          "severity": "medium"
+        }
       ],
-      "compliance_controls": ["NIST-800-207-TENET-3", "NIST-800-53-AC-19", "CISA-ZTMM-DEVICE-ID", "ISO-27001-A.8.1", "SOC2-CC6.1", "SOC2-CC6.8"],
-      "equivalent_in": {"azure-entra": "Conditional Access Device Compliance Policies (Intune)", "aws-iam": "AWS SSO with Device Trust (Jamf/CrowdStrike)", "okta": "Okta Device Assurance Policies"}
+      "compliance_controls": [
+        "NIST-800-207-TENET-3",
+        "NIST-800-53-AC-19",
+        "CISA-ZTMM-DEVICE-ID",
+        "ISO-27001-A.8.1",
+        "SOC2-CC6.1",
+        "SOC2-CC6.8"
+      ],
+      "equivalent_in": {
+        "azure-entra": "Conditional Access Device Compliance Policies (Intune)",
+        "aws-iam": "AWS SSO with Device Trust (Jamf/CrowdStrike)",
+        "okta": "Okta Device Assurance Policies"
+      }
     }
   ]
 }

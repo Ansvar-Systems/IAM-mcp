@@ -10,7 +10,12 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-3", "NIST-800-53-AC-6", "ISO-27001-A.5.15", "ISO-27001-A.8.3", "CIS-6.1"]
+      "cross_references": [
+        "NIST-800-53-AC-3",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.8.3"
+      ]
     },
     {
       "id": "SOC2-CC6.2",
@@ -22,7 +27,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-2", "ISO-27001-A.5.16", "ISO-27001-A.5.18", "CIS-5.1", "CIS-6.1", "CIS-6.2"]
+      "cross_references": [
+        "NIST-800-53-AC-2",
+        "ISO-27001-A.5.16",
+        "ISO-27001-A.5.18"
+      ]
     },
     {
       "id": "SOC2-CC6.3",
@@ -34,7 +43,13 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-5", "NIST-800-53-AC-6", "NIST-800-53-AC-3(7)", "ISO-27001-A.5.15", "ISO-27001-A.8.2", "CIS-6.8"]
+      "cross_references": [
+        "NIST-800-53-AC-5",
+        "NIST-800-53-AC-6",
+        "NIST-800-53-AC-3(7)",
+        "ISO-27001-A.5.15",
+        "ISO-27001-A.8.2"
+      ]
     },
     {
       "id": "SOC2-CC6.4",
@@ -46,7 +61,10 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-3", "ISO-27001-A.7.2"]
+      "cross_references": [
+        "NIST-800-53-AC-3",
+        "ISO-27001-A.7.2"
+      ]
     },
     {
       "id": "SOC2-CC6.5",
@@ -58,7 +76,10 @@
       "assurance_level": null,
       "zero_trust_pillar": "data",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-3", "ISO-27001-A.8.10"]
+      "cross_references": [
+        "NIST-800-53-AC-3",
+        "ISO-27001-A.8.10"
+      ]
     },
     {
       "id": "SOC2-CC6.6",
@@ -70,7 +91,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "network",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-17", "NIST-800-53-AC-17(2)", "ISO-27001-A.8.20", "CIS-6.3", "CIS-6.4"]
+      "cross_references": [
+        "NIST-800-53-AC-17",
+        "NIST-800-53-AC-17(2)",
+        "ISO-27001-A.8.20"
+      ]
     },
     {
       "id": "SOC2-CC6.7",
@@ -82,7 +107,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "data",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-4", "NIST-800-63C-ASSERTION-PROTECTION", "ISO-27001-A.5.14"]
+      "cross_references": [
+        "NIST-800-53-AC-4",
+        "NIST-800-63C-ASSERTION-PROTECTION",
+        "ISO-27001-A.5.14"
+      ]
     },
     {
       "id": "SOC2-CC6.8",
@@ -94,7 +123,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "devices",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-19", "ISO-27001-A.8.1", "CISA-ZTMM-DEVICE-ID"]
+      "cross_references": [
+        "NIST-800-53-AC-19",
+        "ISO-27001-A.8.1",
+        "CISA-ZTMM-DEVICE-ID"
+      ]
     },
     {
       "id": "SOC2-CC5.2",
@@ -106,7 +139,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "governance",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-1", "NIST-800-63-XAAL-SELECTION", "ISO-27001-A.5.15"]
+      "cross_references": [
+        "NIST-800-53-AC-1",
+        "NIST-800-63-XAAL-SELECTION",
+        "ISO-27001-A.5.15"
+      ]
     },
     {
       "id": "SOC2-CC7.2",
@@ -118,7 +155,12 @@
       "assurance_level": null,
       "zero_trust_pillar": "visibility",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-2(4)", "NIST-800-53-AC-2(12)", "ISO-27001-A.8.15", "ISO-27001-A.8.16", "CIS-5.5"]
+      "cross_references": [
+        "NIST-800-53-AC-2(4)",
+        "NIST-800-53-AC-2(12)",
+        "ISO-27001-A.8.15",
+        "ISO-27001-A.8.16"
+      ]
     },
     {
       "id": "SOC2-CC8.1",
@@ -130,7 +172,10 @@
       "assurance_level": null,
       "zero_trust_pillar": "governance",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-3", "ISO-27001-A.8.9", "CIS-6.1"]
+      "cross_references": [
+        "NIST-800-53-AC-3",
+        "ISO-27001-A.8.9"
+      ]
     },
     {
       "id": "SOC2-CC9.2",
@@ -142,7 +187,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "identity",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-20", "ISO-27001-A.5.19", "ISO-27001-A.5.20"]
+      "cross_references": [
+        "NIST-800-53-AC-20",
+        "ISO-27001-A.5.19",
+        "ISO-27001-A.5.20"
+      ]
     },
     {
       "id": "SOC2-CC1.4",
@@ -154,7 +203,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "governance",
       "maturity_level": "traditional",
-      "cross_references": ["NIST-800-53-AC-1", "ISO-27001-A.5.1", "CISA-ZTMM-GOVERNANCE"]
+      "cross_references": [
+        "NIST-800-53-AC-1",
+        "ISO-27001-A.5.1",
+        "CISA-ZTMM-GOVERNANCE"
+      ]
     },
     {
       "id": "SOC2-CC3.2",
@@ -166,7 +219,11 @@
       "assurance_level": null,
       "zero_trust_pillar": "governance",
       "maturity_level": "initial",
-      "cross_references": ["NIST-800-53-AC-5", "NIST-800-53-AC-6", "ISO-27001-A.5.3"]
+      "cross_references": [
+        "NIST-800-53-AC-5",
+        "NIST-800-53-AC-6",
+        "ISO-27001-A.5.3"
+      ]
     }
   ]
 }
