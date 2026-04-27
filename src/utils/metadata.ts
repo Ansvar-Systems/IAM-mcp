@@ -8,6 +8,7 @@ export interface ResponseMetadata {
 export interface ToolResponse<T> {
   results: T;
   _metadata: ResponseMetadata;
+  _citations?: unknown;
 }
 
 export function generateResponseMetadata(builtAt?: string): ResponseMetadata {
